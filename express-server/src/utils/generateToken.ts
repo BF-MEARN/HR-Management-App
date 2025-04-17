@@ -21,7 +21,10 @@ const generateToken = (user: User) => {
             isActive: user.isActive,
             isCreated: user.isCreated,
         },
-        process.env.JWT_SECRET!
+        process.env.JWT_SECRET!,
+        {
+            expiresIn: '3h'
+        }
     )
 
     return token;
