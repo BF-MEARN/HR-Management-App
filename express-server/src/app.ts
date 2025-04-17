@@ -7,7 +7,7 @@ app.use(express.json());
 app.use(cors())
 app.use(express.urlencoded({ extended: true }));
 
-// app.all('*', (_req, res) => {
+// app.all('*', (_req: Request, res) => {
 //   res.status(404).json({ message: 'Not Found' });
 // });
 
