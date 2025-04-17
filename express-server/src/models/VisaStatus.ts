@@ -60,4 +60,4 @@ const VisaStatusSchema = new Schema(
 
 const VisaStatus = mongoose.model("VisaStatus", VisaStatusSchema);
 
-module.exports = VisaStatus;
+export default VisaStatus;

@@ -29,4 +29,4 @@ const HousingSchema = new Schema(
 
 const Housing = mongoose.model("Housing", HousingSchema);
 
-module.exports = Housing;
+export default Housing;

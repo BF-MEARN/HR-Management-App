@@ -30,4 +30,4 @@ const FacilityReportSchema = new Schema(
 
 const FacilityReport = mongoose.model("FacilityReport", FacilityReportSchema);
 
-module.exports = FacilityReport;
+export default FacilityReport;

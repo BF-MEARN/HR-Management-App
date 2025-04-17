@@ -17,4 +17,4 @@ const RegistrationToken = mongoose.model(
   RegistrationTokenSchema
 );
 
-module.exports = RegistrationToken;
+export default RegistrationToken;
