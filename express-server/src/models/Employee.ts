@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const Schema = mongoose.Schema;
 
@@ -54,9 +54,6 @@ const EmployeeSchema = new Schema({
   onboardingStatus: { type: String, enum: ['Not Started', 'Pending', 'Approved', 'Rejected'] },
   onboardingFeedback: { type: String }
 })
-
-
-
 
 const Employee = mongoose.model('Employee', EmployeeSchema);
 
