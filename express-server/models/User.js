@@ -11,9 +11,10 @@ const UserSchema = new Schema(
 			ref: "Employee",
 			unique: true,
 			index: true,
+      sparse: true,
 		},
 		username: { type: String, required: true, unique: true },
-		password: { type: String },
+		password: { type: String, required: true },
 		email: {
 			type: String,
 			required: true,
