@@ -3,33 +3,33 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema(
-  {
-    // Changed employeeInfo to employeeId
-    // Changed ref to Employee
-    employeeId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Employee",
-      unique: true,
-      index: true,
-    },
-    username: { type: String, required: true, unique: true },
-    password: { type: String },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-      match: [/.+@.+\..+/, "Please fill a valid email address"],
-    },
-    role: { type: String, enum: ["employee", "hr"] },
-    token: { type: String }, // optional, for registration token tracking
-    isActive: { type: Boolean, default: true },
-    // Changed isCreated to isOnBoarding
-    isOnboardingComplete: { type: Boolean, default: false },
-  },
-  { timestamps: true }
+	{
+		// Changed employeeInfo to employeeId
+		// Changed ref to Employee
+		employeeId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "Employee",
+			unique: true,
+			index: true,
+		},
+		username: { type: String, required: true, unique: true },
+		password: { type: String },
+		email: {
+			type: String,
+			required: true,
+			unique: true,
+			lowercase: true,
+			match: [/.+@.+\..+/, "Please fill a valid email address"],
+		},
+		role: { type: String, enum: ["employee", "hr"] },
+		token: { type: String }, // optional, for registration token tracking
+		isActive: { type: Boolean, default: true },
+		// Changed isCreated to isOnBoarding
+		isOnboardingComplete: { type: Boolean, default: false },
+	},
+	{ timestamps: true }
 );
 
 const User = mongoose.model("User", UserSchema);
 
-module.exports = User;
+export default User;
