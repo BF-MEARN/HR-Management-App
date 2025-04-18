@@ -48,11 +48,12 @@ const EmployeeSchema = new Schema(
     },
     emergencyContacts: [
       {
-        firstName: { type: String },
-        lastName: { type: String },
+        firstName: { type: String, required: true },
+        lastName: { type: String, required: true },
         middleName: { type: String },
         phone: {
           type: String,
+          required: true,
           match: [
             /^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/,
             "Please fill a valid phone number",
@@ -61,9 +62,10 @@ const EmployeeSchema = new Schema(
         email: {
           type: String,
           lowercase: true,
+          required: true,
           match: [/.+@.+\..+/, "Please fill a valid email address"],
         },
-        relationship: { type: String },
+        relationship: { type: String, required: true },
       },
     ],
     contactInfo: {
@@ -84,7 +86,7 @@ const EmployeeSchema = new Schema(
       },
     },
     address: {
-      building: { type: String, required: true },
+      building: { type: String },
       street: { type: String, required: true },
       city: { type: String, required: true },
       state: { type: String, required: true },
