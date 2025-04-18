@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
 import validator from 'validator';
-import { Request, Response, NextFunction } from 'express';
 
-export const userAuth = async (req: Request, res: Response, next: NextFunction) => {
+
+export const userAuth = async (req, res, next) => {
     const token = req.cookies.authToken;
     if (!token) {
         return res.status(401).json({ message: 'Unauthorized (No Token)' });
@@ -13,7 +13,7 @@ export const userAuth = async (req: Request, res: Response, next: NextFunction) 
         if (typeof decoded !== 'object' || !decoded.id || !validator.isMongoId(decoded.id)) {
             return res.status(401).json({ message: 'Unauthorized (Invalid Token)' });
         }
-    } catch (error: unknown) {
+    } catch (error) {
         return res.status(401).json(error);
     }
 

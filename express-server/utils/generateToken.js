@@ -1,16 +1,16 @@
 import jwt from 'jsonwebtoken';
 
-interface User {
-    _id: string,
-    username: string,
-    password: string,
-    email: string,
-    role: string,
-    isActive: boolean,
-    isCreated: boolean,
-}
+// interface User {
+//     _id: string,
+//     username: string,
+//     password: string,
+//     email: string,
+//     role: string,
+//     isActive: boolean,
+//     isCreated: boolean,
+// }
 
-const generateToken = (user: User) => {
+const generateToken = (user) => {
     const token = jwt.sign(
         {
             id: user._id,
