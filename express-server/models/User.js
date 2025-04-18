@@ -22,7 +22,7 @@ const UserSchema = new Schema(
 			match: [/.+@.+\..+/, "Please fill a valid email address"],
 		},
 		role: { type: String, enum: ["employee", "hr"] },
-		token: { type: String }, // optional, for registration token tracking
+		token: { type: String },
 		isActive: { type: Boolean, default: true },
 		// Changed isCreated to isOnBoarding
 		isOnboardingComplete: { type: Boolean, default: false },
