@@ -3,8 +3,6 @@ import tsPlugin from '@typescript-eslint/eslint-plugin';
 import parser from '@typescript-eslint/parser';
 import prettier from 'eslint-config-prettier';
 import security from 'eslint-plugin-security';
-import prettier from 'eslint-config-prettier';
-
 
 export default [
   js.configs.recommended,
