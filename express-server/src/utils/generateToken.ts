@@ -1,33 +1,33 @@
 import jwt from 'jsonwebtoken';
 
 interface User {
-    _id: string,
-    username: string,
-    password: string,
-    email: string,
-    role: string,
-    isActive: boolean,
-    isCreated: boolean,
+  _id: string;
+  username: string;
+  password: string;
+  email: string;
+  role: string;
+  isActive: boolean;
+  isCreated: boolean;
 }
 
 const generateToken = (user: User) => {
-    const token = jwt.sign(
-        {
-            id: user._id,
-            username: user.username,
-            password: user.password,
-            email: user.email,
-            role: user.role,
-            isActive: user.isActive,
-            isCreated: user.isCreated,
-        },
-        process.env.JWT_SECRET!,
-        {
-            expiresIn: '3h'
-        }
-    )
+  const token = jwt.sign(
+    {
+      id: user._id,
+      username: user.username,
+      password: user.password,
+      email: user.email,
+      role: user.role,
+      isActive: user.isActive,
+      isCreated: user.isCreated,
+    },
+    process.env.JWT_SECRET!,
+    {
+      expiresIn: '3h',
+    }
+  );
 
-    return token;
-}
+  return token;
+};
 
 export default generateToken;

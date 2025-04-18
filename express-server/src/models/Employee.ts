@@ -1,10 +1,10 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const Schema = mongoose.Schema;
 
 const EmployeeSchema = new Schema(
   {
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     middleName: { type: String },
@@ -13,16 +13,16 @@ const EmployeeSchema = new Schema(
     ssn: {
       type: String,
       required: true,
-      match: [/^\d{3}-\d{2}-\d{4}$/, "Please use ###-##-#### format for SSN"],
+      match: [/^\d{3}-\d{2}-\d{4}$/, 'Please use ###-##-#### format for SSN'],
     },
     dob: { type: Date, required: true },
     gender: {
       type: String,
-      enum: ["male", "female", "prefer_not_to_say"],
+      enum: ['male', 'female', 'prefer_not_to_say'],
       required: true,
     },
     isCitizenOrPR: { type: Boolean, required: true },
-    visaInfo: { type: mongoose.Schema.Types.ObjectId, ref: "VisaStatus" },
+    visaInfo: { type: mongoose.Schema.Types.ObjectId, ref: 'VisaStatus' },
     driverLicense: {
       number: { type: String },
       expirationDate: { type: Date },
@@ -36,13 +36,13 @@ const EmployeeSchema = new Schema(
         type: String,
         match: [
           /^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/,
-          "Please fill a valid phone number",
+          'Please fill a valid phone number',
         ],
       },
       email: {
         type: String,
         lowercase: true,
-        match: [/.+@.+\..+/, "Please fill a valid email address"],
+        match: [/.+@.+\..+/, 'Please fill a valid email address'],
       },
       relationship: { type: String },
     },
@@ -55,13 +55,13 @@ const EmployeeSchema = new Schema(
           type: String,
           match: [
             /^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/,
-            "Please fill a valid phone number",
+            'Please fill a valid phone number',
           ],
         },
         email: {
           type: String,
           lowercase: true,
-          match: [/.+@.+\..+/, "Please fill a valid email address"],
+          match: [/.+@.+\..+/, 'Please fill a valid email address'],
         },
         relationship: { type: String },
       },
@@ -72,14 +72,14 @@ const EmployeeSchema = new Schema(
         required: true,
         match: [
           /^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/,
-          "Please fill a valid phone number",
+          'Please fill a valid phone number',
         ],
       },
       workPhone: {
         type: String,
         match: [
           /^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/,
-          "Please fill a valid phone number",
+          'Please fill a valid phone number',
         ],
       },
     },
@@ -97,20 +97,20 @@ const EmployeeSchema = new Schema(
     },
     onboardingStatus: {
       type: String,
-      enum: ["Not Started", "Pending", "Approved", "Rejected"],
-      default: "Not Started",
+      enum: ['Not Started', 'Pending', 'Approved', 'Rejected'],
+      default: 'Not Started',
     },
     onboardingFeedback: { type: String },
     // Add houseId
     houseId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Housing",
+      ref: 'Housing',
       index: true,
     },
   },
   { timestamps: true }
 );
 
-const Employee = mongoose.model("Employee", EmployeeSchema);
+const Employee = mongoose.model('Employee', EmployeeSchema);
 
 export default Employee;
