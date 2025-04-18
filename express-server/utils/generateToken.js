@@ -1,16 +1,10 @@
 import jwt from 'jsonwebtoken';
 
-// interface User {
-//     _id: string,
-//     username: string,
-//     password: string,
-//     email: string,
-//     role: string,
-//     isActive: boolean,
-//     isCreated: boolean,
-// }
+export const generateToken = (userId) => {
+  return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: '3h' })
+}
 
-const generateToken = (user) => {
+export const generateTokenWithFullUser = (user) => {
     const token = jwt.sign(
         {
             id: user._id,
@@ -21,7 +15,7 @@ const generateToken = (user) => {
             isActive: user.isActive,
             isCreated: user.isCreated,
         },
-        process.env.JWT_SECRET!,
+        process.env.JWT_SECRET,
         {
             expiresIn: '3h'
         }
@@ -29,5 +23,3 @@ const generateToken = (user) => {
 
     return token;
 }
-
-export default generateToken;
