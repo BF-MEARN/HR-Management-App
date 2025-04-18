@@ -1,24 +1,24 @@
 import mongoose from "mongoose";
 import { faker } from "@faker-js/faker";
-import bcrypt from "bcrypt";
-import db from "../config/connection";
+import bcrypt from "bcryptjs";
+import db from "../config/connection.js";
 
-import Employee from "../models/Employee";
-import FacilityReport from "../models/FacilityReport";
-import Housing from "../models/Housing";
-import RegistrationToken from "../models/RegistrationToken";
-import User from "../models/User";
-import VisaStatus from "../models/VisaStatus";
+import Employee from "../models/Employee.js";
+import FacilityReport from "../models/FacilityReport.js";
+import Housing from "../models/Housing.js";
+import RegistrationToken from "../models/RegistrationToken.js";
+import User from "../models/User.js";
+import VisaStatus from "../models/VisaStatus.js";
 
-const SALT_ROUNDS: number = 10;
-const amountHousing: number = 5;
-const amountUserEmployee: number = 20;
-const amountFacilityReports: number = 15;
-const amountRegTokens: number = 10;
+const SALT_ROUNDS = 10;
+const amountHousing = 5;
+const amountUserEmployee = 20;
+const amountFacilityReports = 15;
+const amountRegTokens = 10;
 
 const seedDatabase = async () => {
   console.log("Connecting to database...");
-  await new Promise<void>((res, rej) => {
+  await new Promise((res, rej) => {
     if (db.readyState === 1) {
       console.log("Already connected.");
       res();
@@ -83,10 +83,10 @@ const seedDatabase = async () => {
     const createdUsers = [];
     const createdVisaStatuses = [];
     const employeeUpdates = [];
-    const housingResidentMap: { [key: string]: mongoose.Types.ObjectId[] } = {};
+    const housingResidentMap = {};
     createdHousing.forEach((h) => (housingResidentMap[h._id.toString()] = []));
 
-    const hrPassword = await bcrypt.hash("password", SALT_ROUNDS);
+    const hrPassword = await bcrypt.hashSync("password", SALT_ROUNDS);
     const hrUser = new User({
       username: "hradmin",
       password: hrPassword,
@@ -109,7 +109,7 @@ const seedDatabase = async () => {
       const username = faker.internet
         .username({ firstName, lastName })
         .toLowerCase();
-      const password = await bcrypt.hash("password", SALT_ROUNDS);
+      const password = await bcrypt.hashSync("password", SALT_ROUNDS);
       const isCitizenOrPR = faker.datatype.boolean(0.3);
       const assignedHouse = faker.helpers.arrayElement(createdHousing);
 
@@ -136,23 +136,23 @@ const seedDatabase = async () => {
         isCitizenOrPR,
         driverLicense: faker.datatype.boolean(0.7)
           ? {
-              number: faker.string.alphanumeric(10).toUpperCase(),
-              expirationDate: faker.date.future({ years: 5 }),
-              file: faker.system.filePath(),
-            }
+            number: faker.string.alphanumeric(10).toUpperCase(),
+            expirationDate: faker.date.future({ years: 5 }),
+            file: faker.system.filePath(),
+          }
           : undefined,
         reference: faker.datatype.boolean(0.4)
           ? {
-              firstName: faker.person.firstName(),
-              lastName: faker.person.lastName(),
-              phone: faker.phone.number(),
-              email: faker.internet.email(),
-              relationship: faker.helpers.arrayElement([
-                "Former Manager",
-                "Professor",
-                "Colleague",
-              ]),
-            }
+            firstName: faker.person.firstName(),
+            lastName: faker.person.lastName(),
+            phone: faker.phone.number(),
+            email: faker.internet.email(),
+            relationship: faker.helpers.arrayElement([
+              "Former Manager",
+              "Professor",
+              "Colleague",
+            ]),
+          }
           : undefined,
         emergencyContacts: [
           {
@@ -170,19 +170,19 @@ const seedDatabase = async () => {
           // Optionally add a second emergency contact
           ...(faker.datatype.boolean(0.3)
             ? [
-                {
-                  firstName: faker.person.firstName(),
-                  lastName: faker.person.lastName(),
-                  phone: faker.phone.number(),
-                  email: faker.internet.email(),
-                  relationship: faker.helpers.arrayElement([
-                    "Parent",
-                    "Sibling",
-                    "Friend",
-                    "Spouse",
-                  ]),
-                },
-              ]
+              {
+                firstName: faker.person.firstName(),
+                lastName: faker.person.lastName(),
+                phone: faker.phone.number(),
+                email: faker.internet.email(),
+                relationship: faker.helpers.arrayElement([
+                  "Parent",
+                  "Sibling",
+                  "Friend",
+                  "Spouse",
+                ]),
+              },
+            ]
             : []),
         ],
         contactInfo: {
@@ -204,10 +204,10 @@ const seedDatabase = async () => {
         },
         carInfo: faker.datatype.boolean(0.6)
           ? {
-              make: faker.vehicle.manufacturer(),
-              model: faker.vehicle.model(),
-              color: faker.vehicle.color(),
-            }
+            make: faker.vehicle.manufacturer(),
+            model: faker.vehicle.model(),
+            color: faker.vehicle.color(),
+          }
           : undefined,
         onboardingStatus: "Not Started",
       });
@@ -249,13 +249,8 @@ const seedDatabase = async () => {
         });
         createdVisaStatuses.push(newVisaStatus);
       }
-      type EmployeeUpdatePayload = {
-        userId: mongoose.Types.ObjectId;
-        houseId: mongoose.Types.ObjectId;
-        visaInfo?: mongoose.Types.ObjectId; 
-      };
 
-      const updateData: EmployeeUpdatePayload = {
+      const updateData = {
         userId: newUser._id,
         houseId: assignedHouse._id,
       };
@@ -316,10 +311,8 @@ const seedDatabase = async () => {
     }
 
     console.log(
-      `${createdEmployees.length} Employees, ${
-        createdUsers.length - 1
-      } Employee Users, and ${
-        createdVisaStatuses.length
+      `${createdEmployees.length} Employees, ${createdUsers.length - 1
+      } Employee Users, and ${createdVisaStatuses.length
       } Visa Statuses processed.`
     );
 
@@ -353,12 +346,12 @@ const seedDatabase = async () => {
             },
             ...(faker.datatype.boolean(0.5)
               ? [
-                  {
-                    createdBy: createdByUser._id,
-                    description: faker.lorem.sentence(8),
-                    timestamp: faker.date.recent({ days: 5 }),
-                  },
-                ]
+                {
+                  createdBy: createdByUser._id,
+                  description: faker.lorem.sentence(8),
+                  timestamp: faker.date.recent({ days: 5 }),
+                },
+              ]
               : []),
           ],
         });
@@ -391,7 +384,7 @@ const seedDatabase = async () => {
 
     // --- Seeding Complete ---
     console.log("Seeding process completed successfully.");
-  } catch (error: unknown) {
+  } catch (error) {
     console.error("Seeding failed:", error);
     if (error instanceof Error) {
       console.error("Error details:", error.message);
