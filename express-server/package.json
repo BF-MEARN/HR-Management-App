@@ -2,6 +2,7 @@
 	"name": "express-server",
 	"version": "1.0.0",
 	"main": "index.js",
+	"type": "module",
 	"scripts": {
 		"dev": "npm run build && node dist/index.js",
 		"build": "npm run clean && npm run build-ts",
