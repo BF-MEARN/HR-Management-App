@@ -1,6 +1,6 @@
 import { memo, useState } from "react"
 import { Button, TextField } from "@mui/material";
-import { Report } from "./HousingContainer";
+import { Report } from "./Housing";
 
 interface FacilityReportProps {
     index: number;

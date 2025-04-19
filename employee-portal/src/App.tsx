@@ -3,7 +3,7 @@ import NavBar from './components/NavBar';
 import Home from './pages/Home';
 import LoginPage from './pages/Login';
 import RegisterPage from './pages/Register';
-import HousingPage from './pages/housing_without_backend/HousingContainer';
+import HousingPage from './pages/housing_without_backend/Housing';
 
 function App() {
   return (

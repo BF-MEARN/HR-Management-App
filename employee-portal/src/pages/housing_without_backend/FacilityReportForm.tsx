@@ -1,6 +1,6 @@
 import { Button, Paper, TextField } from "@mui/material"
 import { v4 as randomId } from 'uuid';
-import { Report } from "./HousingContainer";
+import { Report } from "./Housing";
 
 interface FacilityReportFormProps {
     formTitle: string;
