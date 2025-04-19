@@ -1,4 +1,5 @@
 import { Card, Typography } from '@mui/material';
+
 import AuthForm, { AuthFormData } from '../components/AuthForm';
 
 export default function RegisterPage() {
@@ -24,11 +25,7 @@ export default function RegisterPage() {
       <Typography component="h1" variant="h4">
         Register
       </Typography>
-      <AuthForm
-        submitButtonText="Register"
-        onSubmit={handleSubmit}
-        includeEmailField={true}
-      />
+      <AuthForm submitButtonText="Register" onSubmit={handleSubmit} includeEmailField={true} />
     </Card>
   );
 }

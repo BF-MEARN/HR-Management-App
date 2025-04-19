@@ -5,7 +5,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "seed": "node ./utils/seed.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "type": "module",
   "keywords": [],
@@ -13,6 +16,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
@@ -23,6 +27,10 @@
     "validator": "^13.15.0"
   },
   "devDependencies": {
-    "@faker-js/faker": "^9.7.0"
+    "@faker-js/faker": "^9.7.0",
+    "eslint": "^9.25.0",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-node": "^11.1.0",
+    "prettier": "^3.5.3"
   }
 }
