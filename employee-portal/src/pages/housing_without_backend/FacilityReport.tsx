@@ -1,10 +1,15 @@
 import { memo, useState } from "react"
-import { Report } from "./Housing";
 import { Button, TextField } from "@mui/material";
+import { Report } from "./HousingContainer";
 
+interface FacilityReportProps {
+    index: number;
+    title: string;
+    description: string;
+    setReports: React.Dispatch<React.SetStateAction<Report[]>>;
+}
 
-
-const FacilityReport = ({ index, title, description, setReport }: {index: number, title: string; description: string; setReport: React.Dispatch<React.SetStateAction<Report[]>>}) => {
+const FacilityReport = ({ index, title, description, setReports }: FacilityReportProps) => {
     const [currTitle, setTitle] = useState(title);
     const [currDescription, setDescription] = useState(description);
     const [edit, setEdit] = useState(false);
@@ -16,7 +21,7 @@ const FacilityReport = ({ index, title, description, setReport }: {index: number
     }
 
     const handleDelete = (index: number) => {
-        setReport(prevReports => {
+        setReports(prevReports => {
             const splicedReports = [...prevReports];
             splicedReports.splice(index, 1);
             console.log(splicedReports);
@@ -30,7 +35,7 @@ const FacilityReport = ({ index, title, description, setReport }: {index: number
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>, index: number) => {
         e.preventDefault();
-        setReport(prevReports => {
+        setReports(prevReports => {
             const editedReports = [...prevReports];
             editedReports[index].title = currTitle;
             editedReports[index].description = currDescription;
@@ -84,7 +89,7 @@ const FacilityReport = ({ index, title, description, setReport }: {index: number
                 )
             }
         </>
-)
+    )
 }
 
 export default memo(FacilityReport);
