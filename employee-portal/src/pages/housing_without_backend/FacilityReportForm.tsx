@@ -2,7 +2,7 @@ import { Button, Paper, TextField } from "@mui/material"
 import { v4 as randomId } from 'uuid';
 import { Report } from "./Housing";
 
-interface FacilityReportFormProps {
+interface ExistingFacilityReportFormProps {
     formTitle: string;
     setFormTitle: React.Dispatch<React.SetStateAction<string>>;
     formDescription: string;
@@ -17,7 +17,7 @@ export default function FacilityReportForm (
         formDescription, 
         setFormDescription, 
         setReports 
-    }: FacilityReportFormProps
+    }: ExistingFacilityReportFormProps
 ) 
 {
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

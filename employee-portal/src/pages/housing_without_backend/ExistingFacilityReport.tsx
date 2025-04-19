@@ -2,14 +2,14 @@ import { memo, useState } from "react"
 import { Button, TextField } from "@mui/material";
 import { Report } from "./Housing";
 
-interface FacilityReportProps {
+interface ExistingFacilityReportProps {
     index: number;
     title: string;
     description: string;
     setReports: React.Dispatch<React.SetStateAction<Report[]>>;
 }
 
-const FacilityReport = ({ index, title, description, setReports }: FacilityReportProps) => {
+const ExistingFacilityReport = ({ index, title, description, setReports }: ExistingFacilityReportProps) => {
     const [currTitle, setTitle] = useState(title);
     const [currDescription, setDescription] = useState(description);
     const [edit, setEdit] = useState(false);
@@ -92,4 +92,4 @@ const FacilityReport = ({ index, title, description, setReports }: FacilityRepor
     )
 }
 
-export default memo(FacilityReport);
+export default memo(ExistingFacilityReport);

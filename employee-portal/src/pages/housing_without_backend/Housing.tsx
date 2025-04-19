@@ -1,6 +1,6 @@
 import { Paper } from "@mui/material"
 import { useState } from "react"
-import FacilityReport from "./FacilityReport";
+import ExistingFacilityReport from "./ExistingFacilityReport";
 import HousingDetails from "./HousingDetails";
 import FacilityReportForm from "./FacilityReportForm";
 
@@ -29,7 +29,7 @@ export default function HousingPage () {
             <Paper>
                 <h1>Existing/Past Reports</h1>
                 {reports.map((report, index) => (
-                    <FacilityReport 
+                    <ExistingFacilityReport 
                         key={report.id} 
                         index={index} 
                         title={report.title} 
