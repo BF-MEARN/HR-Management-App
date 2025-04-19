@@ -3,6 +3,7 @@ import NavBar from './components/NavBar';
 import Home from './pages/Home';
 import LoginPage from './pages/Login';
 import RegisterPage from './pages/Register';
+import OnboardingApplicationPage from './pages/OnboardingApplication';
 
 function App() {
   return (
@@ -14,6 +15,9 @@ function App() {
           <Route>
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
+          </Route>
+          <Route>
+            <Route path="onboard" element={<OnboardingApplicationPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
