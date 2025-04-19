@@ -18,10 +18,10 @@ export interface Report {
     comments: Comment[]
 }
 
-export default function HousingPage () {
-    const [formTitle, setFormTitle] = useState<string>('');
-    const [formDescription, setFormDescription] = useState<string>('');
-    const [reports, setReports] = useState<Report[]>([]);
+export default function HousingPage() {
+  const [formTitle, setFormTitle] = useState<string>('');
+  const [formDescription, setFormDescription] = useState<string>('');
+  const [reports, setReports] = useState<Report[]>([]);
 
     return (
         <>

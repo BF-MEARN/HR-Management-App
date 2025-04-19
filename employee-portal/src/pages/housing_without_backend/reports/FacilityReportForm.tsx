@@ -1,13 +1,13 @@
-import { Button, Paper, TextField } from "@mui/material"
+import { Button, Paper, TextField } from '@mui/material';
 import { v4 as randomId } from 'uuid';
 import { Report } from "../Housing";
 
 interface ExistingFacilityReportFormProps {
-    formTitle: string;
-    setFormTitle: React.Dispatch<React.SetStateAction<string>>;
-    formDescription: string;
-    setFormDescription: React.Dispatch<React.SetStateAction<string>>;
-    setReports: React.Dispatch<React.SetStateAction<Report[]>>;
+  formTitle: string;
+  setFormTitle: React.Dispatch<React.SetStateAction<string>>;
+  formDescription: string;
+  setFormDescription: React.Dispatch<React.SetStateAction<string>>;
+  setReports: React.Dispatch<React.SetStateAction<Report[]>>;
 }
 
 export default function FacilityReportForm (
