@@ -23,6 +23,9 @@
     "@angular/platform-browser": "^14.2.0",
     "@angular/platform-browser-dynamic": "^14.2.0",
     "@angular/router": "^14.2.0",
+    "@ngrx/effects": "^14.3.3",
+    "@ngrx/store": "^14.3.3",
+    "@ngrx/store-devtools": "^14.3.3",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"
@@ -37,6 +40,7 @@
     "@angular/cli": "~14.2.13",
     "@angular/compiler-cli": "^14.2.0",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
+    "@ngrx/schematics": "^14.3.3",
     "@types/jasmine": "~4.0.0",
     "@types/node": "^16.18.126",
     "@typescript-eslint/eslint-plugin": "5.43.0",
