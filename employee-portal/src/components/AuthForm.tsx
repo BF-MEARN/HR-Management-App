@@ -1,5 +1,6 @@
-import { Box, Button, FormControl, FormLabel, TextField } from '@mui/material';
 import React from 'react';
+
+import { Box, Button, FormControl, FormLabel, TextField } from '@mui/material';
 
 export interface AuthFormData {
   username: string;
@@ -136,12 +137,7 @@ export default function AuthForm(props: AuthFormProps) {
           color={passwordError ? 'error' : 'primary'}
         />
       </FormControl>
-      <Button
-        type="submit"
-        fullWidth
-        variant="contained"
-        onClick={validateInputs}
-      >
+      <Button type="submit" fullWidth variant="contained" onClick={validateInputs}>
         {submitButtonText}
       </Button>
     </Box>
