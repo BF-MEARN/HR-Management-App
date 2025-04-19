@@ -1,4 +1,5 @@
 import { Card, Typography } from '@mui/material';
+
 import AuthForm, { AuthFormData } from '../components/AuthForm';
 
 export default function LoginPage() {
@@ -24,11 +25,7 @@ export default function LoginPage() {
       <Typography component="h1" variant="h4" fontWeight={'bold'}>
         Log in
       </Typography>
-      <AuthForm
-        submitButtonText="Login"
-        onSubmit={handleSubmit}
-        includeEmailField={false}
-      />
+      <AuthForm submitButtonText="Login" onSubmit={handleSubmit} includeEmailField={false} />
     </Card>
   );
 }
