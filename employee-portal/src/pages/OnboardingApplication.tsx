@@ -1,14 +1,8 @@
-import {
-  Box,
-  Button,
-  Paper,
-  Step,
-  StepLabel,
-  Stepper,
-  Typography,
-} from '@mui/material';
 import React, { ComponentType } from 'react';
-import PersonalInfoForm from '../components/OnboardingApplication/PersonalInfoForm';
+
+import { Box, Button, Paper, Step, StepLabel, Stepper, Typography } from '@mui/material';
+
+import PersonalInfoForm from '../components/employee-info-forms/PersonalInfoForm';
 
 interface OnboardingStep<T> {
   id: string;
@@ -36,16 +30,10 @@ function StepperFooter(props: {
   handleSkip: () => void;
   handleNext: () => void;
 }) {
-  const { isFirst, isSkippable, isLast, handleBack, handleSkip, handleNext } =
-    props;
+  const { isFirst, isSkippable, isLast, handleBack, handleSkip, handleNext } = props;
   return (
     <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-      <Button
-        color="inherit"
-        disabled={isFirst}
-        onClick={handleBack}
-        sx={{ mr: 1 }}
-      >
+      <Button color="inherit" disabled={isFirst} onClick={handleBack} sx={{ mr: 1 }}>
         Back
       </Button>
       <Box sx={{ flex: '1 1 auto' }} />
@@ -135,9 +123,7 @@ export default function OnBoardingApplicationPage() {
                 optional?: React.ReactNode;
               } = {};
               if (step.skippable) {
-                labelProps.optional = (
-                  <Typography variant="caption">Optional</Typography>
-                );
+                labelProps.optional = <Typography variant="caption">Optional</Typography>;
               }
               if (isStepSkipped(index)) {
                 stepProps.completed = false;

@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {
   Box,
   Button,
@@ -9,7 +11,6 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import React from 'react';
 
 export interface PersonalInfoFormData {
   // Names
@@ -84,10 +85,7 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
     }
   };
 
-  const updateAddressField = (
-    key: keyof PersonalInfoFormData['address'],
-    value: string
-  ) => {
+  const updateAddressField = (key: keyof PersonalInfoFormData['address'], value: string) => {
     setFormData((prev) => ({
       ...prev,
       address: { ...prev.address, [key]: value },
