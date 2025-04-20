@@ -372,6 +372,7 @@ const seedDatabase = async () => {
           .toLowerCase(),
         token: faker.string.uuid(),
         used: faker.datatype.boolean(0.4),
+        expiresAt: new Date(Date.now() + 3 * 60 * 60 * 1000), // 3 hours from now
       });
     }
     await RegistrationToken.insertMany(registrationTokenData);
