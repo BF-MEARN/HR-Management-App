@@ -1,10 +1,10 @@
-@import '~@angular/material/theming';
+@import '@angular/material/theming';
 
 .nav-container {
   height: 100vh;
-  width: 260px;
+  width: 100%;
   background-color: #ffffff;
-  display: felx;
+  display: flex;
   flex-direction: column;
   overflow-y: auto;
 }
@@ -19,7 +19,7 @@
 
 
   .logo {
-    width: 80px;
+    width: 100px;
     height: auto;
     margin-bottom: 10px;
   }
@@ -39,9 +39,9 @@
   
   .user-avatar {
     mat-icon {
-      font-size: 40px;
-      width: 40px;
-      height: 40px;
+      font-size: 50px;
+      width: 50px;
+      height: 50px;
       color: #3f51b5;
     }
   }
@@ -64,6 +64,65 @@
 }
 
 .mat-divider {
-  margin: 0;
+  width: calc(100% - 32px);
+  margin: 16px auto;
+  border-color: rgba(0, 0, 0, 0.1); // subtle line
 }
 
+
+
+mat-nav-list {
+  padding: 15px 16px;
+  flex: 1;
+  
+  .nav-item {
+    height: 48px;
+    margin-bottom: 8px;
+    border-radius: 50px;
+    margin-right: 10px;
+    
+    &:hover {
+      background-color: rgba(63, 81, 181, 0.05);
+    }
+    
+    .nav-icon {
+      margin-right: 15px;
+      color: rgba(0, 0, 0, 0.6);
+    }
+    
+    .nav-text {
+      font-weight: 400;
+    }
+  }
+  
+  .active-link {
+    background-color: rgba(63, 81, 181, 0.1);
+    color: #3f51b5;
+    
+    .nav-icon {
+      color: #3f51b5;
+    }
+  }
+}
+
+
+.nav-footer {
+  margin-top: auto;
+  padding: 15px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  
+  .logout-button {
+    width: 100%;
+    text-align: left;
+    color: rgba(0, 0, 0, 0.6);
+    
+    &:hover {
+      color: #f44336;
+      background-color: rgba(244, 67, 54, 0.05);
+    }
+    
+    mat-icon {
+      margin-right: 10px;
+    }
+  }
+}
