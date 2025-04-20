@@ -1,0 +1,29 @@
+.token-history-container {
+  margin-top: 24px;
+  overflow-x: auto;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.status-used {
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+.status-unused {
+  color: #f57c00;
+  font-weight: 500;
+}
+
+.status-expired {
+  color: #c62828;
+  font-weight: 500;
+}
+
+.status-valid {
+  color: #2e7d32;
+  font-weight: 500;
+}

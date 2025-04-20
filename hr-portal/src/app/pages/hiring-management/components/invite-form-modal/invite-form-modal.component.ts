@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TokenService } from 'src/app/services/token.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -15,9 +16,10 @@ export class InviteFormModalComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
+    private inviteService: TokenService,
     private dialogRef: MatDialogRef<InviteFormModalComponent>,
     private snackbar: MatSnackBar,
-    private http: HttpClient
+    
   ) {}
 
   ngOnInit(): void {
@@ -31,20 +33,17 @@ export class InviteFormModalComponent implements OnInit {
     if (this.inviteForm.valid) {
       const payload = this.inviteForm.value;
 
-      this.http
-        .post(`${environment.apiUrl}/invite/generate`, payload)
-        .subscribe({
-          next: () => {
-            this.snackbar.open('Invitation sent!', 'Close', { duration: 3000 });
-            this.dialogRef.close();
-          },
-          error: (err) => {
-            console.error(err);
-            this.snackbar.open('Failed to send invite. Try again.', 'Close', {
-              duration: 3000,
-            });
-          },
-        });
+      this.inviteService.sendInvite(payload).subscribe({
+        next: (res) => {
+          this.dialogRef.close(true);
+          this.snackbar.open('Invite sent successfully', 'Close', { duration: 3000 });
+        },
+        error: (err) => {
+          console.error('Failed to send invite', err);
+          this.snackbar.open('Failed to send invite', 'Close', { duration: 3000 });
+        },
+      });
+      
     }
   }
 }

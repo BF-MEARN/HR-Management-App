@@ -8,13 +8,16 @@ import { MatInputModule } from '@angular/material/input';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTableModule } from '@angular/material/table';
+
 
 import { HiringManagementRoutingModule } from './hiring-management-routing.module';
 import { HiringManagementComponent } from './hiring-management.component';
 import { InviteFormModalComponent } from './components/invite-form-modal/invite-form-modal.component';
+import { TokenHistoryComponent } from './components/token-history/token-history.component';
 
 @NgModule({
-  declarations: [HiringManagementComponent, InviteFormModalComponent],
+  declarations: [HiringManagementComponent, InviteFormModalComponent, TokenHistoryComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -27,6 +30,8 @@ import { InviteFormModalComponent } from './components/invite-form-modal/invite-
     MatDialogModule,
     MatButtonModule,
     MatSnackBarModule,
+    MatTableModule,
+    
   ],
 })
 export class HiringManagementModule {}

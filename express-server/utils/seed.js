@@ -359,6 +359,23 @@ const seedDatabase = async () => {
       console.log('Skipping Facility Reports: Not enough employees with housing or users found.');
     }
 
+    // --- DROP TTL INDEX ON expiresAt (if it exists) ---
+    try {
+      const indexes = await RegistrationToken.collection.indexes();
+      const ttlIndex = indexes.find(
+        (idx) => idx.key?.expiresAt === 1 && idx.expireAfterSeconds !== undefined
+      );
+
+      if (ttlIndex) {
+        await RegistrationToken.collection.dropIndex(ttlIndex.name);
+        console.log('Dropped TTL index on expiresAt field.');
+      } else {
+        console.log('No TTL index on expiresAt found (or already removed).');
+      }
+    } catch (err) {
+      console.warn('Failed to check or drop TTL index on expiresAt:', err.message);
+    }
+
     // --- 6. Seed Registration Tokens ---
     console.log(`Seeding: Registration Tokens`);
     const registrationTokenData = [];
