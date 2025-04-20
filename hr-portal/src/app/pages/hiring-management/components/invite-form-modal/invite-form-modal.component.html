@@ -1,0 +1,40 @@
+<h2 mat-dialog-title>Send Invite to New Employee</h2>
+
+<form [formGroup]="inviteForm" (ngSubmit)="onSubmit()">
+  <mat-dialog-content class="dialog-content">
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Full Name</mat-label>
+      <input matInput formControlName="name" placeholder="e.g. John Doe" />
+      <mat-error *ngIf="inviteForm.get('name')?.hasError('required')">
+        Name is required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Email</mat-label>
+      <input
+        matInput
+        formControlName="email"
+        placeholder="e.g. john@example.com"
+      />
+      <mat-error *ngIf="inviteForm.get('email')?.hasError('required')">
+        Email is required
+      </mat-error>
+      <mat-error *ngIf="inviteForm.get('email')?.hasError('email')">
+        Please enter a valid email
+      </mat-error>
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close type="button">Cancel</button>
+    <button
+      mat-flat-button
+      color="primary"
+      type="submit"
+      [disabled]="inviteForm.invalid"
+    >
+      Send Invite
+    </button>
+  </mat-dialog-actions>
+</form>
