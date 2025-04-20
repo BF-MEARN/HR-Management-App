@@ -1,9 +1,9 @@
 import cors from 'cors';
-import express from 'express';
-import cors from 'cors';
 import dotenv from 'dotenv';
-import userRouter from './routers/UserRouter.js';
+import express from 'express';
+
 import inviteRouter from './routers/InviteRouter.js';
+import userRouter from './routers/UserRouter.js';
 
 dotenv.config();
 
@@ -19,9 +19,6 @@ app.use(
     credentials: true,
   })
 );
-
-
-
 
 app.use('/api/user', userRouter);
 app.use('/api/invite', inviteRouter);

@@ -7,16 +7,16 @@ export const userAuth = async (req, res, next) => {
     return res.status(401).json({ message: 'Unauthorized (No Token)' });
   }
 
-	try {
-		const decoded = jwt.verify(token, process.env.JWT_SECRET);
-		
-		if (typeof decoded !== 'object' || !decoded.id || !validator.isMongoId(decoded.id)) {
-			return res.status(401).json({ message: 'Unauthorized (Invalid Token)' });
-		}
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-		req.user = decoded;
-		next();
-	} catch (error) {
-		return res.status(401).json(error);
-	}
+    if (typeof decoded !== 'object' || !decoded.id || !validator.isMongoId(decoded.id)) {
+      return res.status(401).json({ message: 'Unauthorized (Invalid Token)' });
+    }
+
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json(error);
+  }
 };
