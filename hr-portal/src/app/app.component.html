@@ -1,2 +1,7 @@
-<app-navigation-bar *ngIf="showNavbar"></app-navigation-bar>
-<router-outlet></router-outlet>
+<div class="app-container">
+  <app-navigation-bar *ngIf="showNavbar"></app-navigation-bar>
+
+  <div class="page-content">
+    <router-outlet></router-outlet>
+  </div>
+</div>

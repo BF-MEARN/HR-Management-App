@@ -5,7 +5,6 @@
       alt="Company Logo"
       class="logo"
     />
-    <!-- <img src="assets/images/fallbacklogo.png" alt="Company Logo" class="logo" /> -->
     <h2 class="company-name">HR Portal</h2>
   </div>
 
@@ -36,8 +35,8 @@
     </a>
   </mat-nav-list>
 
-  <div class="sidebar-footer">
-    <button mat-button class="logout-button">
+  <div class="nav-footer">
+    <button mat-button class="logout-button" (click)="logout()">
       <mat-icon>exit_to_app</mat-icon>
       <span>Log Out</span>
     </button>
