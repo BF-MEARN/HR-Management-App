@@ -2,7 +2,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 
-import inviteRouter from './routers/InviteRouter.js';
+import tokenRouter from './routers/TokenRouter.js';
 import userRouter from './routers/UserRouter.js';
 
 dotenv.config();
@@ -20,7 +20,7 @@ app.use(
 );
 
 app.use('/api/user', userRouter);
-app.use('/api/invite', inviteRouter);
+app.use('/api/token', tokenRouter);
 
 // app.all('*', (_req: Request, res) => {
 //   res.status(404).json({ message: 'Not Found' });
