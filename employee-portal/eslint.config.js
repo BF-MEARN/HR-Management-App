@@ -25,6 +25,7 @@ export default tseslint.config(
       'react-refresh': reactRefresh,
     },
     rules: {
+      ...react.configs.recommended.rules,
       'react/jsx-uses-react': 'error',
       'react/jsx-uses-vars': 'error',
       ...reactHooks.configs.recommended.rules,

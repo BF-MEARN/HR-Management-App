@@ -2,7 +2,9 @@ import React, { ComponentType } from 'react';
 
 import { Box, Button, Paper, Step, StepLabel, Stepper, Typography } from '@mui/material';
 
+import DriverAndCarInfoForm from '../components/employee-info-forms/DriverAndCarInfoForm';
 import PersonalInfoForm from '../components/employee-info-forms/PersonalInfoForm';
+import WorkAuthorizationForm from '../components/employee-info-forms/WorkAuthorizationForm';
 
 interface OnboardingStep<T> {
   id: string;
@@ -59,15 +61,19 @@ export default function OnBoardingApplicationPage() {
     {
       id: 'driverAndCarInfo',
       name: "Driver's License and Cars",
+      component: DriverAndCarInfoForm,
       skippable: true,
     },
-    { id: 'workAuth', name: 'Work Authorization' },
+    {
+      id: 'workAuth',
+      name: 'Work Authorization',
+      component: WorkAuthorizationForm,
+    },
     {
       id: 'contacts',
       name: 'Reference & Emergency Contacts',
     },
-    { id: 'documents', name: 'Documents' },
-    { id: 'summary', name: 'Summary' },
+    { id: 'documents', name: 'Documents Review' },
   ];
 
   const [activeStepIndex, setActiveStepIndex] = React.useState(0);

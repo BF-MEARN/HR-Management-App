@@ -2,7 +2,6 @@ import React from 'react';
 
 import {
   Box,
-  Button,
   FormControl,
   Grid,
   InputLabel,
@@ -11,6 +10,8 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+
+import FileUploadWithPreview from '../FileUploadWithPreview';
 
 export interface PersonalInfoFormData {
   // Names
@@ -80,9 +81,13 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
   );
 
   const updateField = (key: keyof PersonalInfoFormData, value: string) => {
-    if (key != 'address' && key != 'email') {
+    if (key != 'profilePicture' && key != 'address' && key != 'email') {
       setFormData((prev) => ({ ...prev, [key]: value }));
     }
+  };
+
+  const updateProfilePicture = (value: string | File) => {
+    setFormData((prev) => ({ ...prev, profilePicture: value }));
   };
 
   const updateAddressField = (key: keyof PersonalInfoFormData['address'], value: string) => {
@@ -137,59 +142,12 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
       <Typography variant="h6" mt={4} mb={1}>
         Profile Picture
       </Typography>
-      <Box
-        sx={{
-          margin: 'auto',
-          display: 'flex',
-          flexFlow: 'column',
-          alignItems: 'center',
-          gap: '0.5rem',
-        }}
-      >
-        <Box
-          sx={{
-            width: '200px',
-            height: '200px',
-            border: '1px dashed #ccc',
-            borderRadius: 2,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            overflow: 'hidden',
-            backgroundColor: '#f9f9f9',
-          }}
-        >
-          {formData.profilePicture ? (
-            <img
-              src={
-                typeof formData.profilePicture === 'string'
-                  ? formData.profilePicture
-                  : URL.createObjectURL(formData.profilePicture)
-              }
-              alt="Preview"
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          ) : (
-            <Typography variant="body2" color="textSecondary">
-              No picture uploaded
-            </Typography>
-          )}
-        </Box>
-        <Button variant="outlined" component="label">
-          Upload Picture
-          <input
-            type="file"
-            hidden
-            accept="image/*"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                setFormData((prev) => ({ ...prev, profilePicture: file }));
-              }
-            }}
-          />
-        </Button>
-      </Box>
+      <FileUploadWithPreview
+        file={formData.profilePicture}
+        onFileSelect={(f) => updateProfilePicture(f)}
+        buttonText="Upload Picture..."
+        type="image"
+      />
       {/* Section: Contact */}
       <Typography variant="h6" mt={4} mb={1}>
         Contact
