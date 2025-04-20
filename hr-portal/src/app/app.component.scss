@@ -7,11 +7,11 @@
 app-navigation-bar {
   position: sticky;
   width: 300px;
-  border-right: 1px solid #cccccc; 
+  border-right: 1px solid #cccccc;
 }
 
 // Rendered content area
 .page-content {
   flex: 1;
-  overflow-y: auto; 
+  overflow-y: auto;
 }

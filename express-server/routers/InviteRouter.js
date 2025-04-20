@@ -1,4 +1,5 @@
 import express from 'express';
+
 import { generateToken } from '../controllers/InviteController.js';
 
 const router = express.Router();

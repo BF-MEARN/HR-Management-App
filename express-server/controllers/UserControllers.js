@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+
 import User from '../models/User.js';
 import { generateToken } from '../utils/generateToken.js';
 
@@ -22,12 +23,12 @@ export const login = async (req, res) => {
 
     const authToken = generateToken(user._id);
 
-    res.cookie("authToken", authToken, {
+    res.cookie('authToken', authToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'Lax',
       maxAge: 3 * 60 * 60 * 1000,
-    })
+    });
 
     res.status(200).json({ message: 'login successful', user });
   } catch (error) {
@@ -36,8 +37,8 @@ export const login = async (req, res) => {
 };
 
 export const logout = async (req, res) => {
-  res.clearCookie("authToken").json({ message: "Logged out successfully" });
-}
+  res.clearCookie('authToken').json({ message: 'Logged out successfully' });
+};
 
 export const register = async (req, res) => {
   try {
