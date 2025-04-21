@@ -47,7 +47,10 @@ export default function WorkAuthorizationForm({
     ? citizenOrPermanentResidentTypes
     : foreignerTypes;
   return (
-    <Box sx={{ display: 'flex', flexFlow: 'column', gap: '2rem' }}>
+    <Box sx={{ px: 2 }}>
+      <Typography variant="h6" mb={1}>
+        Work Authorization
+      </Typography>
       <FormControlLabel
         control={
           <Checkbox
@@ -89,7 +92,7 @@ export default function WorkAuthorizationForm({
       </FormControl>
       {!formData.isCitizenOrPermanentResident && (
         <>
-          <Typography variant="subtitle1" fontWeight="bold">
+          <Typography variant="subtitle1" sx={{ marginBlock: '1rem' }}>
             Additional Info
           </Typography>
           <Grid container spacing={2}>

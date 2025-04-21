@@ -4,6 +4,7 @@ import { Box, Button, Paper, Step, StepLabel, Stepper, Typography } from '@mui/m
 
 import DriverAndCarInfoForm from '../components/employee-info-forms/DriverAndCarInfoForm';
 import PersonalInfoForm from '../components/employee-info-forms/PersonalInfoForm';
+import ReferenceAndEmergencyContactForm from '../components/employee-info-forms/ReferenceAndEmergencyContactForm';
 import WorkAuthorizationForm from '../components/employee-info-forms/WorkAuthorizationForm';
 
 interface OnboardingStep<T> {
@@ -72,8 +73,9 @@ export default function OnBoardingApplicationPage() {
     {
       id: 'contacts',
       name: 'Reference & Emergency Contacts',
+      component: ReferenceAndEmergencyContactForm,
     },
-    { id: 'documents', name: 'Documents Review' },
+    { id: 'documents', name: 'Document Confirmation' },
   ];
 
   const [activeStepIndex, setActiveStepIndex] = React.useState(0);
@@ -122,7 +124,7 @@ export default function OnBoardingApplicationPage() {
         <FinishedStep />
       ) : (
         <>
-          <Stepper activeStep={activeStepIndex}>
+          <Stepper activeStep={activeStepIndex} alternativeLabel>
             {steps.map((step, index) => {
               const stepProps: { completed?: boolean } = {};
               const labelProps: {

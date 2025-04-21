@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Box, Checkbox, FormControlLabel, Grid, TextField } from '@mui/material';
+import { Box, Checkbox, FormControlLabel, Grid, TextField, Typography } from '@mui/material';
 import { produce } from 'immer';
 
 import FileUploadWithPreview from '../FileUploadWithPreview';
@@ -32,7 +32,10 @@ export default function DriverAndCarInfoForm(props: { initFormData?: DriverAndCa
     props.initFormData ?? { hasDriverLicense: false, hasCar: false }
   );
   return (
-    <Box sx={{ display: 'flex', flexFlow: 'column' }}>
+    <Box sx={{ px: 2 }}>
+      <Typography variant="h6" mb={1}>
+        Driver&apos;s License
+      </Typography>
       <FormControlLabel
         control={
           <Checkbox
@@ -100,6 +103,9 @@ export default function DriverAndCarInfoForm(props: { initFormData?: DriverAndCa
           </Grid>
         </Grid>
       )}
+      <Typography variant="h6" mb={1}>
+        Car
+      </Typography>
       <FormControlLabel
         control={
           <Checkbox
