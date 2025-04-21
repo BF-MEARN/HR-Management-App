@@ -23,9 +23,10 @@ import { HiringManagementComponent } from './hiring-management.component';
 import { InviteFormModalComponent } from './components/invite-form-modal/invite-form-modal.component';
 import { TokenHistoryComponent } from './components/token-history/token-history.component';
 import { MatCardModule } from '@angular/material/card';
+import { OnboardingApplicationsComponent } from './components/onboarding-applications/onboarding-applications.component';
 
 @NgModule({
-  declarations: [HiringManagementComponent, InviteFormModalComponent, TokenHistoryComponent],
+  declarations: [HiringManagementComponent, OnboardingApplicationsComponent, InviteFormModalComponent, TokenHistoryComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,
