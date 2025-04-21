@@ -3,7 +3,9 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Store } from '@ngrx/store';
 import { TokenService } from 'src/app/services/token.service';
+import { addNewToken } from 'src/app/store/token/token.actions';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -15,11 +17,11 @@ export class InviteFormModalComponent implements OnInit {
   inviteForm!: FormGroup;
 
   constructor(
+    private store: Store,
     private fb: FormBuilder,
-    private inviteService: TokenService,
+    private tokenService: TokenService,
     private dialogRef: MatDialogRef<InviteFormModalComponent>,
     private snackbar: MatSnackBar,
-    
   ) {}
 
   ngOnInit(): void {
@@ -32,11 +34,12 @@ export class InviteFormModalComponent implements OnInit {
   onSubmit(): void {
     if (this.inviteForm.valid) {
       const payload = this.inviteForm.value;
-
-      this.inviteService.sendInvite(payload).subscribe({
+  
+      this.tokenService.sendInvite(payload).subscribe({
         next: (res) => {
-          this.dialogRef.close(true);
+          this.store.dispatch(addNewToken({ token: res.token }));
           this.snackbar.open('Invite sent successfully', 'Close', { duration: 3000 });
+          this.dialogRef.close();
         },
         error: (err) => {
           console.error('Failed to send invite', err);

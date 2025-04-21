@@ -1,23 +1,27 @@
 import { Component, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
 import { RegistrationToken } from 'src/app/interfaces/registration-token';
-import { TokenService } from 'src/app/services/token.service';
+import { loadTokenHistory } from 'src/app/store/token/token.actions';
+import { selectAllTokens } from 'src/app/store/token/token.selectors';
 
 @Component({
   selector: 'app-token-history',
   templateUrl: './token-history.component.html',
-  styleUrls: ['./token-history.component.scss']
+  styleUrls: ['./token-history.component.scss'],
 })
 export class TokenHistoryComponent implements OnInit {
-  tokens: RegistrationToken[] = [];
-  displayedColumns: string[] = ['name', 'email', 'used', 'expired', 'link'];
+  tokens$!: Observable<RegistrationToken[]>;
 
-  constructor(private inviteService: TokenService) { }
+  constructor(private store: Store) {}
 
   ngOnInit(): void {
-    this.inviteService.getTokenHistory().subscribe({
-      next: (data) => (this.tokens = data),
-      error: (err) => console.error('Failed to fetch token history', err),
-    })
+    this.store.dispatch(loadTokenHistory());
+    this.tokens$ = this.store.select(selectAllTokens);
   }
 
+  getFullInviteLink(token: string): string {
+    return `${window.location.origin}/register/${token}`;
+  }
+  
 }
