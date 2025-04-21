@@ -1,7 +1,10 @@
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 
+import { requireHR, userAuth } from './middlewares/AuthMiddlewares.js';
+import errorHandler from './middlewares/ErrorHandler.js';
 import tokenRouter from './routers/TokenRouter.js';
 import userRouter from './routers/UserRouter.js';
 
@@ -11,19 +14,32 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.use(
   cors({
-    origin: ['http://localhost:4200', 'http://localhost:4173'],
+    origin: ['http://localhost:4200', 'http://localhost:5173'],
     credentials: true,
   })
 );
 
+// Common routes
+// Allow anyone to login/register
 app.use('/api/user', userRouter);
-app.use('/api/token', tokenRouter);
 
-// app.all('*', (_req: Request, res) => {
-//   res.status(404).json({ message: 'Not Found' });
-// });
+// HR specific routes
+app.use('/api/hr/token', userAuth, requireHR, tokenRouter);
+
+// Fallback route
+app.get('*', (req, res) => {
+  if (req.originalUrl.startsWith('/api')) {
+    return res.status(404).json({ message: 'API route not found' });
+  }
+
+  res.status(404).send('Not Found');
+});
+
+// Global error handler
+app.use(errorHandler);
 
 export default app;
