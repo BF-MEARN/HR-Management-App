@@ -1,0 +1,94 @@
+<mat-tab-group>
+  <!-- Pending Applications Tab -->
+  <mat-tab label="Pending">
+    <mat-card class="onboarding-card">
+      <mat-card-title>Pending Applications</mat-card-title>
+      <mat-card-content>
+        <div class="table-container">
+          <table class="mat-elevation-z8">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let employee of pending">
+                <td>{{ employee.firstName }} {{ employee.lastName }}</td>
+                <td>{{ employee.userId?.email }}</td>
+                <td>{{ employee.onboardingStatus }}</td>
+                <td>
+                  <button mat-stroked-button color="primary">View Application</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
+
+  <!-- Rejected Applications Tab -->
+  <mat-tab label="Rejected">
+    <mat-card class="onboarding-card">
+      <mat-card-title>Rejected Applications</mat-card-title>
+      <mat-card-content>
+        <div class="table-container">
+          <table class="mat-elevation-z8">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let employee of rejected">
+                <td>{{ employee.firstName }} {{ employee.lastName }}</td>
+                <td>{{ employee.userId?.email }}</td>
+                <td>{{ employee.onboardingStatus }}</td>
+                <td>
+                  <button mat-stroked-button color="primary">View Application</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
+
+  <!-- Approved Applications Tab -->
+  <mat-tab label="Approved">
+    <mat-card class="onboarding-card">
+      <mat-card-title>Approved Applications</mat-card-title>
+      <mat-card-content>
+        <div class="table-container">
+          <table class="mat-elevation-z8">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let employee of approved">
+                <td>{{ employee.firstName }} {{ employee.lastName }}</td>
+                <td>{{ employee.userId?.email }}</td>
+                <td>{{ employee.onboardingStatus }}</td>
+                <td>
+                  <button mat-stroked-button color="primary">View Application</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
+</mat-tab-group>

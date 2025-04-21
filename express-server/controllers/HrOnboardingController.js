@@ -1,4 +1,6 @@
 import Employee from '../models/Employee.js';
+// eslint-disable-next-line no-unused-vars
+import VisaStatus from '../models/VisaStatus.js';
 
 /**
  * @desc    Get all pending onboarding applications
