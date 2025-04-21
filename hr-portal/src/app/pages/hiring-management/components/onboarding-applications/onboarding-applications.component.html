@@ -1,94 +1,88 @@
 <mat-tab-group>
   <!-- Pending Applications Tab -->
   <mat-tab label="Pending">
-    <mat-card class="onboarding-card">
-      <mat-card-title>Pending Applications</mat-card-title>
-      <mat-card-content>
-        <div class="table-container">
-          <table class="mat-elevation-z8">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let employee of pending">
-                <td>{{ employee.firstName }} {{ employee.lastName }}</td>
-                <td>{{ employee.userId?.email }}</td>
-                <td>{{ employee.onboardingStatus }}</td>
-                <td>
-                  <button mat-stroked-button color="primary">View Application</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+    <div class="application-list-wrapper">
+      <h2>Pending Applications</h2>
+
+      <div class="application-table">
+        <div class="application-table-header">
+          <div>Name</div>
+          <div>Email</div>
+          <div>Status</div>
+          <div>Action</div>
         </div>
-      </mat-card-content>
-    </mat-card>
+
+        <div class="application-table-row" *ngFor="let employee of pending">
+          <div>{{ employee.firstName }} {{ employee.lastName }}</div>
+          <div>{{ employee.userId?.email }}</div>
+          <div>
+            <span class="pill status-pill" [ngClass]="employee.onboardingStatus.toLowerCase()">
+              {{ employee.onboardingStatus }}
+            </span>
+          </div>
+          <div>
+            <button mat-stroked-button color="primary" class="view-btn">View Application</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </mat-tab>
 
   <!-- Rejected Applications Tab -->
   <mat-tab label="Rejected">
-    <mat-card class="onboarding-card">
-      <mat-card-title>Rejected Applications</mat-card-title>
-      <mat-card-content>
-        <div class="table-container">
-          <table class="mat-elevation-z8">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let employee of rejected">
-                <td>{{ employee.firstName }} {{ employee.lastName }}</td>
-                <td>{{ employee.userId?.email }}</td>
-                <td>{{ employee.onboardingStatus }}</td>
-                <td>
-                  <button mat-stroked-button color="primary">View Application</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+    <div class="application-list-wrapper">
+      <h2>Rejected Applications</h2>
+
+      <div class="application-table">
+        <div class="application-table-header">
+          <div>Name</div>
+          <div>Email</div>
+          <div>Status</div>
+          <div>Action</div>
         </div>
-      </mat-card-content>
-    </mat-card>
+
+        <div class="application-table-row" *ngFor="let employee of rejected">
+          <div>{{ employee.firstName }} {{ employee.lastName }}</div>
+          <div>{{ employee.userId?.email }}</div>
+          <div>
+            <span class="pill status-pill" [ngClass]="employee.onboardingStatus.toLowerCase()">
+              {{ employee.onboardingStatus }}
+            </span>
+          </div>
+          <div>
+            <button mat-stroked-button color="primary" class="view-btn">View Application</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </mat-tab>
 
   <!-- Approved Applications Tab -->
   <mat-tab label="Approved">
-    <mat-card class="onboarding-card">
-      <mat-card-title>Approved Applications</mat-card-title>
-      <mat-card-content>
-        <div class="table-container">
-          <table class="mat-elevation-z8">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let employee of approved">
-                <td>{{ employee.firstName }} {{ employee.lastName }}</td>
-                <td>{{ employee.userId?.email }}</td>
-                <td>{{ employee.onboardingStatus }}</td>
-                <td>
-                  <button mat-stroked-button color="primary">View Application</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+    <div class="application-list-wrapper">
+      <h2>Approved Applications</h2>
+
+      <div class="application-table">
+        <div class="application-table-header">
+          <div>Name</div>
+          <div>Email</div>
+          <div>Status</div>
+          <div>Action</div>
         </div>
-      </mat-card-content>
-    </mat-card>
-  </mat-tab>
-</mat-tab-group>
+
+        <div class="application-table-row" *ngFor="let employee of approved">
+          <div>{{ employee.firstName }} {{ employee.lastName }}</div>
+          <div>{{ employee.userId?.email }}</div>
+          <div>
+            <span class="pill status-pill" [ngClass]="employee.onboardingStatus.toLowerCase()">
+              {{ employee.onboardingStatus }}
+            </span>
+          </div>
+          <div>
+            <button mat-stroked-button color="primary" class="view-btn">View Application</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-tab></mat-tab-group
+>
