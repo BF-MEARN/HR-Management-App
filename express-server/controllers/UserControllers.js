@@ -5,6 +5,11 @@ import { generateToken } from '../utils/generateToken.js';
 
 const saltRounds = 10;
 
+/**
+ * @desc    Log in user and set authToken cookie
+ * @route   POST /api/user/login
+ * @access  Public
+ */
 export const login = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -36,10 +41,20 @@ export const login = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Clear authToken cookie and log out
+ * @route   POST /api/user/logout
+ * @access  Authenticated users
+ */
 export const logout = async (req, res) => {
   res.clearCookie('authToken').json({ message: 'Logged out successfully' });
 };
 
+/**
+ * @desc    Register a new user (defaults to employee role)
+ * @route   POST /api/user/register
+ * @access  Public
+ */
 export const register = async (req, res) => {
   try {
     const { username, password, email } = req.body;

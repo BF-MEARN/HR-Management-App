@@ -134,6 +134,13 @@ const seedDatabase = async () => {
       const password = await bcrypt.hashSync('password', SALT_ROUNDS);
       const isCitizenOrPR = faker.datatype.boolean(0.3);
       const assignedHouse = faker.helpers.arrayElement(createdHousing);
+      const onboardingStatus = faker.helpers.arrayElement(['Pending', 'Approved', 'Rejected']);
+      const onboardingFeedback =
+        onboardingStatus === 'Rejected'
+          ? faker.lorem.sentence(8)
+          : faker.datatype.boolean(0.5)
+            ? faker.lorem.sentence(5)
+            : '';
 
       const newEmployee = new Employee({
         firstName,
@@ -216,7 +223,8 @@ const seedDatabase = async () => {
               color: faker.vehicle.color(),
             }
           : undefined,
-        onboardingStatus: 'Not Started',
+        onboardingStatus,
+        onboardingFeedback,
       });
 
       const newUser = new User({

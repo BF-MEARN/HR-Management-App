@@ -5,7 +5,8 @@ import express from 'express';
 
 import { requireHR, userAuth } from './middlewares/AuthMiddlewares.js';
 import errorHandler from './middlewares/ErrorHandler.js';
-import tokenRouter from './routers/TokenRouter.js';
+import hrOnboardingRouter from './routers/HrOnboardingRouter.js';
+import hrTokenRouter from './routers/HrTokenRouter.js';
 import userRouter from './routers/UserRouter.js';
 
 dotenv.config();
@@ -28,7 +29,8 @@ app.use(
 app.use('/api/user', userRouter);
 
 // HR specific routes
-app.use('/api/hr/token', userAuth, requireHR, tokenRouter);
+app.use('/api/hr/token', userAuth, requireHR, hrTokenRouter);
+app.use('/api/hr/onboarding', userAuth, requireHR, hrOnboardingRouter);
 
 // Fallback route
 app.get('*', (req, res) => {
