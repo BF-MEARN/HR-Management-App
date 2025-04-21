@@ -102,7 +102,7 @@ const EmployeeSchema = new Schema(
       enum: ['Not Started', 'Pending', 'Approved', 'Rejected'],
       default: 'Not Started',
     },
-    onboardingFeedback: { type: String },
+    onboardingFeedback: { type: String, default: '' },
     // Add houseId
     houseId: {
       type: mongoose.Schema.Types.ObjectId,

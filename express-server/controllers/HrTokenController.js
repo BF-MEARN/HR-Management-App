@@ -3,7 +3,11 @@ import { v4 as uuidv4 } from 'uuid';
 import RegistrationToken from '../models/RegistrationToken.js';
 import { sendEmail } from '../utils/emailService.js';
 
-// Generates a unique token and sends an email to the user
+/**
+ * @desc    Generate a registration token and send email invite
+ * @route   POST /api/hr/token/generate
+ * @access  HR only
+ */
 export const generateToken = async (req, res) => {
   try {
     const { name, email } = req.body;
@@ -78,7 +82,11 @@ export const generateToken = async (req, res) => {
   }
 };
 
-// Fetches the token history and enriches it with expiration status
+/**
+ * @desc    Get all registration tokens with expiry info
+ * @route   GET /api/hr/token/history
+ * @access  HR only
+ */
 export const getTokenHistory = async (req, res) => {
   try {
     const tokens = await RegistrationToken.find().sort({ createdAt: -1 });
