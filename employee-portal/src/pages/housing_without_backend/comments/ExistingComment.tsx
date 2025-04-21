@@ -73,6 +73,7 @@ export default function ExistingComment ({ comment, index, reportIndex, setRepor
                             name="description"
                             value={currDescription}
                             onChange={e => setCurrDescription(e.target.value)}
+                            fullWidth
                             required
                         />
                         <Button type="button" onClick={handleCancel}>
