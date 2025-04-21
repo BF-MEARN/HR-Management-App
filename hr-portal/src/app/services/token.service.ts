@@ -10,10 +10,12 @@ import { InviteRequest, RegistrationToken } from '../interfaces/registration-tok
 export class TokenService {
   constructor(private http: HttpClient) {}
 
-  sendInvite(payload: InviteRequest): Observable<any> {
-    return this.http.post(`${environment.apiUrl}/token/generate`, payload, {
-      withCredentials: true,
-    });
+  sendInvite(payload: InviteRequest): Observable<{ token: RegistrationToken }> {
+    return this.http.post<{ token: RegistrationToken }>(
+      `${environment.apiUrl}/token/generate`,
+      payload,
+      { withCredentials: true }
+    );
   }
 
   getTokenHistory(): Observable<RegistrationToken[]> {

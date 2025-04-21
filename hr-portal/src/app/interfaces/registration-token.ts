@@ -9,4 +9,5 @@ export interface RegistrationToken {
   token: string;
   used: boolean;
   createdAt: string;
+  isExpired: boolean;
 }
