@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { RegistrationToken } from 'src/app/interfaces/registration-token';
 import { loadTokenHistory } from 'src/app/store/token/token.actions';
 import { selectAllTokens } from 'src/app/store/token/token.selectors';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-token-history',
@@ -21,7 +22,7 @@ export class TokenHistoryComponent implements OnInit {
   }
 
   getFullInviteLink(token: string): string {
-    return `${window.location.origin}/register/${token}`;
+    return `${environment.reactBaseUrl}/register/${token}`;
   }
   
 }

@@ -12,7 +12,7 @@ export class TokenService {
 
   sendInvite(payload: InviteRequest): Observable<{ token: RegistrationToken }> {
     return this.http.post<{ token: RegistrationToken }>(
-      `${environment.apiUrl}/token/generate`,
+      `${environment.backendBaseUrl}/hr/token/generate`,
       payload,
       { withCredentials: true }
     );
@@ -20,7 +20,7 @@ export class TokenService {
 
   getTokenHistory(): Observable<RegistrationToken[]> {
     return this.http.get<RegistrationToken[]>(
-      `${environment.apiUrl}/token/history`,
+      `${environment.backendBaseUrl}/hr/token/history`,
       { withCredentials: true }
     );
   }
