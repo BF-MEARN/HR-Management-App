@@ -1,0 +1,39 @@
+<div class="home-content">
+  <h2>Welcome, HR!</h2>
+  <p>Logged in as: <strong>hr@example.com</strong></p>
+
+  <div class="dashboard-grid">
+    <div class="stats">
+      <mat-card *ngFor="let stat of dashboardStats" class="stat-card">
+        <mat-icon>{{ stat.icon }}</mat-icon>
+        <div>
+          <h3>{{ stat.value }}</h3>
+          <p>{{ stat.label }}</p>
+        </div>
+      </mat-card>
+    </div>
+
+    <div class="reminders">
+      <mat-card>
+        <h3>Reminders</h3>
+        <ul>
+          <li *ngFor="let task of reminders">
+            <mat-icon color="primary">check_circle</mat-icon>
+            {{ task }}
+          </li>
+        </ul>
+      </mat-card>
+    </div>
+
+    <div class="events">
+      <mat-card>
+        <h3>Upcoming Events</h3>
+        <ul>
+          <li *ngFor="let item of upcomingEvents">
+            <strong>{{ item.date }}</strong> — {{ item.event }}
+          </li>
+        </ul>
+      </mat-card>
+    </div>
+  </div>
+</div>

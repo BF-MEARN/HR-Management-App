@@ -4,14 +4,17 @@ const Schema = mongoose.Schema;
 
 const RegistrationTokenSchema = new Schema(
   {
-    name: { type: String },
-    email: { type: String, index: true },
-    token: { type: String, index: true },
+    name: { type: String, required: true },
+    email: { type: String, required: true, index: true },
+    token: { type: String, required: true, unique: true },
     used: { type: Boolean, default: false },
+    expiresAt: {
+      type: Date,
+      required: true,
+    },
   },
-  { timestamps: true, expireAfterSeconds: 3 * 60 * 60 }
+  { timestamps: true }
 );
 
 const RegistrationToken = mongoose.model('RegistrationToken', RegistrationTokenSchema);
-
 export default RegistrationToken;

@@ -134,6 +134,13 @@ const seedDatabase = async () => {
       const password = await bcrypt.hashSync('password', SALT_ROUNDS);
       const isCitizenOrPR = faker.datatype.boolean(0.3);
       const assignedHouse = faker.helpers.arrayElement(createdHousing);
+      const onboardingStatus = faker.helpers.arrayElement(['Pending', 'Approved', 'Rejected']);
+      const onboardingFeedback =
+        onboardingStatus === 'Rejected'
+          ? faker.lorem.sentence(8)
+          : faker.datatype.boolean(0.5)
+            ? faker.lorem.sentence(5)
+            : '';
 
       const newEmployee = new Employee({
         firstName,
@@ -216,7 +223,8 @@ const seedDatabase = async () => {
               color: faker.vehicle.color(),
             }
           : undefined,
-        onboardingStatus: 'Not Started',
+        onboardingStatus,
+        onboardingFeedback,
       });
 
       const newUser = new User({
@@ -359,6 +367,23 @@ const seedDatabase = async () => {
       console.log('Skipping Facility Reports: Not enough employees with housing or users found.');
     }
 
+    // --- DROP TTL INDEX ON expiresAt (if it exists) ---
+    try {
+      const indexes = await RegistrationToken.collection.indexes();
+      const ttlIndex = indexes.find(
+        (idx) => idx.key?.expiresAt === 1 && idx.expireAfterSeconds !== undefined
+      );
+
+      if (ttlIndex) {
+        await RegistrationToken.collection.dropIndex(ttlIndex.name);
+        console.log('Dropped TTL index on expiresAt field.');
+      } else {
+        console.log('No TTL index on expiresAt found (or already removed).');
+      }
+    } catch (err) {
+      console.warn('Failed to check or drop TTL index on expiresAt:', err.message);
+    }
+
     // --- 6. Seed Registration Tokens ---
     console.log(`Seeding: Registration Tokens`);
     const registrationTokenData = [];
@@ -372,6 +397,7 @@ const seedDatabase = async () => {
           .toLowerCase(),
         token: faker.string.uuid(),
         used: faker.datatype.boolean(0.4),
+        expiresAt: new Date(Date.now() + 3 * 60 * 60 * 1000), // 3 hours from now
       });
     }
     await RegistrationToken.insertMany(registrationTokenData);

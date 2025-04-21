@@ -1,0 +1,35 @@
+<div class="hiring-page-container">
+  <h1 class="page-header">Hiring Management</h1>
+  <mat-tab-group>
+    <!-- Tab 1: Registration Token -->
+    <mat-tab label="Registration Token">
+      <div class="tab-section">
+        <mat-card class="generate-token-card">
+          <div class="generate-section">
+            <div class="header-text">
+              <h2>Generate Token</h2>
+              <p>Invite new employees to onboard the team</p>
+            </div>
+            <button
+              mat-flat-button
+              color="primary"
+              (click)="openDialog()"
+              class="open-dialog-button"
+            >
+              Generate Token & Send Email
+            </button>
+          </div>
+        </mat-card>
+
+        <app-token-history></app-token-history>
+      </div>
+    </mat-tab>
+
+    <!-- Tab 2: Onboarding Applications -->
+    <mat-tab label="Onboarding Applications">
+      <div class="tab-section">
+        <app-onboarding-applications></app-onboarding-applications>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

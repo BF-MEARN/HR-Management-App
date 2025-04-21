@@ -1,0 +1,31 @@
+<div class="token-history-wrapper">
+  <h2>Registration History</h2>
+
+  <div class="token-table">
+    <div class="token-table-header">
+      <div>Name</div>
+      <div>Email</div>
+      <div>Used</div>
+      <div>Expired</div>
+      <div>Registration Link</div>
+    </div>
+
+    <div class="token-table-row" *ngFor="let token of tokens$ | async">
+      <div>{{ token.name }}</div>
+      <div>{{ token.email }}</div>
+      <div>
+        <span class="pill used" *ngIf="token.used">Yes</span>
+        <span class="pill not-used" *ngIf="!token.used">No</span>
+      </div>
+      <div>
+        <span class="pill expired" *ngIf="token.isExpired">Yes</span>
+        <span class="pill active" *ngIf="!token.isExpired">No</span>
+      </div>
+      <div>
+        <a [href]="getFullInviteLink(token.token)" target="_blank" class="link-pill">
+          {{ getFullInviteLink(token.token) }}
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
