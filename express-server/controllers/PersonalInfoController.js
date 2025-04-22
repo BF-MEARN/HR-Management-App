@@ -2,28 +2,38 @@ import Employee from "../models/Employee.js";
 import mongoose from 'mongoose';
 
 // Could populate other data
-const findEmployeeById = async (userId) => {
-  if (!userId) return null;
-  return await Employee.findOne({ userId })
-}
+const findEmployeeByAuthUser = async (userId) => {
+  if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+    console.error('Invalid userId passed to findEmployeeByAuthUser:', userId);
+    return null;
+  }
+  
+  return await Employee.findOne({ userId: userId }).populate('visaInfo');
+};
 
 
 /**
  * ==================
  * GET Employee Data
  * ==================
+ * @route   GET /api/personal-info/
+ * @access  Employee only
  */
 
-export const getPersonalInfo = async (req, res) => {
+export const getPersonalInfo = async (req, res, next) => {
   try {
-    console.log(req.body);
-    const employee = await findEmployeeById(req.body);
-    return res.status(200).json({ employee })
+    const employee = await findEmployeeByAuthUser(req.user.id);
+
+    if (!employee) {
+      return res.status(404).json({ message: 'Employee profile not found for this user.' });
+    }
+
+    return res.status(200).json({ employee });
+  } catch (error) {
+    console.error('Error in getPersonalInfo:', error);
+    next(error);
   }
-  catch (error) {
-    return console.log(error);
-  }
-}
+};
 
 
 

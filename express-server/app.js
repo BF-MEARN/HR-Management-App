@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 
-import { requireHR, userAuth } from './middlewares/AuthMiddlewares.js';
+import { requireHR, userAuth, requireEmployee } from './middlewares/AuthMiddlewares.js';
 import errorHandler from './middlewares/ErrorHandler.js';
 import hrOnboardingRouter from './routers/HrOnboardingRouter.js';
 import hrTokenRouter from './routers/HrTokenRouter.js';
@@ -35,7 +35,7 @@ app.use('/api/hr/onboarding', userAuth, requireHR, hrOnboardingRouter);
 
 // Personal Info Routers (*reminder add middleware after)
 
-app.use('/api/personal-info', userAuth, personalInfoRouter);
+app.use('/api/personal-info', userAuth, requireEmployee, personalInfoRouter);
 
 // Fallback route
 app.get('*', (req, res) => {
