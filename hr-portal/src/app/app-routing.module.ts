@@ -1,11 +1,13 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
+import { GuestGuard } from './guards/guest.guard';
 
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   {
     path: 'login',
+    canActivate: [GuestGuard],
     loadChildren: () =>
       import('./pages/login/login.module').then((m) => m.LoginModule),
   },
@@ -23,7 +25,7 @@ const routes: Routes = [
         (m) => m.HiringManagementModule
       ),
   },
-  { path: '**', redirectTo: 'home' },
+  { path: '**', redirectTo: 'home', pathMatch: 'full' },
 ];
 
 @NgModule({

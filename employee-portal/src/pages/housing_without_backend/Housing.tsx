@@ -2,14 +2,22 @@ import { useState } from 'react';
 
 import { Paper } from '@mui/material';
 
-import ExistingFacilityReport from './ExistingFacilityReport';
-import FacilityReportForm from './FacilityReportForm';
 import HousingDetails from './HousingDetails';
+import ExistingFacilityReport from './reports/ExistingFacilityReport';
+import FacilityReportForm from './reports/FacilityReportForm';
+
+export interface Comment {
+  id: string;
+  description: string;
+  timestamp: Date;
+}
 
 export interface Report {
   id: string;
   title: string;
   description: string;
+  timeframe: Date;
+  comments: Comment[];
 }
 
 export default function HousingPage() {
@@ -36,6 +44,8 @@ export default function HousingPage() {
             index={index}
             title={report.title}
             description={report.description}
+            timeframe={report.timeframe}
+            comments={report.comments}
             setReports={setReports}
           />
         ))}

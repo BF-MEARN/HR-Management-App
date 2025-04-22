@@ -7,5 +7,6 @@ export interface Employee {
   userId?: {
     _id: string;
     email: string;
+    role: 'hr' | 'employee';
   };
 }

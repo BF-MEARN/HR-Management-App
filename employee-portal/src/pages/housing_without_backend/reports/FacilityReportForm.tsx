@@ -1,7 +1,7 @@
 import { Button, Paper, TextField } from '@mui/material';
 import { v4 as randomId } from 'uuid';
 
-import { Report } from './Housing';
+import { Report } from '../Housing';
 
 interface ExistingFacilityReportFormProps {
   formTitle: string;
@@ -22,7 +22,13 @@ export default function FacilityReportForm({
     e.preventDefault();
     setReports((prevReports: Report[]): Report[] => [
       ...prevReports,
-      { id: randomId(), title: formTitle, description: formDescription },
+      {
+        id: randomId(),
+        title: formTitle,
+        description: formDescription,
+        timeframe: new Date(),
+        comments: [],
+      },
     ]);
     setFormTitle('');
     setFormDescription('');
@@ -37,6 +43,7 @@ export default function FacilityReportForm({
           name="title"
           value={formTitle}
           onChange={(e) => setFormTitle(e.target.value)}
+          required
         />
         <br />
         <TextField
@@ -45,6 +52,7 @@ export default function FacilityReportForm({
           value={formDescription}
           onChange={(e) => setFormDescription(e.target.value)}
           fullWidth
+          required
         />
         <Button type="submit">Submit</Button>
       </form>

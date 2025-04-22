@@ -1,5 +1,7 @@
 import Employee from '../models/Employee.js';
 // eslint-disable-next-line no-unused-vars
+import User from '../models/User.js';
+// eslint-disable-next-line no-unused-vars
 import VisaStatus from '../models/VisaStatus.js';
 
 /**
@@ -10,7 +12,7 @@ import VisaStatus from '../models/VisaStatus.js';
 export const getPendingApplications = async (req, res) => {
   try {
     const pendingApps = await Employee.find({ onboardingStatus: 'Pending' })
-      .populate('userId', 'email')
+      .populate('userId', 'email role')
       .populate('visaInfo');
 
     res.status(200).json(pendingApps);
@@ -28,7 +30,7 @@ export const getPendingApplications = async (req, res) => {
 export const getApprovedApplications = async (req, res) => {
   try {
     const approvedApps = await Employee.find({ onboardingStatus: 'Approved' })
-      .populate('userId', 'email')
+      .populate('userId', 'email role')
       .populate('visaInfo');
 
     res.status(200).json(approvedApps);
@@ -45,7 +47,7 @@ export const getApprovedApplications = async (req, res) => {
 export const getRejectedApplications = async (req, res) => {
   try {
     const rejectedApps = await Employee.find({ onboardingStatus: 'Rejected' })
-      .populate('userId', 'email')
+      .populate('userId', 'email role')
       .populate('visaInfo');
 
     res.status(200).json(rejectedApps);
@@ -64,7 +66,7 @@ export const getApplicationById = async (req, res) => {
     const { id } = req.params;
 
     const application = await Employee.findById(id)
-      .populate('userId', 'email')
+      .populate('userId', 'email role')
       .populate('visaInfo');
 
     if (!application) {
