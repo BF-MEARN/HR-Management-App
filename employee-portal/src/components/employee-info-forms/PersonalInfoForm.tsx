@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {
   Box,
   FormControl,
@@ -11,91 +9,19 @@ import {
   Typography,
 } from '@mui/material';
 
+import { useAppDispatch, useAppSelector } from '../../store';
+import { updatePersonalInfo } from '../../store/slices/employeeFormSlice';
+import { Gender } from '../../store/slices/employeeFormTypes';
 import FileUploadWithPreview from '../FileUploadWithPreview';
 
-export interface PersonalInfoFormData {
-  // Names
-  firstName: string;
-  lastName: string;
-  middleName?: string;
-  preferredName?: string;
-
-  // Contact
-  cellPhone: string;
-  workPhone?: string;
-  email: string; // pre-filled, read-only
-
-  // Address
-  address: {
-    building?: string;
-    street: string;
-    city: string;
-    state: string;
-    zip: string;
-  };
-
-  // Profile
-  profilePicture?: File | string; // string if already uploaded
-
-  // Identity
-  ssn: string; // ###-##-####
-  dob: string; // ISO string or Date
-  gender: 'male' | 'female' | 'prefer_not_to_say';
-}
-
-export interface AuthFormData {
-  username: string;
-  email: string;
-  password: string;
-}
-
 export interface PersonalInfoFormProps {
-  email: string;
-  initFormData?: PersonalInfoFormData;
+  onProfilePictureFileChange: (f: File) => void;
 }
 
-export default function PersonalInfoForm(props: PersonalInfoFormProps) {
-  const { email, initFormData } = props;
-  const [formData, setFormData] = React.useState<PersonalInfoFormData>(
-    initFormData ?? {
-      firstName: '',
-      lastName: '',
-      middleName: '',
-      preferredName: '',
-      cellPhone: '',
-      workPhone: '',
-      email,
-      address: {
-        building: '',
-        street: '',
-        city: '',
-        state: '',
-        zip: '',
-      },
+export default function PersonalInfoForm({ onProfilePictureFileChange }: PersonalInfoFormProps) {
+  const formData = useAppSelector((state) => state.employeeForm.personalInfo);
+  const dispatch = useAppDispatch();
 
-      profilePicture: '',
-      ssn: '',
-      dob: '',
-      gender: 'prefer_not_to_say',
-    }
-  );
-
-  const updateField = (key: keyof PersonalInfoFormData, value: string) => {
-    if (key != 'profilePicture' && key != 'address' && key != 'email') {
-      setFormData((prev) => ({ ...prev, [key]: value }));
-    }
-  };
-
-  const updateProfilePicture = (value: string | File) => {
-    setFormData((prev) => ({ ...prev, profilePicture: value }));
-  };
-
-  const updateAddressField = (key: keyof PersonalInfoFormData['address'], value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      address: { ...prev.address, [key]: value },
-    }));
-  };
   return (
     <Box component="form" noValidate sx={{ px: 2 }}>
       {/* Section: Name */}
@@ -109,7 +35,7 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
             required
             fullWidth
             value={formData.firstName}
-            onChange={(e) => updateField('firstName', e.target.value)}
+            onChange={(e) => dispatch(updatePersonalInfo({ firstName: e.target.value }))}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
@@ -118,7 +44,7 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
             required
             fullWidth
             value={formData.lastName}
-            onChange={(e) => updateField('lastName', e.target.value)}
+            onChange={(e) => dispatch(updatePersonalInfo({ lastName: e.target.value }))}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
@@ -126,7 +52,7 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
             label="Middle Name"
             fullWidth
             value={formData.middleName}
-            onChange={(e) => updateField('middleName', e.target.value)}
+            onChange={(e) => dispatch(updatePersonalInfo({ middleName: e.target.value }))}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
@@ -134,7 +60,7 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
             label="Preferred Name"
             fullWidth
             value={formData.preferredName}
-            onChange={(e) => updateField('preferredName', e.target.value)}
+            onChange={(e) => dispatch(updatePersonalInfo({ preferredName: e.target.value }))}
           />
         </Grid>
       </Grid>
@@ -143,8 +69,17 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
         Profile Picture
       </Typography>
       <FileUploadWithPreview
-        file={formData.profilePicture}
-        onFileSelect={(f) => updateProfilePicture(f)}
+        previewURL={formData.profilePicturePreview}
+        fileName={formData.profilePictureFileName}
+        onFileSelect={(f) => {
+          onProfilePictureFileChange(f);
+          dispatch(
+            updatePersonalInfo({
+              profilePictureFileName: f.name,
+              profilePicturePreview: URL.createObjectURL(f),
+            })
+          );
+        }}
         buttonText="Upload Picture..."
         type="image"
       />
@@ -159,7 +94,7 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
             required
             fullWidth
             value={formData.cellPhone}
-            onChange={(e) => updateField('cellPhone', e.target.value)}
+            onChange={(e) => dispatch(updatePersonalInfo({ cellPhone: e.target.value }))}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
@@ -167,7 +102,7 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
             label="Work Phone"
             fullWidth
             value={formData.workPhone}
-            onChange={(e) => updateField('workPhone', e.target.value)}
+            onChange={(e) => dispatch(updatePersonalInfo({ workPhone: e.target.value }))}
           />
         </Grid>
         <Grid size={{ xs: 12 }}>
@@ -191,7 +126,7 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
             required
             fullWidth
             value={formData.address.street}
-            onChange={(e) => updateAddressField('street', e.target.value)}
+            onChange={(e) => dispatch(updatePersonalInfo({ address: { street: e.target.value } }))}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
@@ -199,7 +134,9 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
             label="Building / Apt #"
             fullWidth
             value={formData.address.building}
-            onChange={(e) => updateAddressField('building', e.target.value)}
+            onChange={(e) =>
+              dispatch(updatePersonalInfo({ address: { building: e.target.value } }))
+            }
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
@@ -208,7 +145,7 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
             required
             fullWidth
             value={formData.address.city}
-            onChange={(e) => updateAddressField('city', e.target.value)}
+            onChange={(e) => dispatch(updatePersonalInfo({ address: { city: e.target.value } }))}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
@@ -217,7 +154,7 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
             required
             fullWidth
             value={formData.address.state}
-            onChange={(e) => updateAddressField('state', e.target.value)}
+            onChange={(e) => dispatch(updatePersonalInfo({ address: { state: e.target.value } }))}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
@@ -226,7 +163,7 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
             required
             fullWidth
             value={formData.address.zip}
-            onChange={(e) => updateAddressField('zip', e.target.value)}
+            onChange={(e) => dispatch(updatePersonalInfo({ address: { zip: e.target.value } }))}
           />
         </Grid>
       </Grid>
@@ -242,7 +179,7 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
             required
             fullWidth
             value={formData.ssn}
-            onChange={(e) => updateField('ssn', e.target.value)}
+            onChange={(e) => dispatch(updatePersonalInfo({ ssn: e.target.value }))}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
@@ -252,7 +189,7 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
             required
             fullWidth
             value={formData.dob}
-            onChange={(e) => updateField('dob', e.target.value)}
+            onChange={(e) => dispatch(updatePersonalInfo({ dob: e.target.value }))}
             slotProps={{ inputLabel: { shrink: true } }}
           />
         </Grid>
@@ -263,7 +200,7 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
               labelId="gender-label"
               value={formData.gender}
               label="Gender"
-              onChange={(e) => updateField('gender', e.target.value)}
+              onChange={(e) => dispatch(updatePersonalInfo({ gender: e.target.value as Gender }))}
             >
               <MenuItem value="male">Male</MenuItem>
               <MenuItem value="female">Female</MenuItem>

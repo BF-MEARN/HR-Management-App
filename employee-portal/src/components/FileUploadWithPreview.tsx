@@ -1,4 +1,5 @@
-import { Box, Button, Typography } from '@mui/material';
+import { Download } from '@mui/icons-material';
+import { Box, Button, IconButton, Typography } from '@mui/material';
 
 const AcceptedTypes = {
   image: 'image/png,image/jpeg',
@@ -6,8 +7,10 @@ const AcceptedTypes = {
   any: '*',
 };
 export interface FileUploadWithPreviewProps {
-  file?: File | string;
-  buttonText: string;
+  previewURL?: string;
+  fileName?: string;
+  previewOnly?: boolean;
+  buttonText?: string;
   onFileSelect?: (file: File) => void;
   type: keyof typeof AcceptedTypes;
   width?: string;
@@ -15,16 +18,18 @@ export interface FileUploadWithPreviewProps {
 }
 
 export default function FileUploadWithPreview({
-  file,
-  buttonText,
-  onFileSelect,
+  previewURL,
+  fileName,
+  buttonText = 'Upload File...',
+  onFileSelect = () => {},
+  previewOnly = false,
   type = 'any',
   width = '200px',
   height = '200px',
 }: FileUploadWithPreviewProps) {
   const accept = AcceptedTypes[type];
   const renderContent = () => {
-    if (!file) {
+    if (!previewURL || !fileName) {
       return (
         <Typography variant="body2" color="textSecondary">
           No file uploaded
@@ -32,19 +37,34 @@ export default function FileUploadWithPreview({
       );
     }
 
-    const fileUrl = typeof file === 'string' ? file : URL.createObjectURL(file);
-
     if (type == 'image') {
       return (
         <img
-          src={fileUrl}
+          src={previewURL}
           alt="Preview"
           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
         />
       );
     }
 
-    return <Typography variant="body2">File uploaded</Typography>;
+    return (
+      <Box display="flex" alignItems="center" gap={1}>
+        <Typography>{fileName}</Typography>
+        {previewOnly && (
+          <IconButton
+            aria-label="download"
+            component="a"
+            href={previewURL}
+            target="_blank"
+            rel="noopener noreferrer"
+            download={fileName}
+            size="small"
+          >
+            <Download />
+          </IconButton>
+        )}
+      </Box>
+    );
   };
 
   return (
@@ -72,20 +92,22 @@ export default function FileUploadWithPreview({
       >
         {renderContent()}
       </Box>
-      <Button variant="outlined" component="label">
-        {buttonText}
-        <input
-          type="file"
-          hidden
-          accept={accept}
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file && onFileSelect) {
-              onFileSelect(file);
-            }
-          }}
-        />
-      </Button>
+      {!previewOnly && (
+        <Button variant="outlined" component="label">
+          {buttonText}
+          <input
+            type="file"
+            hidden
+            accept={accept}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file && onFileSelect) {
+                onFileSelect(file);
+              }
+            }}
+          />
+        </Button>
+      )}
     </Box>
   );
 }

@@ -1,36 +1,18 @@
-import React from 'react';
-
 import { Box, Checkbox, FormControlLabel, Grid, TextField, Typography } from '@mui/material';
-import { produce } from 'immer';
 
+import { useAppDispatch, useAppSelector } from '../../store';
+import { updateDriverAndCar } from '../../store/slices/employeeFormSlice';
 import FileUploadWithPreview from '../FileUploadWithPreview';
 
-export interface DriverAndCarFormData {
-  hasDriverLicense: boolean;
-  driverLicense?: {
-    number: string;
-    expirationDate: string;
-    file?: File | string;
-  };
-  hasCar: boolean;
-  carInfo?: {
-    make: string;
-    model: string;
-    color: string;
-  };
+export interface DriverAndCarInfoFormProps {
+  onDriverLicenseFileChange: (f: File) => void;
 }
 
-const emptyLicenseEntry = { number: '', expirationDate: '', file: undefined };
-const emptyCarEntry = {
-  make: '',
-  model: '',
-  color: '',
-};
-
-export default function DriverAndCarInfoForm(props: { initFormData?: DriverAndCarFormData }) {
-  const [formData, setFormData] = React.useState<DriverAndCarFormData>(
-    props.initFormData ?? { hasDriverLicense: false, hasCar: false }
-  );
+export default function DriverAndCarInfoForm({
+  onDriverLicenseFileChange,
+}: DriverAndCarInfoFormProps) {
+  const formData = useAppSelector((state) => state.employeeForm.driverAndCar);
+  const dispatch = useAppDispatch();
   return (
     <Box sx={{ px: 2 }}>
       <Typography variant="h6" mb={1}>
@@ -41,14 +23,7 @@ export default function DriverAndCarInfoForm(props: { initFormData?: DriverAndCa
           <Checkbox
             checked={formData.hasDriverLicense}
             slotProps={{ input: { 'aria-label': 'controlled' } }}
-            onChange={(e) =>
-              setFormData((prev) =>
-                produce(prev, (draft) => {
-                  draft.hasDriverLicense = e.target.checked;
-                  draft.driverLicense = prev.driverLicense ?? emptyLicenseEntry;
-                })
-              )
-            }
+            onChange={(e) => dispatch(updateDriverAndCar({ hasDriverLicense: e.target.checked }))}
           />
         }
         label="I have a driver's license"
@@ -60,13 +35,9 @@ export default function DriverAndCarInfoForm(props: { initFormData?: DriverAndCa
             <TextField
               label="License Number"
               fullWidth
-              value={formData.driverLicense?.number}
+              value={formData.driverLicense.number}
               onChange={(e) =>
-                setFormData((prev) =>
-                  produce(prev, (draft) => {
-                    draft.driverLicense!.number = e.target.value;
-                  })
-                )
+                dispatch(updateDriverAndCar({ driverLicense: { number: e.target.value } }))
               }
             />
           </Grid>
@@ -76,29 +47,30 @@ export default function DriverAndCarInfoForm(props: { initFormData?: DriverAndCa
               label="Expiration Date"
               slotProps={{ inputLabel: { shrink: true } }}
               fullWidth
-              value={formData.driverLicense?.expirationDate}
+              value={formData.driverLicense.expirationDate}
               onChange={(e) =>
-                setFormData((prev) =>
-                  produce(prev, (draft) => {
-                    draft.driverLicense!.expirationDate = e.target.value;
-                  })
-                )
+                dispatch(updateDriverAndCar({ driverLicense: { expirationDate: e.target.value } }))
               }
             />
           </Grid>
           <Grid size={{ xs: 12 }}>
             <FileUploadWithPreview
-              file={formData.driverLicense?.file}
+              previewURL={formData.driverLicense.licensePreview}
               type="document"
-              height={'2rem'}
+              height="2rem"
+              fileName={formData.driverLicense.licenseFileName}
               buttonText="Upload Driver's License"
-              onFileSelect={(file) =>
-                setFormData((prev) =>
-                  produce(prev, (draft) => {
-                    draft.driverLicense!.file = file;
+              onFileSelect={(f) => {
+                dispatch(
+                  updateDriverAndCar({
+                    driverLicense: {
+                      licenseFileName: f.name,
+                      licensePreview: URL.createObjectURL(f),
+                    },
                   })
-                )
-              }
+                );
+                onDriverLicenseFileChange(f);
+              }}
             />
           </Grid>
         </Grid>
@@ -110,14 +82,7 @@ export default function DriverAndCarInfoForm(props: { initFormData?: DriverAndCa
         control={
           <Checkbox
             checked={formData.hasCar}
-            onChange={(e) =>
-              setFormData((prev) =>
-                produce(prev, (draft) => {
-                  draft.hasCar = e.target.checked;
-                  draft.carInfo = prev.carInfo ?? emptyCarEntry;
-                })
-              )
-            }
+            onChange={(e) => dispatch(updateDriverAndCar({ hasCar: e.target.checked }))}
           />
         }
         label="I have a car"
@@ -128,42 +93,24 @@ export default function DriverAndCarInfoForm(props: { initFormData?: DriverAndCa
             <TextField
               label="Car Make"
               fullWidth
-              value={formData.carInfo?.make}
-              onChange={(e) =>
-                setFormData((prev) =>
-                  produce(prev, (draft) => {
-                    draft.carInfo!.make = e.target.value;
-                  })
-                )
-              }
+              value={formData.carInfo.make}
+              onChange={(e) => dispatch(updateDriverAndCar({ carInfo: { make: e.target.value } }))}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 4 }}>
             <TextField
               label="Car Model"
               fullWidth
-              value={formData.carInfo?.model}
-              onChange={(e) =>
-                setFormData((prev) =>
-                  produce(prev, (draft) => {
-                    draft.carInfo!.model = e.target.value;
-                  })
-                )
-              }
+              value={formData.carInfo.model}
+              onChange={(e) => dispatch(updateDriverAndCar({ carInfo: { model: e.target.value } }))}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 4 }}>
             <TextField
               label="Car Color"
               fullWidth
-              value={formData.carInfo?.color}
-              onChange={(e) =>
-                setFormData((prev) =>
-                  produce(prev, (draft) => {
-                    draft.carInfo!.color = e.target.value;
-                  })
-                )
-              }
+              value={formData.carInfo.color}
+              onChange={(e) => dispatch(updateDriverAndCar({ carInfo: { color: e.target.value } }))}
             />
           </Grid>
         </Grid>

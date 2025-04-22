@@ -1,5 +1,3 @@
-import React, { Dispatch } from 'react';
-
 import {
   Box,
   Button,
@@ -12,45 +10,18 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { produce } from 'immer';
 
-export interface Contact {
-  firstName: string;
-  lastName: string;
-  middleName?: string;
-
-  phone: string;
-  email: string;
-  relationship: string;
-}
-
-const emptyContact: Contact = {
-  firstName: '',
-  lastName: '',
-  phone: '',
-  email: '',
-  relationship: '',
-};
-
-export interface ContactFormData {
-  hasReference: boolean;
-  reference?: Contact;
-  emergencyContacts: Contact[];
-}
+import { useAppDispatch, useAppSelector } from '../../store';
+import { updateContacts } from '../../store/slices/employeeFormSlice';
+import { Contact, emptyContact } from '../../store/slices/employeeFormTypes';
 
 function ContactForm({
   contact,
-  setContact,
+  updateContact,
 }: {
   contact: Contact;
-  setContact: Dispatch<React.SetStateAction<Contact>>;
+  updateContact: (patch: Partial<Contact>) => void;
 }) {
-  const updateField = (key: keyof Contact, value: string) =>
-    setContact((prev) =>
-      produce(prev, (draft) => {
-        draft[key] = value;
-      })
-    );
   return (
     <Grid container spacing={2}>
       <Grid size={{ xs: 12, sm: 4 }}>
@@ -59,7 +30,7 @@ function ContactForm({
           required
           fullWidth
           value={contact.firstName}
-          onChange={(e) => updateField('firstName', e.target.value)}
+          onChange={(e) => updateContact({ firstName: e.target.value })}
         />
       </Grid>
       <Grid size={{ xs: 12, sm: 4 }}>
@@ -68,7 +39,7 @@ function ContactForm({
           required
           fullWidth
           value={contact.lastName}
-          onChange={(e) => updateField('lastName', e.target.value)}
+          onChange={(e) => updateContact({ lastName: e.target.value })}
         />
       </Grid>
       <Grid size={{ xs: 12, sm: 4 }}>
@@ -76,7 +47,7 @@ function ContactForm({
           label="Middle Name"
           fullWidth
           value={contact.middleName}
-          onChange={(e) => updateField('middleName', e.target.value)}
+          onChange={(e) => updateContact({ middleName: e.target.value })}
         />
       </Grid>
       <Grid size={{ xs: 12, sm: 6 }}>
@@ -85,7 +56,7 @@ function ContactForm({
           required
           fullWidth
           value={contact.phone}
-          onChange={(e) => updateField('phone', e.target.value)}
+          onChange={(e) => updateContact({ phone: e.target.value })}
         />
       </Grid>
       <Grid size={{ xs: 12, sm: 6 }}>
@@ -94,7 +65,7 @@ function ContactForm({
           required
           fullWidth
           value={contact.email}
-          onChange={(e) => updateField('email', e.target.value)}
+          onChange={(e) => updateContact({ email: e.target.value })}
         />
       </Grid>
       <Grid size={{ xs: 12 }}>
@@ -103,33 +74,35 @@ function ContactForm({
           required
           fullWidth
           value={contact.relationship}
-          onChange={(e) => updateField('relationship', e.target.value)}
+          onChange={(e) => updateContact({ relationship: e.target.value })}
         />
       </Grid>
     </Grid>
   );
 }
 
-export default function ReferenceAndEmergencyContactForm({
-  initFormData,
-}: {
-  initFormData: ContactFormData;
-}) {
-  const [formData, setFormData] = React.useState<ContactFormData>(
-    initFormData ?? {
-      hasReference: false,
-      reference: { ...emptyContact },
-      emergencyContacts: [],
-    }
-  );
+export default function ReferenceAndEmergencyContactForm() {
+  const formData = useAppSelector((state) => state.employeeForm.contacts);
+  const dispatch = useAppDispatch();
 
-  const updateEmergencyContact = (index: number, updated: Contact) => {
-    setFormData((prev) =>
-      produce(prev, (draft) => {
-        draft.emergencyContacts[index] = updated;
-      })
-    );
+  const updateEmergencyContact = (index: number, patch: Partial<Contact>) => {
+    const newArray = [...formData.emergencyContacts];
+    const patchedContact = { ...newArray[index], ...patch };
+    newArray[index] = patchedContact;
+    dispatch(updateContacts({ emergencyContacts: newArray }));
   };
+  const spliceEmergencyContact = (index: number) => {
+    const newArray = [
+      ...formData.emergencyContacts.slice(0, index),
+      ...formData.emergencyContacts.slice(index + 1),
+    ];
+    dispatch(updateContacts({ emergencyContacts: newArray }));
+  };
+  const addNewEmergencyContact = () => {
+    const newArray = [...formData.emergencyContacts, emptyContact];
+    dispatch(updateContacts({ emergencyContacts: newArray }));
+  };
+
   return (
     <Box sx={{ px: 2 }}>
       <Typography variant="h6" mb={1}>
@@ -139,16 +112,7 @@ export default function ReferenceAndEmergencyContactForm({
         control={
           <Checkbox
             checked={formData.hasReference}
-            onChange={(e) =>
-              setFormData((prev) =>
-                produce(prev, (draft) => {
-                  draft.hasReference = e.target.checked;
-                  if (draft.hasReference && !draft.reference) {
-                    draft.reference = emptyContact;
-                  }
-                })
-              )
-            }
+            onChange={(e) => dispatch(updateContacts({ hasReference: e.target.checked }))}
           />
         }
         label="I was referred by someone"
@@ -161,13 +125,7 @@ export default function ReferenceAndEmergencyContactForm({
             </Typography>
             <ContactForm
               contact={formData.reference!}
-              setContact={(updated) => {
-                setFormData((prev) =>
-                  produce(prev, (draft) => {
-                    draft.reference = updated as Contact;
-                  })
-                );
-              }}
+              updateContact={(e) => dispatch(updateContacts({ reference: e }))}
             />
           </CardContent>
         </Card>
@@ -187,35 +145,17 @@ export default function ReferenceAndEmergencyContactForm({
             </Typography>
             <ContactForm
               contact={contact}
-              setContact={(updated) => updateEmergencyContact(i, updated as Contact)}
+              updateContact={(updated) => updateEmergencyContact(i, updated)}
             />
           </CardContent>
           <CardActions>
-            <Button
-              size="small"
-              onClick={() =>
-                setFormData((prev) =>
-                  produce(prev, (draft) => {
-                    draft.emergencyContacts.splice(i, 1);
-                  })
-                )
-              }
-            >
+            <Button size="small" onClick={() => spliceEmergencyContact(i)}>
               Remove
             </Button>
           </CardActions>
         </Card>
       ))}
-      <Button
-        sx={{ mt: 1 }}
-        onClick={() =>
-          setFormData((prev) =>
-            produce(prev, (draft) => {
-              draft.emergencyContacts.push({ ...emptyContact });
-            })
-          )
-        }
-      >
+      <Button sx={{ mt: 1 }} onClick={addNewEmergencyContact}>
         Add contact
       </Button>
     </Box>

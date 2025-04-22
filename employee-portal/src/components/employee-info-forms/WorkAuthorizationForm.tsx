@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {
   Box,
   Checkbox,
@@ -12,40 +10,28 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { produce } from 'immer';
 
+import { useAppDispatch, useAppSelector } from '../../store';
+import { updateWorkAuth } from '../../store/slices/employeeFormSlice';
+import {
+  WorkAuthorizationType,
+  workAuthorizationCategories,
+} from '../../store/slices/employeeFormTypes';
 import FileUploadWithPreview from '../FileUploadWithPreview';
 
-const citizenOrPermanentResidentTypes = {
-  citizen: 'Citizen',
-  green_card: 'Permanent Resident (Green Card)',
-};
-const foreignerTypes = { 'h1-b': 'H1-B', l2: 'L2', f1: 'F1 (CPT/OPT)', h4: 'H4', other: 'Other' };
-
-type AuthorizationType = keyof typeof citizenOrPermanentResidentTypes | keyof typeof foreignerTypes;
-export interface WorkAuthorizationFormData {
-  isCitizenOrPermanentResident: boolean;
-  authorizationType: AuthorizationType;
-  f1Document?: File | string;
-  visaTitle?: string;
-  startDate?: string;
-  endDate?: string;
+export interface WorkAuthorizationFormProps {
+  onF1OptDocumentChange: (f: File) => void;
 }
 
 export default function WorkAuthorizationForm({
-  initFormData,
-}: {
-  initFormData: WorkAuthorizationFormData;
-}) {
-  const [formData, setFormData] = React.useState<WorkAuthorizationFormData>(
-    initFormData ?? {
-      isCitizenOrPermanentResident: true,
-      authorizationType: 'citizen',
-    }
-  );
+  onF1OptDocumentChange,
+}: WorkAuthorizationFormProps) {
+  const formData = useAppSelector((state) => state.employeeForm.workAuth);
+  const dispatch = useAppDispatch();
+
   const selectableTypes = formData.isCitizenOrPermanentResident
-    ? citizenOrPermanentResidentTypes
-    : foreignerTypes;
+    ? workAuthorizationCategories.citizenOrPermanentResidentTypes
+    : workAuthorizationCategories.foreignerTypes;
   return (
     <Box sx={{ px: 2 }}>
       <Typography variant="h6" mb={1}>
@@ -55,16 +41,17 @@ export default function WorkAuthorizationForm({
         control={
           <Checkbox
             checked={formData.isCitizenOrPermanentResident}
-            onChange={(e) =>
-              setFormData((prev) =>
-                produce(prev, (draft) => {
-                  if (prev.isCitizenOrPermanentResident == e.target.checked) return;
-                  draft.isCitizenOrPermanentResident = e.target.checked;
-                  const types = e.target.checked ? citizenOrPermanentResidentTypes : foreignerTypes;
-                  draft.authorizationType = Object.keys(types)[0] as AuthorizationType;
+            onChange={(e) => {
+              const types = e.target.checked
+                ? workAuthorizationCategories.citizenOrPermanentResidentTypes
+                : workAuthorizationCategories.foreignerTypes;
+              dispatch(
+                updateWorkAuth({
+                  isCitizenOrPermanentResident: e.target.checked,
+                  authorizationType: Object.keys(types)[0] as WorkAuthorizationType,
                 })
-              )
-            }
+              );
+            }}
           />
         }
         label="I am a US citizen or a permanent US resident"
@@ -76,9 +63,9 @@ export default function WorkAuthorizationForm({
           value={formData.authorizationType}
           label="Authorization Type"
           onChange={(e) =>
-            setFormData((prev) =>
-              produce(prev, (draft) => {
-                draft.authorizationType = e.target.value as typeof formData.authorizationType;
+            dispatch(
+              updateWorkAuth({
+                authorizationType: e.target.value as WorkAuthorizationType,
               })
             )
           }
@@ -99,17 +86,22 @@ export default function WorkAuthorizationForm({
             {formData.authorizationType == 'f1' && (
               <Grid size={{ xs: 12 }}>
                 <FileUploadWithPreview
-                  file={formData.f1Document}
+                  previewURL={formData.extraAuthInfo.f1DocumentPreview}
+                  fileName={formData.extraAuthInfo.f1DocumentName}
                   type="document"
-                  height={'2rem'}
+                  height="2rem"
                   buttonText="Upload OPT Receipt"
-                  onFileSelect={(file) =>
-                    setFormData((prev) =>
-                      produce(prev, (draft) => {
-                        draft.f1Document = file;
+                  onFileSelect={(file) => {
+                    onF1OptDocumentChange(file);
+                    dispatch(
+                      updateWorkAuth({
+                        extraAuthInfo: {
+                          f1DocumentName: file.name,
+                          f1DocumentPreview: URL.createObjectURL(file),
+                        },
                       })
-                    )
-                  }
+                    );
+                  }}
                 />
               </Grid>
             )}
@@ -118,11 +110,13 @@ export default function WorkAuthorizationForm({
                 <TextField
                   label="Visa Title"
                   fullWidth
-                  value={formData.visaTitle}
+                  value={formData.extraAuthInfo.visaTitle}
                   onChange={(e) =>
-                    setFormData((prev) =>
-                      produce(prev, (draft) => {
-                        draft.visaTitle = e.target.value;
+                    dispatch(
+                      updateWorkAuth({
+                        extraAuthInfo: {
+                          visaTitle: e.target.value,
+                        },
                       })
                     )
                   }
@@ -135,11 +129,13 @@ export default function WorkAuthorizationForm({
                 label="Start Date"
                 slotProps={{ inputLabel: { shrink: true } }}
                 fullWidth
-                value={formData.startDate}
+                value={formData.extraAuthInfo.startDate}
                 onChange={(e) =>
-                  setFormData((prev) =>
-                    produce(prev, (draft) => {
-                      draft.startDate = e.target.value;
+                  dispatch(
+                    updateWorkAuth({
+                      extraAuthInfo: {
+                        startDate: e.target.value,
+                      },
                     })
                   )
                 }
@@ -151,11 +147,13 @@ export default function WorkAuthorizationForm({
                 label="End Date"
                 slotProps={{ inputLabel: { shrink: true } }}
                 fullWidth
-                value={formData.endDate}
+                value={formData.extraAuthInfo.endDate}
                 onChange={(e) =>
-                  setFormData((prev) =>
-                    produce(prev, (draft) => {
-                      draft.endDate = e.target.value;
+                  dispatch(
+                    updateWorkAuth({
+                      extraAuthInfo: {
+                        endDate: e.target.value,
+                      },
                     })
                   )
                 }
