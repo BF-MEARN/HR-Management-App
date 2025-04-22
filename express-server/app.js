@@ -27,6 +27,7 @@ app.use(
 // Common routes
 // Allow anyone to login/register
 app.use('/api/user', userRouter);
+app.use('/api/onboarding')
 
 // HR specific routes
 app.use('/api/hr/token', userAuth, requireHR, hrTokenRouter);
