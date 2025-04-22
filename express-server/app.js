@@ -8,6 +8,7 @@ import errorHandler from './middlewares/ErrorHandler.js';
 import hrOnboardingRouter from './routers/HrOnboardingRouter.js';
 import hrTokenRouter from './routers/HrTokenRouter.js';
 import userRouter from './routers/UserRouter.js';
+import personalInfoRouter from './routers/PersonalInfoRouter.js'
 
 dotenv.config();
 
@@ -31,6 +32,10 @@ app.use('/api/user', userRouter);
 // HR specific routes
 app.use('/api/hr/token', userAuth, requireHR, hrTokenRouter);
 app.use('/api/hr/onboarding', userAuth, requireHR, hrOnboardingRouter);
+
+// Personal Info Routers (*reminder add middleware after)
+
+app.use('/api/personal-info', userAuth, personalInfoRouter);
 
 // Fallback route
 app.get('*', (req, res) => {

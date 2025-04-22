@@ -1,15 +1,36 @@
-import Employee from "../models/Employee";
+import Employee from "../models/Employee.js";
+import mongoose from 'mongoose';
+
+// Could populate other data
+const findEmployeeById = async (userId) => {
+  if (!userId) return null;
+  return await Employee.findOne({ userId })
+}
 
 
 /**
- * GETS
+ * ==================
+ * GET Employee Data
+ * ==================
  */
 
+export const getPersonalInfo = async (req, res) => {
+  try {
+    console.log(req.body);
+    const employee = await findEmployeeById(req.body);
+    return res.status(200).json({ employee })
+  }
+  catch (error) {
+    return console.log(error);
+  }
+}
 
 
 
 /**
- * PUTS
+ * ==================
+ * PUT Sections
+ * ==================
  */
 export const editName = async (req, res) => {
 
