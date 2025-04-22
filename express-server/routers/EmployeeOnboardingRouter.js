@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { createNewEmployee, createHousing } from '../controllers/EmployeeOnboardingController.js';
+import { createHousing, createNewEmployee } from '../controllers/EmployeeOnboardingController.js';
 
 const employeeOnboardingRouter = Router();
 
