@@ -88,3 +88,8 @@ export const register = async (req, res) => {
     console.error({ error: error.message });
   }
 };
+
+export const verifyUser = async (req, res) => {
+  const user = await User.findById(req.user.id).select('-password');
+  res.status(200).json({ user });
+};

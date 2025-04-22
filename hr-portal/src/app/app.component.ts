@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { AuthActions } from './store/auth/auth.actions';
+import { AuthActions, setUser } from './store/auth/auth.actions';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 
@@ -19,7 +19,8 @@ export class AppComponent implements OnInit {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       const user = JSON.parse(storedUser);
-      this.store.dispatch(AuthActions.loginSuccess({ user }));
+      // this.store.dispatch(AuthActions.loginSuccess({ user }));
+      this.store.dispatch(setUser({ user }));
     }
 
     // Logic to show/hide navbar
