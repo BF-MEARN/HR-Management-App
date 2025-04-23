@@ -3,8 +3,9 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 
-import { requireHR, userAuth } from './middlewares/AuthMiddlewares.js';
+import { requireEmployee, requireHR, userAuth } from './middlewares/AuthMiddlewares.js';
 import errorHandler from './middlewares/ErrorHandler.js';
+import employeeFacilityReportRouter from './routers/EmployeeFacilityReportRouter.js';
 import employeeOnboardingRouter from './routers/EmployeeOnboardingRouter.js';
 import hrOnboardingRouter from './routers/HrOnboardingRouter.js';
 import hrTokenRouter from './routers/HrTokenRouter.js';
@@ -33,6 +34,9 @@ app.use('/api/onboarding', employeeOnboardingRouter);
 // HR specific routes
 app.use('/api/hr/token', userAuth, requireHR, hrTokenRouter);
 app.use('/api/hr/onboarding', userAuth, requireHR, hrOnboardingRouter);
+
+// Employee specific routes
+app.use('/api/employee/facilityReport', userAuth, requireEmployee, employeeFacilityReportRouter);
 
 // Fallback route
 app.get('*', (req, res) => {
