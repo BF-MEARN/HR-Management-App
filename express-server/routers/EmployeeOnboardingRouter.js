@@ -10,7 +10,7 @@ import {
   updateI983,
   updateOptEAD,
   updateOptReceipt,
-  validateRegistrationToken
+  validateRegistrationToken,
 } from '../controllers/EmployeeOnboardingController.js';
 
 const employeeOnboardingRouter = Router();

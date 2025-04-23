@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 
 import Employee from '../models/Employee.js';
 import Housing from '../models/Housing.js';
+import RegistrationToken from '../models/RegistrationToken.js';
 import VisaStatus from '../models/VisaStatus.js';
 
 export const validateRegistrationToken = async (req, res) => {
@@ -21,7 +22,7 @@ export const validateRegistrationToken = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Failed to validate employee registration token ', error });
   }
-}
+};
 
 export const createNewEmployee = async (req, res) => {
   try {
