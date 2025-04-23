@@ -1,6 +1,7 @@
-import { GetObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { s3Client } from "./s3-credentials.js";
+import { GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+
+import { s3Client } from './s3-credentials.js';
 
 /**
  * Generates a presigned URL for securely reading an object from S3.
@@ -10,11 +11,11 @@ import { s3Client } from "./s3-credentials.js";
  */
 export const getPresignedGetUrl = async (key, expiresIn = 300) => {
   if (!key) {
-    console.error("getPresignedGetUrl: No key provided.");
+    console.error('getPresignedGetUrl: No key provided.');
     return null;
   }
   if (!process.env.AWS_S3_BUCKET_NAME) {
-    console.error("getPresignedGetUrl: AWS_S3_BUCKET_NAME environment variable not set.");
+    console.error('getPresignedGetUrl: AWS_S3_BUCKET_NAME environment variable not set.');
     return null;
   }
 
@@ -29,7 +30,6 @@ export const getPresignedGetUrl = async (key, expiresIn = 300) => {
 
     console.log(`Generated presigned GET URL for key "${key}"`);
     return url;
-
   } catch (error) {
     console.error(`Error generating presigned GET URL for key "${key}":`, error);
     if (error.name === 'NoSuchKey') {

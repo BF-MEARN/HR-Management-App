@@ -8,8 +8,8 @@ import {
   editEmergencyContact,
   editEmployment,
   editName,
+  getDocumentUrl,
   getPersonalInfo,
-  getDocumentUrl
 } from '../controllers/PersonalInfoController.js';
 
 const router = express.Router();

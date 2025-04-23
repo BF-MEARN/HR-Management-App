@@ -4,9 +4,8 @@ import path from 'path';
 import Employee from '../models/Employee.js';
 import User from '../models/User.js';
 import VisaStatus from '../models/VisaStatus.js';
-import { putObject } from '../utils/putObject.js';
-import { getObject } from '../utils/getObject.js';
 import { getPresignedGetUrl } from '../utils/getPresignedGetUrl.js';
+import { putObject } from '../utils/putObject.js';
 
 /**
  * ==================
@@ -307,7 +306,8 @@ export const editDocuments = async (req, res, next) => {
     }
 
     // --- Handle Metadata Updates from req.body ---
-    const { driverLicense: driverLicenseMetadata, profilePicture: profilePictureMetadata } = req.body;
+    const { driverLicense: driverLicenseMetadata, profilePicture: profilePictureMetadata } =
+      req.body;
 
     if (!profilePictureResult && profilePictureMetadata !== undefined) {
       employee.profilePicture = profilePictureMetadata;
@@ -342,7 +342,6 @@ export const editDocuments = async (req, res, next) => {
     next(error);
   }
 };
-
 
 /**
  * @desc    Get a presigned URL for downloading/previewing a specific document
@@ -391,17 +390,22 @@ export const getDocumentUrl = async (req, res, next) => {
 
     if (!s3Key) {
       console.log(`Document of type "${type}" not found or no key stored for user ${userId}.`);
-      return res.status(404).json({ message: `Document of type "${type}" not found or not uploaded.` });
+      return res
+        .status(404)
+        .json({ message: `Document of type "${type}" not found or not uploaded.` });
     }
 
-    const presignedUrl = await getPresignedGetUrl(s3Key); 
+    const presignedUrl = await getPresignedGetUrl(s3Key);
 
     if (!presignedUrl) {
-      return res.status(500).json({ message: `Failed to generate URL for document type "${type}". Check server logs.` });
+      return res
+        .status(500)
+        .json({
+          message: `Failed to generate URL for document type "${type}". Check server logs.`,
+        });
     }
 
     res.status(200).json({ url: presignedUrl });
-
   } catch (error) {
     console.error(`Error getting document URL for type "${req.query.type}":`, error);
     next(error);
