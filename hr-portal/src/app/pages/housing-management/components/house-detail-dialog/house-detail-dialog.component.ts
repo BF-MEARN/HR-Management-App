@@ -10,6 +10,7 @@ export class HouseDetailDialogComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    console.log("HouseDetailDialogComponent initialized");
   }
 
 }
