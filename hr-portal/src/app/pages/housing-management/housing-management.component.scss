@@ -1,0 +1,28 @@
+.housing-wrapper {
+  padding: 24px;
+
+  .page-header {
+    font-size: 32px;
+    font-weight: 500;
+    margin-bottom: 16px;
+    margin-top: 12px;
+  }
+}
+
+.card-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+.house-card {
+  padding: 0.5rem;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+}
+
+.add-house-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 100;
+}

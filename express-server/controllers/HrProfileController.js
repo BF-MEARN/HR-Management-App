@@ -23,8 +23,7 @@ export const getAllProfiles = async (req, res) => {
 
     res.status(200).json(transformed);
   } catch (err) {
-    console.error('Error fetching employee profiles:', err);
-    res.status(500).json({ message: 'Failed to fetch employee data.' });
+    res.status(500).json({ message: 'Failed to fetch employee data.', error: err.message });
   }
 };
 
@@ -43,7 +42,6 @@ export const getProfileById = async (req, res) => {
 
     res.json(employee);
   } catch (err) {
-    console.error(`Error fetching profile with ID ${req.params.id}:`, err);
-    res.status(500).json({ message: 'Failed to load profile' });
+    res.status(500).json({ message: 'Failed to load profile', error: err.message });
   }
 };

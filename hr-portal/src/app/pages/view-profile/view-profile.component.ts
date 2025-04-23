@@ -96,11 +96,12 @@ export class ViewProfileComponent implements OnInit {
   }
  
   goBack(): void {
-    this.router.navigate(['/hiring'], {
+    this.router.navigate(['/employee-profiles'], {
       queryParams: { tab: this.fromTab }
     });
   }
 
+  // TODO: Route to visa status page by id
   goToVisaStatusPage(employeeId: string): void {
     this.router.navigate(['/visa-status', employeeId]);
   }

@@ -8,43 +8,43 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class OnboardingApplicationService {
+  private readonly baseUrl = `${environment.backendBaseUrl}/hr/onboarding`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getPending(): Observable<Employee[]> {
-    return this.http.get<Employee[]>(
-      `${environment.backendBaseUrl}/hr/onboarding/pending`, 
-      {withCredentials: true}
-    );
+    return this.http.get<Employee[]>(`${this.baseUrl}/pending`, {
+      withCredentials: true,
+    });
   }
 
   getApproved(): Observable<Employee[]> {
-    return this.http.get<Employee[]>(`${environment.backendBaseUrl}/hr/onboarding/approved`, {
+    return this.http.get<Employee[]>(`${this.baseUrl}/approved`, {
       withCredentials: true,
     });
   }
 
   getRejected(): Observable<Employee[]> {
-    return this.http.get<Employee[]>(`${environment.backendBaseUrl}/hr/onboarding/rejected`, {
+    return this.http.get<Employee[]>(`${this.baseUrl}/rejected`, {
       withCredentials: true,
     });
   }
 
-  getApplicationById(id: string) {
-    return this.http.get(`${environment.backendBaseUrl}/hr/onboarding/${id}`, {
+  getApplicationById(id: string): Observable<Employee> {
+    return this.http.get<Employee>(`${this.baseUrl}/${id}`, {
       withCredentials: true,
     });
   }
-  
-  approveApplication(id: string) {
-    return this.http.post(`${environment.backendBaseUrl}/hr/onboarding/${id}/approve`, {}, {
+
+  approveApplication(id: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${id}/approve`, {}, {
       withCredentials: true,
     });
   }
-  
-  rejectApplication(id: string, feedback: string) {
-    return this.http.post(
-      `${environment.backendBaseUrl}/hr/onboarding/${id}/reject`,
+
+  rejectApplication(id: string, feedback: string): Observable<void> {
+    return this.http.post<void>(
+      `${this.baseUrl}/${id}/reject`,
       { feedback },
       { withCredentials: true }
     );
