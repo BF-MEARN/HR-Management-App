@@ -245,9 +245,20 @@ export const updateCommentOnFacilityReport = async (req, res) => {
       return comment._id.toString() === commentId;
     });
     const previousCommentDescription = commentToUpdate.description;
-    const { commentDescription } = req.body;
+    const { updatedCommentDescription } = req.body;
+    // Check if this comment exists
     if (commentToUpdate) {
-      commentToUpdate.description = commentDescription;
+      // Check if this is the current employee's comment
+      // If so, it will update the comment's description
+      if (employeeId.toString() === commentToUpdate.createdBy.toString()) {
+        commentToUpdate.description = updatedCommentDescription;
+      }
+      // Otherwise, it will throw a forbidden error!
+      else {
+        return res.status(403).json({
+          message: 'This employee did NOT create this comment! Hence, they CANNOT edit it!',
+        });
+      }
     }
     await FacilityReport.findByIdAndUpdate(facilityReportId, {
       comments: newCommentList,
