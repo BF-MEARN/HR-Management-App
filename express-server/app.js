@@ -8,6 +8,7 @@ import errorHandler from './middlewares/ErrorHandler.js';
 import employeeFacilityReportRouter from './routers/EmployeeFacilityReportRouter.js';
 import employeeOnboardingRouter from './routers/EmployeeOnboardingRouter.js';
 import hrOnboardingRouter from './routers/HrOnboardingRouter.js';
+import hrProfileRouter from './routers/HrProfileRouter.js';
 import hrTokenRouter from './routers/HrTokenRouter.js';
 import userRouter from './routers/UserRouter.js';
 
@@ -34,6 +35,7 @@ app.use('/api/onboarding', employeeOnboardingRouter);
 // HR specific routes
 app.use('/api/hr/token', userAuth, requireHR, hrTokenRouter);
 app.use('/api/hr/onboarding', userAuth, requireHR, hrOnboardingRouter);
+app.use('/api/hr/profiles', userAuth, requireHR, hrProfileRouter);
 
 // Employee specific routes
 app.use('/api/employee/facilityReport', userAuth, requireEmployee, employeeFacilityReportRouter);

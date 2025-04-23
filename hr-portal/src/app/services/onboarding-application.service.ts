@@ -29,4 +29,24 @@ export class OnboardingApplicationService {
       withCredentials: true,
     });
   }
+
+  getApplicationById(id: string) {
+    return this.http.get(`${environment.backendBaseUrl}/hr/onboarding/${id}`, {
+      withCredentials: true,
+    });
+  }
+  
+  approveApplication(id: string) {
+    return this.http.post(`${environment.backendBaseUrl}/hr/onboarding/${id}/approve`, {}, {
+      withCredentials: true,
+    });
+  }
+  
+  rejectApplication(id: string, feedback: string) {
+    return this.http.post(
+      `${environment.backendBaseUrl}/hr/onboarding/${id}/reject`,
+      { feedback },
+      { withCredentials: true }
+    );
+  }
 }

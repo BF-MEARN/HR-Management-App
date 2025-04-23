@@ -135,12 +135,7 @@ const seedDatabase = async () => {
       const isCitizenOrPR = faker.datatype.boolean(0.3);
       const assignedHouse = faker.helpers.arrayElement(createdHousing);
       const onboardingStatus = faker.helpers.arrayElement(['Pending', 'Approved', 'Rejected']);
-      const onboardingFeedback =
-        onboardingStatus === 'Rejected'
-          ? faker.lorem.sentence(8)
-          : faker.datatype.boolean(0.5)
-            ? faker.lorem.sentence(5)
-            : '';
+      const onboardingFeedback = onboardingStatus === 'Rejected' ? faker.lorem.sentence(8) : '';
 
       const newEmployee = new Employee({
         firstName,
@@ -240,6 +235,7 @@ const seedDatabase = async () => {
 
       let newVisaStatus = null;
       if (!isCitizenOrPR) {
+        // Non-citizen case
         const workAuthType = faker.helpers.arrayElement(['H1-B', 'L2', 'F1', 'H4', 'Other']);
         const isOpt = workAuthType === 'F1';
         newVisaStatus = new VisaStatus({
@@ -255,6 +251,23 @@ const seedDatabase = async () => {
           i983: { status: isOpt ? 'Not Uploaded' : undefined },
           i20: { status: isOpt ? 'Not Uploaded' : undefined },
         });
+      } else {
+        // Add this new case for Citizens and Permanent Residents
+        const citizenshipType = faker.helpers.arrayElement(['Green Card', 'Citizen']);
+        newVisaStatus = new VisaStatus({
+          employeeId: newEmployee._id,
+          workAuthorization: {
+            type: citizenshipType,
+            // For citizens/PR, we might not need start/end dates, but setting them for consistency
+            startDate: faker.date.past({ years: 5 }),
+            // For citizens, end date could be far in future or null
+            endDate: citizenshipType === 'Citizen' ? null : faker.date.future({ years: 10 }),
+          },
+          // No need for OPT documents for citizens/PRs
+        });
+      }
+
+      if (newVisaStatus) {
         createdVisaStatuses.push(newVisaStatus);
       }
 

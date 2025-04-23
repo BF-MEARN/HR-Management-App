@@ -1,0 +1,135 @@
+.page-wrapper {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  h2 {
+    margin-top: 24px;
+    margin-bottom: 16px;
+    font-weight: 500;
+    font-size: 1.5rem;
+  }
+}
+
+.search-section {
+  margin-bottom: 24px;
+
+  .search-bar {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+
+  .count {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+  }
+}
+
+.employee-table-container {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  margin-bottom: 20px;
+}
+
+.employee-table {
+  width: 100%;
+
+  th {
+    background-color: #f5f6fa;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  td {
+    padding: 14px 16px;
+    font-size: 14px;
+    border-bottom: 1px solid #f0f0f0;
+
+    a {
+      color: #1976d2;
+      cursor: pointer;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  tr:hover {
+    background-color: #f9f9f9;
+  }
+
+  // For the SSN partial display styling
+  .ssn-masked {
+    font-family: monospace;
+  }
+
+  // No special styling for work authorization - just regular text
+}
+
+.view-profile-btn {
+  color: #1976d2;
+  border-color: #1976d2;
+  min-width: 120px;
+}
+
+.no-results {
+  margin-top: 20px;
+  font-style: italic;
+  color: #666;
+  text-align: center;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+}
+
+// Loading and error states
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  margin-top: 20px;
+
+  mat-spinner {
+    margin-bottom: 16px;
+  }
+
+  p {
+    color: #666;
+  }
+}
+
+.error-message {
+  color: #c62828;
+  text-align: center;
+  margin-top: 8px;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .page-wrapper {
+    padding: 16px;
+  }
+
+  .employee-table {
+    th,
+    td {
+      padding: 12px 10px;
+      font-size: 13px;
+    }
+  }
+}
