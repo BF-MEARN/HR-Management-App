@@ -4,12 +4,12 @@ import dotenv from 'dotenv';
 import express from 'express';
 import fileUpload from 'express-fileupload';
 
-import { requireHR, userAuth, requireEmployee } from './middlewares/AuthMiddlewares.js';
+import { requireEmployee, requireHR, userAuth } from './middlewares/AuthMiddlewares.js';
 import errorHandler from './middlewares/ErrorHandler.js';
 import hrOnboardingRouter from './routers/HrOnboardingRouter.js';
 import hrTokenRouter from './routers/HrTokenRouter.js';
+import personalInfoRouter from './routers/PersonalInfoRouter.js';
 import userRouter from './routers/UserRouter.js';
-import personalInfoRouter from './routers/PersonalInfoRouter.js'
 
 dotenv.config();
 
@@ -26,9 +26,11 @@ app.use(
   })
 );
 
-app.use(fileUpload({
-  limits: { fileSize: 10 * 1024 * 1024 },
-}));
+app.use(
+  fileUpload({
+    limits: { fileSize: 10 * 1024 * 1024 },
+  })
+);
 
 // Common routes
 // Allow anyone to login/register

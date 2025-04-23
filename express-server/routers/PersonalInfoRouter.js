@@ -1,7 +1,15 @@
 import express from 'express';
 
-import { editName, editAddress, editContactInfo, editEmployment, editEmergencyContact, editDocuments, getPersonalInfo, editEmail } from
-  '../controllers/PersonalInfoController.js';
+import {
+  editAddress,
+  editContactInfo,
+  editDocuments,
+  editEmail,
+  editEmergencyContact,
+  editEmployment,
+  editName,
+  getPersonalInfo,
+} from '../controllers/PersonalInfoController.js';
 
 const router = express.Router();
 

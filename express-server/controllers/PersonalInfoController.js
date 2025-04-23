@@ -1,15 +1,16 @@
-import Employee from "../models/Employee.js";
 import mongoose from 'mongoose';
-import VisaStatus from '../models/VisaStatus.js';
-import User from '../models/User.js';
-import { putObject } from "../utils/putObject.js";
 import path from 'path';
+
+import Employee from '../models/Employee.js';
+import User from '../models/User.js';
+import VisaStatus from '../models/VisaStatus.js';
+import { putObject } from '../utils/putObject.js';
 
 /**
  * ==================
  * Helpers
  * ==================
- * 
+ *
  */
 // Could populate other data
 const findEmployeeByAuthUser = async (userId) => {
@@ -18,10 +19,12 @@ const findEmployeeByAuthUser = async (userId) => {
     return null;
   }
 
-  return await Employee.findOne({ userId: userId }).populate({
-    path: 'userId',
-    select: 'email',
-  }).populate('visaInfo');
+  return await Employee.findOne({ userId: userId })
+    .populate({
+      path: 'userId',
+      select: 'email',
+    })
+    .populate('visaInfo');
 };
 
 const updateEmployee = async (req, res, next, update) => {
@@ -38,13 +41,11 @@ const updateEmployee = async (req, res, next, update) => {
     // save() might clear populated fields
     const populatedEmployee = await findEmployeeByAuthUser(req.user.id);
     res.status(200).json({ employee: populatedEmployee });
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Error updating employee section:', error);
     next(error);
   }
-}
-
+};
 
 /**
  * ==================
@@ -69,8 +70,6 @@ export const getPersonalInfo = async (req, res, next) => {
   }
 };
 
-
-
 /**
  * ==================
  * PUT Sections
@@ -84,7 +83,8 @@ export const getPersonalInfo = async (req, res, next) => {
  */
 export const editName = async (req, res, next) => {
   await updateEmployee(req, res, next, (employee, body) => {
-    const { firstName, lastName, middleName, preferredName, profilePicture, ssn, dob, gender } = body;
+    const { firstName, lastName, middleName, preferredName, profilePicture, ssn, dob, gender } =
+      body;
     if (firstName !== undefined) employee.firstName = firstName;
     if (lastName !== undefined) employee.lastName = lastName;
     employee.middleName = middleName;
@@ -93,8 +93,8 @@ export const editName = async (req, res, next) => {
     if (ssn !== undefined) employee.ssn = ssn;
     if (dob !== undefined) employee.dob = dob;
     if (gender !== undefined) employee.gender = gender;
-  })
-}
+  });
+};
 
 /**
  * @desc    Edit the User's Email Address
@@ -112,11 +112,13 @@ export const editEmail = async (req, res, next) => {
 
     const existingUserWithNewEmail = await User.findOne({
       email: newEmail.toLowerCase(),
-      _id: { $ne: userId }
+      _id: { $ne: userId },
     });
 
     if (existingUserWithNewEmail) {
-      return res.status(409).json({ message: `This email address is already registered to another account.` });
+      return res
+        .status(409)
+        .json({ message: `This email address is already registered to another account.` });
     }
 
     const userToUpdate = await User.findById(userId);
@@ -126,7 +128,6 @@ export const editEmail = async (req, res, next) => {
     await userToUpdate.save();
 
     res.status(200).json({ message: 'Email updated successfully.', newEmail: userToUpdate.email });
-
   } catch (error) {
     console.error('Error updating email:', error);
     next(error);
@@ -165,8 +166,8 @@ export const editContactInfo = async (req, res, next) => {
     }
     if (cellPhone !== undefined) employee.contactInfo.cellPhone = cellPhone;
     employee.contactInfo.workPhone = workPhone;
-  })
-}
+  });
+};
 
 /**
  * @desc    Edit Employment Info Section
@@ -179,7 +180,7 @@ export const editEmployment = async (req, res, next) => {
     const { workAuthorization } = req.body;
 
     if (!workAuthorization) {
-      return res.status(400).json({ message: "Missing workAuthorization data in request body." });
+      return res.status(400).json({ message: 'Missing workAuthorization data in request body.' });
     }
 
     const { type, startDate, endDate, otherTitle } = workAuthorization;
@@ -198,7 +199,9 @@ export const editEmployment = async (req, res, next) => {
     const visaStatus = await VisaStatus.findById(employee.visaInfo);
 
     if (!visaStatus) {
-      console.error(`VisaStatus not found for ID ${employee.visaInfo} for employee with userId ${userId}`);
+      console.error(
+        `VisaStatus not found for ID ${employee.visaInfo} for employee with userId ${userId}`
+      );
       return res.status(404).json({ message: 'Visa status record not found.' });
     }
 
@@ -211,7 +214,8 @@ export const editEmployment = async (req, res, next) => {
     if (endDate !== undefined) visaStatus.workAuthorization.endDate = endDate;
 
     if (type === 'Other') {
-      visaStatus.workAuthorization.otherTitle = otherTitle || visaStatus.workAuthorization.otherTitle;
+      visaStatus.workAuthorization.otherTitle =
+        otherTitle || visaStatus.workAuthorization.otherTitle;
     } else {
       visaStatus.workAuthorization.otherTitle = undefined;
     }
@@ -225,9 +229,8 @@ export const editEmployment = async (req, res, next) => {
 
     res.status(200).json({
       message: 'Employment (Visa) information updated successfully.',
-      employee: updatedPopulatedEmployee
+      employee: updatedPopulatedEmployee,
     });
-
   } catch (error) {
     console.error('Error updating employment (visa) information:', error);
     if (error.name === 'ValidationError') {
@@ -255,9 +258,8 @@ export const editEmergencyContact = async (req, res, next) => {
   });
 };
 
-
 /**
- * @desc    Edit Document Metadata and Upload Files 
+ * @desc    Edit Document Metadata and Upload Files
  * @route   PUT /api/personal-info/documents
  * @access  Employee only
  */
@@ -282,7 +284,6 @@ export const editDocuments = async (req, res, next) => {
       if (profilePictureResult) {
         employee.profilePicture = profilePictureResult.key;
       } else {
-
         console.warn(`Profile picture upload failed for user ${userId}`);
         return res.status(500).json({ message: 'Profile picture upload failed.' });
       }
@@ -291,12 +292,12 @@ export const editDocuments = async (req, res, next) => {
     if (req.files && req.files.driverLicenseFile) {
       const file = req.files.driverLicenseFile;
       const fileExtension = path.extname(file.name);
-      const key = `employees/${userId}/driversLicense-${Date.now()}${fileExtension}`; 
+      const key = `employees/${userId}/driversLicense-${Date.now()}${fileExtension}`;
 
       driverLicenseFileResult = await putObject(file.data, key, file.mimetype);
       if (driverLicenseFileResult) {
         if (!employee.driverLicense) employee.driverLicense = {};
-        employee.driverLicense.file = driverLicenseFileResult.key; 
+        employee.driverLicense.file = driverLicenseFileResult.key;
       } else {
         console.warn(`Driver's license upload failed for user ${userId}`);
         return res.status(500).json({ message: 'Driver license upload failed.' });
@@ -304,7 +305,8 @@ export const editDocuments = async (req, res, next) => {
     }
 
     // --- Handle Metadata Updates from req.body ---
-    const { driverLicense: driverLicenseMetadata, profilePicture: profilePictureMetadata } = req.body;
+    const { driverLicense: driverLicenseMetadata, profilePicture: profilePictureMetadata } =
+      req.body;
 
     if (!profilePictureResult && profilePictureMetadata !== undefined) {
       employee.profilePicture = profilePictureMetadata;
@@ -312,30 +314,30 @@ export const editDocuments = async (req, res, next) => {
 
     if (driverLicenseMetadata !== undefined) {
       if (!employee.driverLicense) employee.driverLicense = {};
-      if (driverLicenseMetadata.number !== undefined) employee.driverLicense.number = driverLicenseMetadata.number;
-      if (driverLicenseMetadata.expirationDate !== undefined) employee.driverLicense.expirationDate = driverLicenseMetadata.expirationDate;
+      if (driverLicenseMetadata.number !== undefined)
+        employee.driverLicense.number = driverLicenseMetadata.number;
+      if (driverLicenseMetadata.expirationDate !== undefined)
+        employee.driverLicense.expirationDate = driverLicenseMetadata.expirationDate;
 
       if (!driverLicenseFileResult && driverLicenseMetadata.file !== undefined) {
         employee.driverLicense.file = driverLicenseMetadata.file;
       }
-      console.log("test")
-    // eslint-disable-next-line no-prototype-builtins
+      console.log('test');
+      // eslint-disable-next-line no-prototype-builtins
     } else if (req.body.hasOwnProperty('driverLicense') && req.body.driverLicense === null) {
       employee.driverLicense = undefined;
     }
 
     // --- Save and Respond ---
     await employee.save();
-    const updatedPopulatedEmployee = await findEmployeeByAuthUser(userId); 
+    const updatedPopulatedEmployee = await findEmployeeByAuthUser(userId);
 
     res.status(200).json({
       message: `Documents information updated successfully.`,
-      employee: updatedPopulatedEmployee
+      employee: updatedPopulatedEmployee,
     });
-
   } catch (error) {
     console.error(`Error updating documents:`, error);
     next(error);
   }
 };
-
