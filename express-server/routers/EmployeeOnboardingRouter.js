@@ -10,6 +10,7 @@ import {
   updateI983,
   updateOptEAD,
   updateOptReceipt,
+  validateRegistrationToken
 } from '../controllers/EmployeeOnboardingController.js';
 
 const employeeOnboardingRouter = Router();
@@ -32,5 +33,6 @@ employeeOnboardingRouter.patch('/update-opt-receipt', updateOptReceipt);
 employeeOnboardingRouter.patch('/update-opt-ead', updateOptEAD);
 employeeOnboardingRouter.patch('/update-i983', updateI983);
 employeeOnboardingRouter.patch('/update-i20', updateI20);
+employeeOnboardingRouter.get('/registration-token/:tokenUUID', validateRegistrationToken);
 
 export default employeeOnboardingRouter;
