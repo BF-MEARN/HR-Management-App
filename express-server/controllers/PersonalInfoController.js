@@ -1,5 +1,9 @@
 import Employee from "../models/Employee.js";
 import mongoose from 'mongoose';
+import VisaStatus from '../models/VisaStatus.js';
+import User from '../models/User.js';
+import { putObject } from "../utils/putObject.js";
+import path from 'path';
 
 /**
  * ==================
@@ -14,7 +18,10 @@ const findEmployeeByAuthUser = async (userId) => {
     return null;
   }
 
-  return await Employee.findOne({ userId: userId }).populate('visaInfo');
+  return await Employee.findOne({ userId: userId }).populate({
+    path: 'userId',
+    select: 'email',
+  }).populate('visaInfo');
 };
 
 const updateEmployee = async (req, res, next, update) => {
@@ -27,8 +34,10 @@ const updateEmployee = async (req, res, next, update) => {
 
     update(employee, req.body);
 
-    const updatedEmployee = await employee.save();
-    res.status(200).json({ employee: updatedEmployee });
+    await employee.save();
+    // save() might clear populated fields
+    const populatedEmployee = await findEmployeeByAuthUser(req.user.id);
+    res.status(200).json({ employee: populatedEmployee });
   }
   catch (error) {
     console.error('Error updating employee section:', error);
@@ -67,7 +76,13 @@ export const getPersonalInfo = async (req, res, next) => {
  * PUT Sections
  * ==================
  */
-export const editName = async (req, res) => {
+
+/**
+ * @desc    Edit Name Section
+ * @route   PUT /api/personal-info/name
+ * @access  Employee only
+ */
+export const editName = async (req, res, next) => {
   await updateEmployee(req, res, next, (employee, body) => {
     const { firstName, lastName, middleName, preferredName, profilePicture, ssn, dob, gender } = body;
     if (firstName !== undefined) employee.firstName = firstName;
@@ -75,8 +90,48 @@ export const editName = async (req, res) => {
     employee.middleName = middleName;
     employee.preferredName = preferredName;
     if (profilePicture !== undefined) employee.profilePicture = profilePicture;
+    if (ssn !== undefined) employee.ssn = ssn;
+    if (dob !== undefined) employee.dob = dob;
+    if (gender !== undefined) employee.gender = gender;
   })
 }
+
+/**
+ * @desc    Edit the User's Email Address
+ * @route   PUT /api/personal-info/email
+ * @access  Employee only
+ */
+export const editEmail = async (req, res, next) => {
+  try {
+    const { email: newEmail } = req.body;
+    const userId = req.user.id;
+
+    if (!newEmail) {
+      return res.status(400).json({ message: `New email address is required.` });
+    }
+
+    const existingUserWithNewEmail = await User.findOne({
+      email: newEmail.toLowerCase(),
+      _id: { $ne: userId }
+    });
+
+    if (existingUserWithNewEmail) {
+      return res.status(409).json({ message: `This email address is already registered to another account.` });
+    }
+
+    const userToUpdate = await User.findById(userId);
+
+    userToUpdate.email = newEmail.toLowerCase();
+
+    await userToUpdate.save();
+
+    res.status(200).json({ message: 'Email updated successfully.', newEmail: userToUpdate.email });
+
+  } catch (error) {
+    console.error('Error updating email:', error);
+    next(error);
+  }
+};
 
 /**
  * @desc    Edit Address Section
@@ -97,18 +152,190 @@ export const editAddress = async (req, res, next) => {
   });
 };
 
-export const editContactInfo = async (req, res) => {
-
+/**
+ * @desc    Edit Contact Info Section
+ * @route   PUT /api/personal-info/contact-info
+ * @access  Employee only
+ */
+export const editContactInfo = async (req, res, next) => {
+  await updateEmployee(req, res, next, (employee, body) => {
+    const { cellPhone, workPhone } = body;
+    if (!employee.contactInfo) {
+      employee.contactInfo = {};
+    }
+    if (cellPhone !== undefined) employee.contactInfo.cellPhone = cellPhone;
+    employee.contactInfo.workPhone = workPhone;
+  })
 }
 
-export const editEmployment = async (req, res) => {
+/**
+ * @desc    Edit Employment Info Section
+ * @route   PUT /api/personal-info/employment
+ * @access  Employee only
+ */
+export const editEmployment = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { workAuthorization } = req.body;
 
-}
+    if (!workAuthorization) {
+      return res.status(400).json({ message: "Missing workAuthorization data in request body." });
+    }
 
-export const editEmergencyContact = async (req, res) => {
+    const { type, startDate, endDate, otherTitle } = workAuthorization;
 
-}
+    const employee = await Employee.findOne({ userId: userId }).select('visaInfo isCitizenOrPR');
 
-export const editDocuments = async (req, res) => {
+    if (!employee) {
+      return res.status(404).json({ message: 'Employee profile not found.' });
+    }
 
-}
+    if (employee.isCitizenOrPR || !employee.visaInfo) {
+      return res.status(400).json({ message: 'Visa information cannot be edited.' });
+    }
+
+    // Find the associated VisaStatus document
+    const visaStatus = await VisaStatus.findById(employee.visaInfo);
+
+    if (!visaStatus) {
+      console.error(`VisaStatus not found for ID ${employee.visaInfo} for employee with userId ${userId}`);
+      return res.status(404).json({ message: 'Visa status record not found.' });
+    }
+
+    if (!visaStatus.workAuthorization) {
+      visaStatus.workAuthorization = {};
+    }
+
+    if (type !== undefined) visaStatus.workAuthorization.type = type;
+    if (startDate !== undefined) visaStatus.workAuthorization.startDate = startDate;
+    if (endDate !== undefined) visaStatus.workAuthorization.endDate = endDate;
+
+    if (type === 'Other') {
+      visaStatus.workAuthorization.otherTitle = otherTitle || visaStatus.workAuthorization.otherTitle;
+    } else {
+      visaStatus.workAuthorization.otherTitle = undefined;
+    }
+
+    visaStatus.markModified('workAuthorization');
+
+    await visaStatus.save();
+
+    // Repopulate in case
+    const updatedPopulatedEmployee = await findEmployeeByAuthUser(userId);
+
+    res.status(200).json({
+      message: 'Employment (Visa) information updated successfully.',
+      employee: updatedPopulatedEmployee
+    });
+
+  } catch (error) {
+    console.error('Error updating employment (visa) information:', error);
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ message: 'Validation failed', errors: error.errors });
+    }
+    next(error);
+  }
+};
+
+/**
+ * @desc    Edit Emergency Contact Section
+ * @route   PUT /api/personal-info/emergency-contact
+ * @access  Employee only
+ */
+export const editEmergencyContact = async (req, res, next) => {
+  await updateEmployee(req, res, next, (employee, body) => {
+    const { emergencyContacts } = body;
+    if (!Array.isArray(emergencyContacts)) {
+      const error = new Error('Validation failed: emergencyContacts must be an array.');
+      error.name = 'ValidationError';
+      error.errors = { emergencyContacts: { message: 'Must be an array.' } };
+      throw error;
+    }
+    employee.emergencyContacts = emergencyContacts;
+  });
+};
+
+
+/**
+ * @desc    Edit Document Metadata and Upload Files 
+ * @route   PUT /api/personal-info/documents
+ * @access  Employee only
+ */
+export const editDocuments = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const employee = await findEmployeeByAuthUser(userId);
+
+    if (!employee) {
+      return res.status(404).json({ message: `Employee profile not found.` });
+    }
+
+    // --- Handle File Uploads ---
+    let profilePictureResult, driverLicenseFileResult;
+
+    if (req.files && req.files.profilePictureFile) {
+      const file = req.files.profilePictureFile;
+      const fileExtension = path.extname(file.name);
+      const key = `employees/${userId}/profile-${Date.now()}${fileExtension}`;
+
+      profilePictureResult = await putObject(file.data, key, file.mimetype);
+      if (profilePictureResult) {
+        employee.profilePicture = profilePictureResult.key;
+      } else {
+
+        console.warn(`Profile picture upload failed for user ${userId}`);
+        return res.status(500).json({ message: 'Profile picture upload failed.' });
+      }
+    }
+
+    if (req.files && req.files.driverLicenseFile) {
+      const file = req.files.driverLicenseFile;
+      const fileExtension = path.extname(file.name);
+      const key = `employees/${userId}/driversLicense-${Date.now()}${fileExtension}`; 
+
+      driverLicenseFileResult = await putObject(file.data, key, file.mimetype);
+      if (driverLicenseFileResult) {
+        if (!employee.driverLicense) employee.driverLicense = {};
+        employee.driverLicense.file = driverLicenseFileResult.key; 
+      } else {
+        console.warn(`Driver's license upload failed for user ${userId}`);
+        return res.status(500).json({ message: 'Driver license upload failed.' });
+      }
+    }
+
+    // --- Handle Metadata Updates from req.body ---
+    const { driverLicense: driverLicenseMetadata, profilePicture: profilePictureMetadata } = req.body;
+
+    if (!profilePictureResult && profilePictureMetadata !== undefined) {
+      employee.profilePicture = profilePictureMetadata;
+    }
+
+    if (driverLicenseMetadata !== undefined) {
+      if (!employee.driverLicense) employee.driverLicense = {};
+      if (driverLicenseMetadata.number !== undefined) employee.driverLicense.number = driverLicenseMetadata.number;
+      if (driverLicenseMetadata.expirationDate !== undefined) employee.driverLicense.expirationDate = driverLicenseMetadata.expirationDate;
+
+      if (!driverLicenseFileResult && driverLicenseMetadata.file !== undefined) {
+        employee.driverLicense.file = driverLicenseMetadata.file;
+      }
+      console.log("test")
+    // eslint-disable-next-line no-prototype-builtins
+    } else if (req.body.hasOwnProperty('driverLicense') && req.body.driverLicense === null) {
+      employee.driverLicense = undefined;
+    }
+
+    // --- Save and Respond ---
+    await employee.save();
+    const updatedPopulatedEmployee = await findEmployeeByAuthUser(userId); 
+
+    res.status(200).json({
+      message: `Documents information updated successfully.`,
+      employee: updatedPopulatedEmployee
+    });
+
+  } catch (error) {
+    console.error(`Error updating documents:`, error);
+    next(error);
+  }
+};
+

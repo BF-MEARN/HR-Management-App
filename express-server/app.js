@@ -2,6 +2,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
+import fileUpload from 'express-fileupload';
 
 import { requireHR, userAuth, requireEmployee } from './middlewares/AuthMiddlewares.js';
 import errorHandler from './middlewares/ErrorHandler.js';
@@ -24,6 +25,10 @@ app.use(
     credentials: true,
   })
 );
+
+app.use(fileUpload({
+  limits: { fileSize: 10 * 1024 * 1024 },
+}));
 
 // Common routes
 // Allow anyone to login/register

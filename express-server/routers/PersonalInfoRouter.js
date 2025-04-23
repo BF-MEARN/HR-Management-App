@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { editName, editAddress, editContactInfo, editEmployment, editEmergencyContact, editDocuments, getPersonalInfo } from
+import { editName, editAddress, editContactInfo, editEmployment, editEmergencyContact, editDocuments, getPersonalInfo, editEmail } from
   '../controllers/PersonalInfoController.js';
 
 const router = express.Router();
@@ -13,5 +13,6 @@ router.put('/contact-info', editContactInfo);
 router.put('/employment', editEmployment);
 router.put('/emergency-contact', editEmergencyContact);
 router.put('/documents', editDocuments);
+router.put('/email', editEmail);
 
 export default router;
