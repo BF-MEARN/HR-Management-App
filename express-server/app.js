@@ -6,6 +6,7 @@ import express from 'express';
 import { requireEmployee, requireHR, userAuth } from './middlewares/AuthMiddlewares.js';
 import errorHandler from './middlewares/ErrorHandler.js';
 import employeeFacilityReportRouter from './routers/EmployeeFacilityReportRouter.js';
+import employeeHousingRouter from './routers/EmployeeHousingRouter.js';
 import employeeOnboardingRouter from './routers/EmployeeOnboardingRouter.js';
 import hrOnboardingRouter from './routers/HrOnboardingRouter.js';
 import hrTokenRouter from './routers/HrTokenRouter.js';
@@ -37,6 +38,7 @@ app.use('/api/hr/onboarding', userAuth, requireHR, hrOnboardingRouter);
 
 // Employee specific routes
 app.use('/api/employee/facilityReport', userAuth, requireEmployee, employeeFacilityReportRouter);
+app.use('/api/employee/housing', employeeHousingRouter);
 
 // Fallback route
 app.get('*', (req, res) => {
