@@ -2,6 +2,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
+import fileUpload from 'express-fileupload';
 
 import { requireEmployee, requireHR, userAuth } from './middlewares/AuthMiddlewares.js';
 import errorHandler from './middlewares/ErrorHandler.js';
@@ -9,6 +10,7 @@ import employeeFacilityReportRouter from './routers/EmployeeFacilityReportRouter
 import employeeOnboardingRouter from './routers/EmployeeOnboardingRouter.js';
 import hrOnboardingRouter from './routers/HrOnboardingRouter.js';
 import hrTokenRouter from './routers/HrTokenRouter.js';
+import personalInfoRouter from './routers/PersonalInfoRouter.js';
 import userRouter from './routers/UserRouter.js';
 
 dotenv.config();
@@ -26,6 +28,12 @@ app.use(
   })
 );
 
+app.use(
+  fileUpload({
+    limits: { fileSize: 10 * 1024 * 1024 },
+  })
+);
+
 // Common routes
 // Allow anyone to login/register
 app.use('/api/user', userRouter);
@@ -37,6 +45,10 @@ app.use('/api/hr/onboarding', userAuth, requireHR, hrOnboardingRouter);
 
 // Employee specific routes
 app.use('/api/employee/facilityReport', userAuth, requireEmployee, employeeFacilityReportRouter);
+
+// Personal Info Routers (*reminder add middleware after)
+
+app.use('/api/personal-info', userAuth, requireEmployee, personalInfoRouter);
 
 // Fallback route
 app.get('*', (req, res) => {
