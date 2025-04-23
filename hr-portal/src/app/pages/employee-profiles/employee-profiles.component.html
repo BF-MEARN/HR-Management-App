@@ -1,0 +1,92 @@
+<div class="page-wrapper">
+  <h1 class="page-header">Employee Profiles</h1>
+
+  <div class="search-section">
+    <mat-form-field appearance="outline" class="search-bar">
+      <mat-label>Search employees</mat-label>
+      <input
+        matInput
+        placeholder="Search by name"
+        [(ngModel)]="searchQuery"
+        (input)="onSearchChange()"
+      />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    <p class="count">Total Employees: {{ filteredEmployees.length }}</p>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading employee profiles...</p>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-container">
+    <mat-icon color="warn">error_outline</mat-icon>
+    <p class="error-message">{{ errorMessage }}</p>
+  </div>
+
+  <div *ngIf="!isLoading && !errorMessage" class="employee-table-container">
+    <table mat-table [dataSource]="filteredEmployees" class="employee-table">
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let emp">{{ emp.firstName }} {{ emp.lastName }}</td>
+      </ng-container>
+
+      <!-- SSN Column -->
+      <ng-container matColumnDef="ssn">
+        <th mat-header-cell *matHeaderCellDef>SSN</th>
+        <td mat-cell *matCellDef="let emp" class="ssn-masked">
+          ***-**-{{ emp.ssn?.slice(-4) || '####' }}
+        </td>
+      </ng-container>
+
+      <!-- Work Auth Column -->
+      <ng-container matColumnDef="auth">
+        <th mat-header-cell *matHeaderCellDef>Work Authorization</th>
+        <td mat-cell *matCellDef="let emp">
+          {{ emp.visaInfo?.workAuthorization?.type || 'N/A' }}
+        </td>
+      </ng-container>
+
+      <!-- Phone Column -->
+      <ng-container matColumnDef="phone">
+        <th mat-header-cell *matHeaderCellDef>Phone</th>
+        <td mat-cell *matCellDef="let emp">
+          {{ emp.contactInfo?.cellPhone || 'N/A' }}
+        </td>
+      </ng-container>
+
+      <!-- Email Column -->
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Email</th>
+        <td mat-cell *matCellDef="let emp">
+          {{ emp.userId?.email || 'N/A' }}
+        </td>
+      </ng-container>
+
+      <!-- Action Column -->
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef>Action</th>
+        <td mat-cell *matCellDef="let emp">
+          <button
+            mat-stroked-button
+            color="primary"
+            class="view-profile-btn"
+            (click)="openProfile(emp._id)"
+          >
+            View Profile
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+
+  <p *ngIf="!isLoading && !errorMessage && filteredEmployees.length === 0" class="no-results">
+    No employees found matching your search criteria.
+  </p>
+</div>

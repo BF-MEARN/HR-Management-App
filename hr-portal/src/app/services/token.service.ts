@@ -8,21 +8,22 @@ import { InviteRequest, RegistrationToken } from '../interfaces/registration-tok
   providedIn: 'root',
 })
 export class TokenService {
+  private readonly baseUrl = `${environment.backendBaseUrl}/hr/token`;
+
   constructor(private http: HttpClient) {}
 
   sendInvite(payload: InviteRequest): Observable<{ token: RegistrationToken }> {
     return this.http.post<{ token: RegistrationToken }>(
-      `${environment.backendBaseUrl}/hr/token/generate`,
+      `${this.baseUrl}/generate`,
       payload,
       { withCredentials: true }
     );
   }
 
   getTokenHistory(): Observable<RegistrationToken[]> {
-    return this.http.get<RegistrationToken[]>(
-      `${environment.backendBaseUrl}/hr/token/history`,
-      { withCredentials: true }
-    );
+    return this.http.get<RegistrationToken[]>(`${this.baseUrl}/history`, {
+      withCredentials: true,
+    });
   }
   
 }

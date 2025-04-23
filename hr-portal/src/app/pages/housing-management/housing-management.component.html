@@ -1,0 +1,44 @@
+<div class="housing-wrapper">
+  <h1 class="page-header">Housing Management</h1>
+
+  <div class="card-grid">
+    <mat-card *ngFor="let house of houses$ | async" class="house-card">
+      <mat-card-header>
+        <mat-card-title> {{ house.address.street }}, {{ house.address.city }} </mat-card-title>
+        <mat-card-subtitle> {{ house.address.state }} {{ house.address.zip }} </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <p><strong>Landlord:</strong> {{ house.landlord.fullName }}</p>
+        <p><strong>Phone:</strong> {{ house.landlord.phone }}</p>
+        <p><strong>Email:</strong> {{ house.landlord.email }}</p>
+        <p><strong>Residents:</strong> {{ house.residents.length }}</p>
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <button
+          mat-icon-button
+          color="primary"
+          (click)="openDetailsDialog(house)"
+          matTooltip="View Details"
+        >
+          <mat-icon>visibility</mat-icon>
+        </button>
+
+        <button
+          mat-icon-button
+          color="warn"
+          (click)="deleteHouse(house._id)"
+          matTooltip="Delete House"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <!-- Floating Action Button -->
+  <button mat-fab color="primary" class="add-house-btn" (click)="openAddHouseDialog()">
+    <mat-icon>add</mat-icon>
+  </button>
+</div>

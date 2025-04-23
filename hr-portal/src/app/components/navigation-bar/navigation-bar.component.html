@@ -1,10 +1,6 @@
 <div class="nav-container">
   <div class="logo-container">
-    <img
-      src="assets/images/fallback-logo.png"
-      alt="Company Logo"
-      class="logo"
-    />
+    <img src="assets/images/fallback-logo.png" alt="Company Logo" class="logo" />
     <h2 class="company-name">HR Portal</h2>
   </div>
 
@@ -27,6 +23,7 @@
       mat-list-item
       *ngFor="let item of menuItems"
       [routerLink]="item.path"
+      [queryParams]="item.queryParams || null"
       routerLinkActive="active-link"
       class="nav-item"
     >

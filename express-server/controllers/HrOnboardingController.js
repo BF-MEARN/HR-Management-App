@@ -118,7 +118,7 @@ export const rejectApplication = async (req, res) => {
       id,
       {
         onboardingStatus: 'Rejected',
-        rejectionFeedback: feedback || '',
+        onboardingFeedback: feedback || '',
       },
       { new: true }
     );

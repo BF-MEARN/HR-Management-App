@@ -1,0 +1,378 @@
+<!-- Simple back button -->
+<div class="back-navigation">
+  <button mat-icon-button (click)="goBack()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <span class="page-title">Application Review</span>
+</div>
+
+<div class="content-container">
+  <!-- Profile Card -->
+  <mat-card class="section-card profile-card">
+    <div class="profile-header">
+      <div class="avatar-icon">
+        <mat-icon>person</mat-icon>
+      </div>
+      <div class="profile-info">
+        <div class="name-status-wrapper">
+          <h2>
+            {{ application?.preferredName || application?.firstName }} {{ application?.lastName }}
+          </h2>
+        </div>
+        <p class="sub-email">{{ application?.userId.email }}</p>
+      </div>
+      <mat-chip [ngClass]="statusClass" selected>
+        {{ application?.onboardingStatus }}
+      </mat-chip>
+    </div>
+  </mat-card>
+
+  <!-- Personal Information -->
+  <mat-card class="section-card">
+    <mat-card-header>
+      <mat-card-title>Personal Information</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="info-grid">
+        <!-- Legal First Name -->
+        <div class="info-pair">
+          <mat-icon>person</mat-icon>
+          <div class="info-content">
+            <div class="label">First Name</div>
+            <div class="value">{{ application?.firstName || 'Not provided' }}</div>
+          </div>
+        </div>
+
+        <!-- Legal Last Name -->
+        <div class="info-pair">
+          <mat-icon>person</mat-icon>
+          <div class="info-content">
+            <div class="label">Last Name</div>
+            <div class="value">{{ application?.lastName || 'Not provided' }}</div>
+          </div>
+        </div>
+
+        <!-- Middle Name -->
+        <div class="info-pair">
+          <mat-icon>person_outline</mat-icon>
+          <div class="info-content">
+            <div class="label">Middle Name</div>
+            <div class="value">{{ application?.middleName || 'Not provided' }}</div>
+          </div>
+        </div>
+
+        <!-- Preferred Name -->
+        <div class="info-pair">
+          <mat-icon>star</mat-icon>
+          <div class="info-content">
+            <div class="label">Preferred Name</div>
+            <div class="value">{{ application?.preferredName || 'Not provided' }}</div>
+          </div>
+        </div>
+
+        <!-- Date of Birth -->
+        <div class="info-pair">
+          <mat-icon>cake</mat-icon>
+          <div class="info-content">
+            <div class="label">Date of Birth</div>
+            <div class="value">{{ application?.dob | date: 'longDate' || 'Not provided' }}</div>
+          </div>
+        </div>
+
+        <!-- Gender -->
+        <div class="info-pair">
+          <mat-icon>wc</mat-icon>
+          <div class="info-content">
+            <div class="label">Gender</div>
+            <div class="value">{{ formatGender(application?.gender) }}</div>
+          </div>
+        </div>
+
+        <!-- SSN -->
+        <div class="info-pair">
+          <mat-icon>badge</mat-icon>
+          <div class="info-content ssn-wrapper">
+            <div class="label">SSN</div>
+            <div class="value">
+              {{
+                application?.ssn
+                  ? showFullSSN
+                    ? application?.ssn
+                    : '***-**-' + application?.ssn?.slice(-4)
+                  : 'Not provided'
+              }}
+              <button
+                *ngIf="application?.ssn"
+                mat-icon-button
+                type="button"
+                (click)="toggleSSNVisibility()"
+                [attr.aria-label]="showFullSSN ? 'Hide SSN' : 'Show SSN'"
+              >
+                <mat-icon>{{ showFullSSN ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  <!-- Contact Information -->
+  <mat-card class="section-card">
+    <mat-card-header>
+      <mat-card-title>Contact Information</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="info-pair">
+        <mat-icon>phone</mat-icon>
+        <div class="info-content">
+          <div class="label">Cell Phone</div>
+          <div class="value">{{ application?.contactInfo?.cellPhone || 'Not provided' }}</div>
+        </div>
+      </div>
+      <div class="info-pair">
+        <mat-icon>business</mat-icon>
+        <div class="info-content">
+          <div class="label">Work Phone</div>
+          <div class="value">{{ application?.contactInfo?.workPhone || 'Not provided' }}</div>
+        </div>
+      </div>
+      <div class="info-pair">
+        <mat-icon>home</mat-icon>
+        <div class="info-content">
+          <div class="label">Address</div>
+          <div class="value" *ngIf="application?.address?.street; else noAddress">
+            {{ application?.address?.building ? application?.address.building + ', ' : '' }}
+            {{ application?.address?.street }}<br />
+            {{ application?.address?.city }}, {{ application?.address?.state }}
+            {{ application?.address?.zip }}
+          </div>
+          <ng-template #noAddress>
+            <div class="value not-provided">Not provided</div>
+          </ng-template>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Work Authorization -->
+  <mat-card class="section-card">
+    <mat-card-header>
+      <mat-card-title>Work Authorization</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="citizenship-status" [ngClass]="citizenshipClass">
+        <mat-icon>{{ application?.isCitizenOrPR ? 'check_circle' : 'work' }}</mat-icon>
+        <span>
+          {{
+            application?.isCitizenOrPR !== undefined
+              ? application?.isCitizenOrPR
+                ? application?.visaInfo?.workAuthorization?.type ||
+                  'U.S. Citizen or Permanent Resident'
+                : 'Non-U.S. Citizen'
+              : 'Not specified'
+          }}
+        </span>
+      </div>
+
+      <div *ngIf="!application?.isCitizenOrPR && application?.visaInfo" class="visa-details">
+        <div class="info-row">
+          <span class="label">Visa Type</span>
+          <span class="value">
+            {{
+              application?.visaInfo.workAuthorization?.type === 'Other'
+                ? application?.visaInfo.workAuthorization?.title || 'Other'
+                : application?.visaInfo.workAuthorization?.type
+            }}
+          </span>
+        </div>
+
+        <!-- Show Visa Title if type is "Other" -->
+        <div class="info-row" *ngIf="application?.visaInfo.workAuthorization.type === 'Other'">
+          <span class="label">Visa Title</span>
+          <span class="value">
+            {{ application?.visaInfo.workAuthorization.otherTitle || 'Not provided' }}
+          </span>
+        </div>
+
+        <div class="info-row">
+          <span class="label">Start Date</span>
+          <span class="value">
+            {{ application?.visaInfo.workAuthorization?.startDate | date: 'mediumDate' }}
+          </span>
+        </div>
+
+        <div class="info-row">
+          <span class="label">End Date</span>
+          <span class="value">
+            {{ application?.visaInfo.workAuthorization?.endDate | date: 'mediumDate' }}
+          </span>
+        </div>
+
+        <div
+          *ngIf="application?.visaInfo?.workAuthorization?.type === 'F1'"
+          class="f1-visa-info-box"
+        >
+          <mat-icon color="accent">info</mat-icon>
+          <span>
+            This employee is on an <strong>F1 visa</strong>. Please review all related documents and
+            approvals in the <strong>Visa Status Management</strong> section.
+          </span>
+          <button mat-flat-button color="primary" (click)="goToVisaStatusPage(application._id)">
+            View F1 Visa Documents
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="!application?.isCitizenOrPR && !application?.visaInfo" class="empty-section">
+        <mat-icon>info</mat-icon>
+        <span>No visa information provided</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Driver's License -->
+  <mat-card class="section-card">
+    <mat-card-header>
+      <mat-card-title>Driver's License</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="application?.driverLicense?.number; else noDriverLicense">
+        <div class="info-row">
+          <span class="label">License Number: </span>
+          <span class="value">{{ application?.driverLicense.number }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Expiration Date: </span>
+          <span class="value">{{
+            application?.driverLicense.expirationDate | date: 'mediumDate'
+          }}</span>
+        </div>
+        <button
+          mat-stroked-button
+          color="primary"
+          class="document-button"
+          (click)="downloadDocument(application?.driverLicense)"
+        >
+          <mat-icon>file_download</mat-icon>
+          View Driver's License
+        </button>
+      </div>
+      <ng-template #noDriverLicense>
+        <div class="empty-section">
+          <mat-icon>info</mat-icon>
+          <span>No driver's license information provided</span>
+        </div>
+      </ng-template>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Reference -->
+  <mat-card class="section-card">
+    <mat-card-header>
+      <mat-card-title>Reference</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="application?.reference; else noReference">
+        <div class="info-pair">
+          <mat-icon>person</mat-icon>
+          <div class="info-content">
+            <div class="value">
+              {{ application?.reference.firstName }} {{ application?.reference.lastName }}
+            </div>
+            <div class="label">{{ application?.reference.relationship }}</div>
+          </div>
+        </div>
+        <div class="info-pair">
+          <mat-icon>phone</mat-icon>
+          <div class="info-content">
+            <div class="value">{{ application?.reference.phone }}</div>
+          </div>
+        </div>
+        <div class="info-pair">
+          <mat-icon>email</mat-icon>
+          <div class="info-content">
+            <div class="value">{{ application?.reference.email }}</div>
+          </div>
+        </div>
+      </div>
+      <ng-template #noReference>
+        <div class="empty-section">
+          <mat-icon>info</mat-icon>
+          <span>No reference information provided</span>
+        </div>
+      </ng-template>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Emergency Contacts -->
+  <mat-card class="section-card">
+    <mat-card-header>
+      <mat-card-title>Emergency Contacts</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="application?.emergencyContacts?.length; else noEmergencyContacts">
+        <div class="contact-card" *ngFor="let contact of application?.emergencyContacts">
+          <div class="contact-header">
+            <h3>{{ contact.firstName }} {{ contact.lastName }}</h3>
+            <span class="relationship-tag">{{ contact.relationship }}</span>
+          </div>
+          <div class="contact-details">
+            <div class="contact-item">
+              <mat-icon>phone</mat-icon>
+              <span>{{ contact.phone }}</span>
+            </div>
+            <div class="contact-item">
+              <mat-icon>email</mat-icon>
+              <span>{{ contact.email }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ng-template #noEmergencyContacts>
+        <div class="empty-section">
+          <mat-icon>info</mat-icon>
+          <span>No emergency contacts provided</span>
+        </div>
+      </ng-template>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Car Information -->
+  <mat-card class="section-card">
+    <mat-card-header>
+      <mat-card-title>Car Information</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="application?.carInfo?.make; else noCarInfo">
+        <div class="info-pair">
+          <mat-icon>directions_car</mat-icon>
+          <div class="info-content">
+            <div class="value">
+              {{ application?.carInfo.color }} {{ application?.carInfo.make }}
+              {{ application?.carInfo.model }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <ng-template #noCarInfo>
+        <div class="empty-section">
+          <mat-icon>info</mat-icon>
+          <span>No car information provided</span>
+        </div>
+      </ng-template>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Application Feedback Card (if approved) -->
+  <mat-card
+    class="section-card feedback-card approved-feedback"
+    *ngIf="application?.onboardingStatus === 'Approved' && application?.onboardingFeedback"
+  >
+    <mat-card-header>
+      <mat-card-title>Application Feedback</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p>{{ application?.onboardingFeedback }}</p>
+    </mat-card-content>
+  </mat-card>
+</div>

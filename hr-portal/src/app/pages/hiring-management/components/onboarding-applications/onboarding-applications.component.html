@@ -1,4 +1,4 @@
-<mat-tab-group>
+<mat-tab-group [(selectedIndex)]="selectedTab" (selectedIndexChange)="tabChange.emit($event)">
   <!-- Pending Applications Tab -->
   <mat-tab label="Pending">
     <div class="application-list-wrapper">
@@ -21,7 +21,14 @@
             </span>
           </div>
           <div>
-            <button mat-stroked-button color="primary" class="view-btn">View Application</button>
+            <button
+              mat-stroked-button
+              color="primary"
+              class="view-btn"
+              (click)="viewApplication(employee._id)"
+            >
+              View Application
+            </button>
           </div>
         </div>
       </div>
@@ -50,7 +57,14 @@
             </span>
           </div>
           <div>
-            <button mat-stroked-button color="primary" class="view-btn">View Application</button>
+            <button
+              mat-stroked-button
+              color="primary"
+              class="view-btn"
+              (click)="viewApplication(employee._id)"
+            >
+              View Application
+            </button>
           </div>
         </div>
       </div>
@@ -79,7 +93,14 @@
             </span>
           </div>
           <div>
-            <button mat-stroked-button color="primary" class="view-btn">View Application</button>
+            <button
+              mat-stroked-button
+              color="primary"
+              class="view-btn"
+              (click)="viewApplication(employee._id)"
+            >
+              View Application
+            </button>
           </div>
         </div>
       </div>

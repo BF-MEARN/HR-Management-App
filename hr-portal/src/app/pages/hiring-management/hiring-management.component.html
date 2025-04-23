@@ -1,35 +1,46 @@
 <div class="hiring-page-container">
   <h1 class="page-header">Hiring Management</h1>
-  <mat-tab-group>
-    <!-- Tab 1: Registration Token -->
-    <mat-tab label="Registration Token">
-      <div class="tab-section">
-        <mat-card class="generate-token-card">
-          <div class="generate-section">
-            <div class="header-text">
-              <h2>Generate Token</h2>
-              <p>Invite new employees to onboard the team</p>
-            </div>
-            <button
-              mat-flat-button
-              color="primary"
-              (click)="openDialog()"
-              class="open-dialog-button"
-            >
-              Generate Token & Send Email
-            </button>
-          </div>
-        </mat-card>
 
-        <app-token-history></app-token-history>
+  <div class="modal-trigger-section">
+    <!-- Token Generate and Send Email -->
+    <mat-card class="card-section">
+      <div class="card-container">
+        <div class="card-text">
+          <h2>Generate Token</h2>
+          <p>Invite new employees to onboard the team</p>
+        </div>
+        <button
+          mat-flat-button
+          color="primary"
+          (click)="openInviteDialog()"
+          class="open-dialog-button"
+        >
+          Send Invite
+        </button>
       </div>
-    </mat-tab>
+    </mat-card>
 
-    <!-- Tab 2: Onboarding Applications -->
-    <mat-tab label="Onboarding Applications">
-      <div class="tab-section">
-        <app-onboarding-applications></app-onboarding-applications>
+    <!-- Registration Token History -->
+    <mat-card class="card-section">
+      <div class="card-container">
+        <div class="card-text">
+          <h2>Registration History</h2>
+          <p>View registration history</p>
+        </div>
+        <button
+          mat-flat-button
+          color="primary"
+          (click)="openHistoryDialog()"
+          class="open-dialog-button"
+        >
+          View History
+        </button>
       </div>
-    </mat-tab>
-  </mat-tab-group>
+    </mat-card>
+  </div>
+
+  <div class="tab-section">
+    <app-onboarding-applications [selectedTab]="tabIndex" (tabChange)="onTabChange($event)">
+    </app-onboarding-applications>
+  </div>
 </div>

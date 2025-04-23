@@ -1,0 +1,492 @@
+// Variables
+$card-border-radius: 12px;
+$max-content-width: 800px;
+$section-spacing: 20px;
+
+:host {
+  display: block;
+  background-color: #fff;
+  min-height: 100vh;
+  padding-bottom: 40px;
+  padding-top: 20px;
+}
+
+.back-navigation {
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  margin-bottom: 16px;
+  max-width: $max-content-width;
+  margin-left: auto;
+  margin-right: auto;
+
+  button {
+    color: #555;
+  }
+
+  .page-title {
+    font-size: 20px;
+    font-weight: 500;
+    margin-left: 12px;
+    color: #333;
+  }
+}
+
+.content-container {
+  max-width: $max-content-width;
+  margin: 0 auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: $section-spacing;
+}
+
+.section-card {
+  padding: 0;
+  margin: 0;
+  border-radius: $card-border-radius;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background-color: white;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  overflow: hidden;
+
+  mat-card-header {
+    background-color: #f5f6fa;
+    padding: 16px 24px;
+    border-bottom: 1px solid #eee;
+
+    mat-card-title {
+      margin-top: 12px;
+    }
+  }
+
+  mat-card-content {
+    padding: 24px;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+  }
+}
+
+.feedback-card {
+  background-color: #fff8f7;
+
+  &.approved-feedback {
+    border-left: 5px solid #4caf50;
+    background-color: #f1f8e9;
+  }
+}
+
+.profile-card {
+  .profile-header {
+    background-color: white;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    .avatar-icon {
+      width: 70px;
+      height: 70px;
+      background-color: #f0f0f0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #e0e0e0;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+
+      mat-icon {
+        font-size: 40px;
+        width: 40px;
+        height: 40px;
+        color: #666;
+      }
+    }
+
+    .profile-info {
+      flex: 1;
+
+      .name-status-wrapper {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 8px;
+
+        h2 {
+          margin: 0;
+          font-size: 22px;
+          font-weight: 600;
+          color: #333;
+        }
+      }
+
+      .sub-email {
+        margin: 0;
+        font-size: 14px;
+        color: #666;
+      }
+    }
+
+    mat-chip {
+      font-size: 12px;
+      padding: 4px 12px;
+      height: auto;
+      border-radius: 16px;
+      margin-left: auto; // pushes chip to the far right
+
+      &.pending {
+        background-color: #ff9800 !important;
+        color: white !important;
+      }
+
+      &.approved {
+        background-color: #4caf50 !important;
+        color: white !important;
+      }
+
+      &.rejected {
+        background-color: #f44336 !important;
+        color: white !important;
+      }
+    }
+  }
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.info-pair {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 16px 0;
+  font-size: 15px;
+
+  mat-icon {
+    color: #777;
+    margin-top: 2px;
+  }
+
+  .info-content {
+    flex: 1;
+
+    .label {
+      color: #666;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .value {
+      color: #333;
+      font-weight: 500;
+
+      &.not-provided {
+        color: #888;
+        font-style: italic;
+        font-weight: normal;
+      }
+    }
+  }
+}
+
+.empty-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  color: #888;
+  font-style: italic;
+  gap: 8px;
+
+  mat-icon {
+    color: #999;
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+  }
+}
+
+.citizenship-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+
+  &.citizen {
+    background-color: #e3f2fd;
+    color: #1976d2;
+
+    mat-icon {
+      color: #1976d2;
+    }
+  }
+
+  &.non-citizen {
+    background-color: #fff3e0;
+    color: #f57c00;
+
+    mat-icon {
+      color: #f57c00;
+    }
+  }
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+
+  span {
+    font-weight: 500;
+    font-size: 16px;
+  }
+}
+
+.visa-details {
+  margin-top: 16px;
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+
+    .label {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .value {
+      font-weight: 500;
+      color: #333;
+    }
+  }
+}
+
+.f1-visa-info-box {
+  margin-top: 16px;
+  padding: 16px;
+  background-color: #e8f4fd;
+  border-left: 4px solid #1976d2;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  mat-icon {
+    font-size: 24px;
+    color: #1976d2;
+  }
+
+  span {
+    flex: 1;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+
+    strong {
+      font-weight: 600;
+    }
+  }
+
+  button {
+    margin-left: auto;
+    white-space: nowrap;
+  }
+}
+
+.document-button {
+  width: 100%;
+  margin-top: 16px;
+  height: 48px;
+  font-size: 15px;
+  border-width: 2px;
+
+  mat-icon {
+    margin-right: 8px;
+  }
+}
+
+.contact-card {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  border-left: 4px solid #1976d2;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .contact-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+
+    h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .relationship-tag {
+      background-color: #e3f2fd;
+      color: #1976d2;
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-weight: 500;
+    }
+  }
+
+  .contact-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      mat-icon {
+        color: #666;
+        font-size: 18px;
+        height: 18px;
+        width: 18px;
+      }
+
+      span {
+        color: #555;
+      }
+    }
+  }
+}
+
+mat-expansion-panel {
+  margin: 8px 0;
+  border-radius: 8px !important;
+  overflow: hidden;
+
+  &::ng-deep {
+    .mat-expansion-panel-header {
+      padding: 0 16px;
+      height: 56px;
+    }
+
+    .mat-expansion-panel-body {
+      padding: 16px;
+    }
+  }
+
+  .contact-details {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      mat-icon {
+        color: #777;
+      }
+    }
+  }
+}
+
+.action-card {
+  margin-top: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+
+  .feedback-box {
+    width: 100%;
+    margin-bottom: 16px;
+
+    textarea {
+      min-height: 100px;
+    }
+  }
+
+  .button-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+
+    button {
+      min-width: 180px;
+      height: 48px;
+      font-size: 16px;
+
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+}
+
+// Typography adjustments
+mat-card-title {
+  font-size: 20px !important;
+  font-weight: 600 !important;
+}
+
+mat-card-subtitle {
+  font-size: 14px !important;
+  color: #666 !important;
+}
+
+mat-divider {
+  margin: 16px 0 !important;
+}
+
+// Responsive adjustments
+@media (max-width: 599px) {
+  .content-container {
+    padding: 16px;
+  }
+
+  .toolbar {
+    height: auto;
+    padding: 12px;
+    flex-wrap: wrap;
+
+    .status-info {
+      margin-top: 8px;
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
+
+  .button-row {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+}

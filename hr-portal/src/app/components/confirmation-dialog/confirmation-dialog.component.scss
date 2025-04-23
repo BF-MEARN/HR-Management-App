@@ -1,0 +1,47 @@
+.dialog-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #212121;
+  padding-bottom: 12px;
+}
+
+.dialog-content {
+  font-size: 16px;
+  color: #424242;
+  line-height: 1.5;
+  padding-bottom: 20px;
+  padding-top: 5px;
+  min-width: 300px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 8px;
+
+  button {
+    min-width: 100px;
+    font-weight: 500;
+    font-size: 14px;
+  }
+
+  .cancel-button {
+    color: #546e7a;
+  }
+
+  .confirm-button {
+    background-color: #d32f2f;
+    color: white;
+
+    &:hover {
+      background-color: #b71c1c;
+    }
+  }
+}
+
+:host ::ng-deep .mat-dialog-container {
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+}

@@ -12,9 +12,14 @@ import { AuthActions } from 'src/app/store/auth/auth.actions';
 export class NavigationBarComponent implements OnInit {
   menuItems = [
     { path: '/home', label: 'Home', icon: 'home' },
-    { path: '/employees', label: 'Employee Profiles', icon: 'people' },
+    { path: '/employee-profiles', label: 'Employee Profiles', icon: 'people' },
     { path: '/visa', label: 'Visa Status Management', icon: 'article' },
-    { path: '/hiring', label: 'Hiring Management', icon: 'work' },
+    {
+      label: 'Hiring Management',
+      path: ['/hiring'],
+      queryParams: { subTab: 'pending' },
+      icon: 'work'
+    },
     { path: '/housing', label: 'Housing Management', icon: 'house' },
   ];
 

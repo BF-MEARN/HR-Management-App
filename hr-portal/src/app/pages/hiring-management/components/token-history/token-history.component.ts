@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { RegistrationToken } from 'src/app/interfaces/registration-token';
@@ -14,7 +15,7 @@ import { environment } from 'src/environments/environment';
 export class TokenHistoryComponent implements OnInit {
   tokens$!: Observable<RegistrationToken[]>;
 
-  constructor(private store: Store) {}
+  constructor(private store: Store, private dialogRef: MatDialogRef<TokenHistoryComponent>) {}
 
   ngOnInit(): void {
     this.store.dispatch(loadTokenHistory());
@@ -25,4 +26,8 @@ export class TokenHistoryComponent implements OnInit {
     return `${environment.reactBaseUrl}/register/${token}`;
   }
   
+
+  closeDialog(): void {
+    this.dialogRef.close();
+  }
 }

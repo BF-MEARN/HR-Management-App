@@ -24,6 +24,7 @@ import { InviteFormModalComponent } from './components/invite-form-modal/invite-
 import { TokenHistoryComponent } from './components/token-history/token-history.component';
 import { MatCardModule } from '@angular/material/card';
 import { OnboardingApplicationsComponent } from './components/onboarding-applications/onboarding-applications.component';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [HiringManagementComponent, OnboardingApplicationsComponent, InviteFormModalComponent, TokenHistoryComponent],
@@ -44,6 +45,7 @@ import { OnboardingApplicationsComponent } from './components/onboarding-applica
     MatTableModule,
     MatCardModule,
     MatTabsModule,
+    MatIconModule,
   ],
 })
 export class HiringManagementModule {}
