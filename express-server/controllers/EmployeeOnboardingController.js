@@ -88,7 +88,7 @@ export const createHousing = async (req, res) => {
 export const addResidentToHousing = async (req, res) => {
   try {
     // front end should send address of housing and _id of employee to add
-    const { address, _id } = req.body;
+    const { address, _id } = 'address' in req.body && '_id' in req.body ? req.body : req.autoAssign;
 
     const residentId = new mongoose.Types.ObjectId(_id);
 
