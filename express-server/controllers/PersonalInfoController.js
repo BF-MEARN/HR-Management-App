@@ -398,11 +398,9 @@ export const getDocumentUrl = async (req, res, next) => {
     const presignedUrl = await getPresignedGetUrl(s3Key);
 
     if (!presignedUrl) {
-      return res
-        .status(500)
-        .json({
-          message: `Failed to generate URL for document type "${type}". Check server logs.`,
-        });
+      return res.status(500).json({
+        message: `Failed to generate URL for document type "${type}". Check server logs.`,
+      });
     }
 
     res.status(200).json({ url: presignedUrl });
