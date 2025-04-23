@@ -5,6 +5,8 @@ import Employee from '../models/Employee.js';
 import User from '../models/User.js';
 import VisaStatus from '../models/VisaStatus.js';
 import { putObject } from '../utils/putObject.js';
+import { getObject } from '../utils/getObject.js';
+import { getPresignedGetUrl } from '../utils/getPresignedGetUrl.js';
 
 /**
  * ==================
@@ -305,8 +307,7 @@ export const editDocuments = async (req, res, next) => {
     }
 
     // --- Handle Metadata Updates from req.body ---
-    const { driverLicense: driverLicenseMetadata, profilePicture: profilePictureMetadata } =
-      req.body;
+    const { driverLicense: driverLicenseMetadata, profilePicture: profilePictureMetadata } = req.body;
 
     if (!profilePictureResult && profilePictureMetadata !== undefined) {
       employee.profilePicture = profilePictureMetadata;
@@ -322,7 +323,7 @@ export const editDocuments = async (req, res, next) => {
       if (!driverLicenseFileResult && driverLicenseMetadata.file !== undefined) {
         employee.driverLicense.file = driverLicenseMetadata.file;
       }
-      console.log('test');
+
       // eslint-disable-next-line no-prototype-builtins
     } else if (req.body.hasOwnProperty('driverLicense') && req.body.driverLicense === null) {
       employee.driverLicense = undefined;
@@ -338,6 +339,71 @@ export const editDocuments = async (req, res, next) => {
     });
   } catch (error) {
     console.error(`Error updating documents:`, error);
+    next(error);
+  }
+};
+
+
+/**
+ * @desc    Get a presigned URL for downloading/previewing a specific document
+ * @route   GET /api/personal-info/document-url
+ * @access  Employee only
+ */
+export const getDocumentUrl = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { type } = req.query;
+
+    if (!type) {
+      return res.status(400).json({ message: 'Missing "type" query parameter.' });
+    }
+
+    const employee = await findEmployeeByAuthUser(userId);
+
+    if (!employee) {
+      return res.status(404).json({ message: 'Employee profile not found.' });
+    }
+
+    let s3Key = null;
+
+    switch (type) {
+      case 'profile':
+        s3Key = employee.profilePicture;
+        break;
+      case 'driverLicense':
+        s3Key = employee.driverLicense?.file;
+        break;
+      case 'optReceipt':
+        s3Key = employee.visaInfo?.optReceipt?.file;
+        break;
+      case 'optEAD':
+        s3Key = employee.visaInfo?.optEAD?.file;
+        break;
+      case 'i983':
+        s3Key = employee.visaInfo?.i983?.file;
+        break;
+      case 'i20':
+        s3Key = employee.visaInfo?.i20?.file;
+        break;
+      default:
+        return res.status(400).json({ message: `Invalid document type "${type}" specified.` });
+    }
+
+    if (!s3Key) {
+      console.log(`Document of type "${type}" not found or no key stored for user ${userId}.`);
+      return res.status(404).json({ message: `Document of type "${type}" not found or not uploaded.` });
+    }
+
+    const presignedUrl = await getPresignedGetUrl(s3Key); 
+
+    if (!presignedUrl) {
+      return res.status(500).json({ message: `Failed to generate URL for document type "${type}". Check server logs.` });
+    }
+
+    res.status(200).json({ url: presignedUrl });
+
+  } catch (error) {
+    console.error(`Error getting document URL for type "${req.query.type}":`, error);
     next(error);
   }
 };

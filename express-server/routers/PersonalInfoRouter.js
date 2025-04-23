@@ -9,11 +9,13 @@ import {
   editEmployment,
   editName,
   getPersonalInfo,
+  getDocumentUrl
 } from '../controllers/PersonalInfoController.js';
 
 const router = express.Router();
 
 router.get('/', getPersonalInfo);
+router.get('/document-url', getDocumentUrl);
 
 router.put('/name', editName);
 router.put('/address', editAddress);
