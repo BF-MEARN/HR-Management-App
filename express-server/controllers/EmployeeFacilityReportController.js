@@ -113,6 +113,37 @@ export const updateFacilityReport = async (req, res) => {
 };
 
 /**
+ * @desc    Close the current facility report
+ * @route   PATCH /api/employee/facilityReport/:facilityReportId/close
+ * @access  Employee only
+ */
+export const closeFacilityReport = async (req, res) => {
+  try {
+    const { facilityReportId } = req.params;
+    const { id: userId } = req.user;
+
+    const findEmployeeByUserId = await Employee.findOne({
+      userId,
+    });
+    const { _id: employeeId } = findEmployeeByUserId;
+    const facilityReport = await FacilityReport.findById(facilityReportId);
+    if (employeeId.toString() !== facilityReport.employeeId.toString()) {
+      return res.status(403).json({
+        message: 'This employee did NOT create this facility report! Hence, they CANNOT close it!',
+      });
+    }
+
+    await FacilityReport.findByIdAndUpdate(facilityReportId, {
+      status: 'Closed',
+    });
+
+    res.status(200).json({ message: 'Successfully closed the facility report' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to close the facility report!', error });
+  }
+};
+
+/**
  * @desc    Delete the facility report
  * @route   DELETE /api/employee/facilityReport/:facilityReportId/delete
  * @access  Employee only

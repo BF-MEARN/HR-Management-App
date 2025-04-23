@@ -2,6 +2,7 @@ import express from 'express';
 
 import {
   addCommentOnFacilityReport,
+  closeFacilityReport,
   createFacilityReport,
   deleteFacilityReport,
   getCurrentUserFacilityReportsByHouseId,
@@ -28,6 +29,12 @@ router.post('/house/:houseId/create', createFacilityReport);
  * @route   PUT /api/employee/facilityReport/:facilityReportId/update
  */
 router.put('/:facilityReportId/update', updateFacilityReport);
+
+/**
+ * @desc    Close the facility report
+ * @route   PATCH /api/employee/facilityReport/:facilityReportId/close
+ */
+router.patch('/:facilityReportId/close', closeFacilityReport);
 
 /**
  * @desc    Delete the facility report
