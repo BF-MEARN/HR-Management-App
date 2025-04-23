@@ -7,6 +7,7 @@ import fileUpload from 'express-fileupload';
 import { requireEmployee, requireHR, userAuth } from './middlewares/AuthMiddlewares.js';
 import errorHandler from './middlewares/ErrorHandler.js';
 import employeeFacilityReportRouter from './routers/EmployeeFacilityReportRouter.js';
+import employeeHousingRouter from './routers/EmployeeHousingRouter.js';
 import employeeOnboardingRouter from './routers/EmployeeOnboardingRouter.js';
 import hrHousingRouter from './routers/HrHousingRouter.js';
 import hrOnboardingRouter from './routers/HrOnboardingRouter.js';
@@ -49,6 +50,7 @@ app.use('/api/hr/housing', userAuth, requireHR, hrHousingRouter);
 
 // Employee specific routes
 app.use('/api/employee/facilityReport', userAuth, requireEmployee, employeeFacilityReportRouter);
+app.use('/api/employee/housing', employeeHousingRouter);
 
 // Personal Info Routers (*reminder add middleware after)
 
