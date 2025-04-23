@@ -1,10 +1,34 @@
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router';
+
 import { Card, Typography } from '@mui/material';
 
 import AuthForm, { AuthFormData } from '../components/AuthForm';
+import { useAppDispatch, useAppSelector } from '../store';
+import { setUser } from '../store/slices/userSlice';
+import { api } from '../utils/utils';
 
 export default function LoginPage() {
-  const handleSubmit = (form: AuthFormData) => {
-    console.log(form);
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user.entry);
+
+  useEffect(() => {
+    if (user) {
+      navigate('/onboard');
+    }
+  });
+
+  const handleSubmit = async (form: AuthFormData) => {
+    const res = await api('/user/login', {
+      method: 'post',
+      body: JSON.stringify({ username: form.username, password: form.password }),
+    });
+    if (res.ok) {
+      const { user } = await res.json();
+      dispatch(setUser(user));
+      navigate('/onboard');
+    }
   };
 
   return (

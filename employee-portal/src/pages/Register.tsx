@@ -1,9 +1,14 @@
+import { useParams } from 'react-router';
+
 import { Card, Typography } from '@mui/material';
 
 import AuthForm, { AuthFormData } from '../components/AuthForm';
 
 export default function RegisterPage() {
+  const params = useParams();
+
   const handleSubmit = (form: AuthFormData) => {
+    console.log(params['token']);
     console.log(form);
   };
 

@@ -38,3 +38,11 @@ export function smartUpdate<T>(target: WritableDraft<T>, patch: DeepPartial<T>) 
 export type DeepPartial<T> = {
   [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K];
 };
+
+export const api = (path: string, options: RequestInit = {}) => {
+  return fetch(`${import.meta.env.VITE_API_URL}${path}`, {
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    ...options,
+  });
+};

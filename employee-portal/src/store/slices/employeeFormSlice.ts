@@ -1,5 +1,6 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
+import { DeepPartial, smartUpdate } from '../../utils/utils';
 import {
   ContactFormData,
   DriverAndCarFormData,
@@ -10,7 +11,6 @@ import {
   emptyPersonalInfoFormData,
   emptyWorkAuthorizationFormData,
 } from './employeeFormTypes';
-import { DeepPartial, smartUpdate } from './utils';
 
 export interface EmployeeFormState {
   personalInfo: PersonalInfoFormData;
