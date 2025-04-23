@@ -7,7 +7,7 @@ const router = Router();
 
 router.post('/login', login);
 router.post('/logout', logout);
-router.post('/register', register);
+router.post('/register', register); //consider use a separated employee register
 
 router.get('/me', userAuth, verifyUser);
 

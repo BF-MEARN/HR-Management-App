@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 
+import RegistrationToken from '../models/RegistrationToken.js';
 import User from '../models/User.js';
 import { generateToken } from '../utils/generateToken.js';
 
@@ -57,10 +58,22 @@ export const logout = async (req, res) => {
  */
 export const register = async (req, res) => {
   try {
-    const { username, password, email } = req.body;
+    const { username, password, email, tokenUUID } = req.body;
 
     if (!username || !password || !email) {
       return res.status(400).json({ error: `Missing username or password or email.` });
+    }
+    if (!tokenUUID) {
+      return res.status(400).json({ error: `Missing registration token.` });
+    }
+    const token = await RegistrationToken.findOne({
+      token: tokenUUID,
+      email,
+      expiresAt: { $gt: new Date() },
+      used: false,
+    });
+    if (!token) {
+      return res.status(400).json({ message: 'Registration token is not valid' });
     }
 
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
@@ -82,10 +95,12 @@ export const register = async (req, res) => {
       role: 'employee',
     });
 
-    await newUser.save();
+    token.used = true;
+    await Promise.all([token.save(), newUser.save()]);
     res.status(201).json({ message: `Registration successful!` });
   } catch (error) {
     console.error({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 

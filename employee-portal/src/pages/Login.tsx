@@ -17,7 +17,7 @@ export default function LoginPage() {
     if (user) {
       navigate('/onboard');
     }
-  });
+  }, [navigate, user]);
 
   const handleSubmit = async (form: AuthFormData) => {
     const res = await api('/user/login', {
@@ -49,7 +49,7 @@ export default function LoginPage() {
       <Typography component="h1" variant="h4" fontWeight={'bold'}>
         Log in
       </Typography>
-      <AuthForm submitButtonText="Login" onSubmit={handleSubmit} includeEmailField={false} />
+      <AuthForm type="login" onSubmit={handleSubmit} />
     </Card>
   );
 }

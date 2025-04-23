@@ -2,6 +2,26 @@ import mongoose from 'mongoose';
 
 import Employee from '../models/Employee.js';
 import Housing from '../models/Housing.js';
+import RegistrationToken from '../models/RegistrationToken.js';
+
+export const validateRegistrationToken = async (req, res) => {
+  try {
+    const { tokenUUID } = req.params;
+
+    // not expired, not used
+    const token = await RegistrationToken.findOne({
+      token: tokenUUID,
+      expiresAt: { $gt: new Date() },
+      used: false,
+    });
+    if (!token) {
+      return res.status(404).json({ message: 'Registration token not found or invalid.' });
+    }
+    return res.status(200).json({ token });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to validate employee registration token ', error });
+  }
+};
 
 export const createNewEmployee = async (req, res) => {
   try {
