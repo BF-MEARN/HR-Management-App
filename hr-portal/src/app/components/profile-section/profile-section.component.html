@@ -3,7 +3,7 @@
   <button mat-icon-button (click)="goBack()">
     <mat-icon>arrow_back</mat-icon>
   </button>
-  <span class="page-title">Application Review</span>
+  <span class="page-title">{{ pageTitle }}</span>
 </div>
 
 <div class="content-container">
@@ -32,7 +32,7 @@
             {{ application?.preferredName || application?.firstName }} {{ application?.lastName }}
           </h2>
         </div>
-        <p class="sub-email">{{ application?.userId.email }}</p>
+        <p class="sub-email">{{ application?.userId?.email }}</p>
       </div>
       <mat-chip [ngClass]="statusClass" selected>
         {{ application?.onboardingStatus }}
@@ -391,13 +391,17 @@
   </mat-card>
 
   <!-- Action Section -->
-  <mat-card class="section-card action-card" *ngIf="application?.onboardingStatus === 'Pending'">
+  <mat-card
+    class="section-card action-card"
+    *ngIf="showActionButtons && application?.onboardingStatus === 'Pending'"
+  >
     <mat-card-content>
       <mat-form-field appearance="outline" class="feedback-box">
         <mat-label>Feedback (Required for rejection)</mat-label>
         <textarea
           matInput
-          [(ngModel)]="feedback"
+          [ngModel]="feedback"
+          (ngModelChange)="onFeedbackChange($event)"
           rows="4"
           placeholder="Provide detailed feedback if rejecting the application..."
         ></textarea>

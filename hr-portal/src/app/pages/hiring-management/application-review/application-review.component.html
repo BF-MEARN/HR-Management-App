@@ -1,0 +1,23 @@
+<div *ngIf="loading" class="loading-container">
+  <mat-spinner></mat-spinner>
+  <p>Loading application...</p>
+</div>
+
+<div *ngIf="error" class="error-container">
+  <mat-icon color="warn">error</mat-icon>
+  <p>{{ error }}</p>
+</div>
+
+<app-profile-section
+  *ngIf="!loading && !error"
+  [application]="application"
+  [showActionButtons]="true"
+  [feedback]="feedback"
+  [pageTitle]="'Application Review'"
+  (goBackEvent)="handleGoBack()"
+  (approveEvent)="handleApprove()"
+  (rejectEvent)="handleReject()"
+  (downloadDocumentEvent)="handleDownloadDocument($event)"
+  (goToVisaStatusPageEvent)="handleGoToVisaStatusPage($event)"
+  (feedbackChange)="handleFeedbackChange($event)"
+></app-profile-section>

@@ -25,6 +25,8 @@ import { TokenHistoryComponent } from './components/token-history/token-history.
 import { MatCardModule } from '@angular/material/card';
 import { OnboardingApplicationsComponent } from './components/onboarding-applications/onboarding-applications.component';
 import { MatIconModule } from '@angular/material/icon';
+import { onboardingReducer } from 'src/app/store/onboarding/onboarding.reducer';
+import { OnboardingEffects } from 'src/app/store/onboarding/onboarding.effects';
 
 @NgModule({
   declarations: [HiringManagementComponent, OnboardingApplicationsComponent, InviteFormModalComponent, TokenHistoryComponent],
@@ -34,7 +36,8 @@ import { MatIconModule } from '@angular/material/icon';
     HttpClientModule,
     HiringManagementRoutingModule,
     StoreModule.forFeature('token', tokenReducer),
-    EffectsModule.forFeature([TokenEffects]),
+    StoreModule.forFeature('onboarding', onboardingReducer),
+    EffectsModule.forFeature([TokenEffects, OnboardingEffects]),
 
     // Angular Material modules used in dialog
     MatFormFieldModule,

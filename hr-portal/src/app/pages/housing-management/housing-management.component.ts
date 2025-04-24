@@ -2,12 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Housing } from 'src/app/interfaces/housing';
 import { AddHouseDialogComponent } from './components/add-house-dialog/add-house-dialog.component';
-import { HouseDetailDialogComponent } from './components/house-detail-dialog/house-detail-dialog.component';
 import { ConfirmationDialogComponent } from 'src/app/components/confirmation-dialog/confirmation-dialog.component';
 import { Store } from '@ngrx/store';
 import { loadHouses } from 'src/app/store/housing/housing.actions';
 import { selectAllHouses } from 'src/app/store/housing/housing.selectors';
 import { HousingManagementService } from 'src/app/services/housing-management.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-housing-management',
@@ -21,6 +21,7 @@ export class HousingManagementComponent implements OnInit {
     private store: Store,
     private housingService: HousingManagementService,
     private dialog: MatDialog,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -37,7 +38,7 @@ export class HousingManagementComponent implements OnInit {
   }
 
   openDetailsDialog(house: Housing): void {
-    this.dialog.open(HouseDetailDialogComponent, { data: house });
+    this.router.navigate(['/housing', house._id]);
   }
 
   deleteHouse(houseId: string): void {

@@ -63,7 +63,7 @@ export class EmployeeProfilesComponent implements OnInit {
   }
 
   openProfile(id: string): void {
-    this.router.navigate(['/view-profile', id]); 
+    this.router.navigate(['/employee-profiles', id]); 
   }
   
   // Helper method to retry loading if there was an error

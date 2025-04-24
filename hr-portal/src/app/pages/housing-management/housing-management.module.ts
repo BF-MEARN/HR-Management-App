@@ -14,7 +14,6 @@ import { housingReducer } from 'src/app/store/housing/housing.reducer';
 import { HousingEffects } from 'src/app/store/housing/housing.effects';
 import { HousingManagementRoutingModule } from './housing-management-routing.module';
 import { HousingManagementComponent } from './housing-management.component';
-import { HouseDetailDialogComponent } from './components/house-detail-dialog/house-detail-dialog.component';
 import { AddHouseDialogComponent } from './components/add-house-dialog/add-house-dialog.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 
@@ -22,7 +21,6 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 @NgModule({
   declarations: [
     HousingManagementComponent,
-    HouseDetailDialogComponent,
     AddHouseDialogComponent
   ],
   imports: [

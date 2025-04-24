@@ -1,10 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatDialog } from '@angular/material/dialog';
 import { OnboardingApplicationService } from 'src/app/services/onboarding-application.service';
-import { ConfirmationDialogComponent } from 'src/app/components/confirmation-dialog/confirmation-dialog.component';
-
 
 @Component({
   selector: 'app-view-profile',
@@ -16,18 +13,13 @@ export class ViewProfileComponent implements OnInit {
   application: any = null;
   loading = true;
   error = '';
-  showReject = false;
-  feedback = '';
-  isLoading = false;
-  fromTab: string = 'pending';
-  showFullSSN: boolean = false;
+  fromTab: string = 'all';
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private onboardingService: OnboardingApplicationService,
-    private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private snackBar: MatSnackBar
   ) { }
 
   ngOnInit(): void {
@@ -55,61 +47,19 @@ export class ViewProfileComponent implements OnInit {
     });
   }
   
-
-
-  get statusClass(): any {
-    return {
-      pending: this.application?.onboardingStatus === 'Pending',
-      approved: this.application?.onboardingStatus === 'Approved',
-      rejected: this.application?.onboardingStatus === 'Rejected',
-    };
-  }
-  
-  getStatusColor(status: string): string {
-    switch (status?.toLowerCase()) {
-      case 'pending':
-        return 'accent';
-      case 'approved':
-        return 'primary';
-      case 'rejected':
-        return 'warn';
-      default:
-        return '';
-    }
-  }
-
-  formatGender(gender: string | undefined): string {
-    if (!gender) return 'Not provided';
-    return gender.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
-  }
-  
-
-  get citizenshipClass(): Record<string, boolean> {
-    return {
-      citizen: this.application?.isCitizenOrPR === true,
-      'non-citizen': this.application?.isCitizenOrPR === false,
-    };
-  }
-  
-  toggleSSNVisibility(): void {
-    this.showFullSSN = !this.showFullSSN;
-  }
- 
-  goBack(): void {
+  handleGoBack(): void {
     this.router.navigate(['/employee-profiles'], {
       queryParams: { tab: this.fromTab }
     });
   }
 
-  // TODO: Route to visa status page by id
-  goToVisaStatusPage(employeeId: string): void {
+  handleGoToVisaStatusPage(employeeId: string): void {
     this.router.navigate(['/visa-status', employeeId]);
   }
-  
-  
 
-  downloadDocument(document: any): void {
-    // TODO: Implement download logic & S3
+
+  // TODO: Implement S3
+  handleDownloadDocument(document: any): void {
     if (document?.file) {
       window.open(document.file, '_blank');
     } else {
