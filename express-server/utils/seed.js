@@ -116,7 +116,7 @@ const seedDatabase = async () => {
       password: hrPassword,
       email: 'hr@example.com',
       role: 'hr',
-      isOnboardingComplete: true,
+      isOnboardingSubmitted: true,
       employeeId: hrEmployee._id,
       isActive: true,
     });
@@ -230,7 +230,7 @@ const seedDatabase = async () => {
         role: 'employee',
 
         isActive: true,
-        isOnboardingComplete: false,
+        isOnboardingSubmitted: false,
       });
 
       let newVisaStatus = null;

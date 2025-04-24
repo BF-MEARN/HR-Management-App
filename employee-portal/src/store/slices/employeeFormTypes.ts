@@ -86,7 +86,7 @@ const citizenOrPermanentResidentTypes = {
   citizen: 'Citizen',
   green_card: 'Permanent Resident (Green Card)',
 };
-const foreignerTypes = { 'h1-b': 'H1-B', l2: 'L2', f1: 'F1 (CPT/OPT)', h4: 'H4', other: 'Other' };
+const foreignerTypes = { 'H1-B': 'H1-B', L2: 'L2', F1: 'F1 (CPT/OPT)', H4: 'H4', other: 'Other' };
 
 export const workAuthorizationCategories = {
   citizenOrPermanentResidentTypes,

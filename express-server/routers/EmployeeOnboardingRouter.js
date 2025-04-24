@@ -1,25 +1,28 @@
 import { Router } from 'express';
 
 import {
+  acceptEmployeeOnboardingSubmission,
   addResidentToHousing,
   createHousing,
-  createNewEmployee,
   getEmployeeData,
   getVisaStatus,
   updateI20,
   updateI983,
   updateOptEAD,
   updateOptReceipt,
-  validateRegistrationToken,
 } from '../controllers/EmployeeOnboardingController.js';
 
 const employeeOnboardingRouter = Router();
 
 /**
- * @desc    Create new employee in DB
+ * @desc    Submit a new employee application in DB
  * @route   GET /api/onboarding/register
  */
-employeeOnboardingRouter.post('/register', createNewEmployee);
+employeeOnboardingRouter.post('/', acceptEmployeeOnboardingSubmission);
+
+/**
+ * NOT USE in onboarding!
+ */
 
 /**
  * @desc    Create new housing in DB
@@ -33,6 +36,5 @@ employeeOnboardingRouter.patch('/update-opt-receipt', updateOptReceipt);
 employeeOnboardingRouter.patch('/update-opt-ead', updateOptEAD);
 employeeOnboardingRouter.patch('/update-i983', updateI983);
 employeeOnboardingRouter.patch('/update-i20', updateI20);
-employeeOnboardingRouter.get('/registration-token/:tokenUUID', validateRegistrationToken);
 
 export default employeeOnboardingRouter;

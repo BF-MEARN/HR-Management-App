@@ -26,7 +26,7 @@ const UserSchema = new Schema(
     token: { type: String }, // optional, for registration token tracking
     isActive: { type: Boolean, default: true },
     // Changed isCreated to isOnBoarding
-    isOnboardingComplete: { type: Boolean, default: false },
+    isOnboardingSubmitted: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
