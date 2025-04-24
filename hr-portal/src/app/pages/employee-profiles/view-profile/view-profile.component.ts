@@ -13,7 +13,8 @@ export class ViewProfileComponent implements OnInit {
   application: any = null;
   loading = true;
   error = '';
-  fromTab: string = 'all';
+  returnTo: string = '';
+  houseId: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -26,8 +27,12 @@ export class ViewProfileComponent implements OnInit {
     this.employeeId = this.route.snapshot.paramMap.get('id') || '';
   
     this.route.queryParams.subscribe((params) => {
-      if (params['fromTab']) {
-        this.fromTab = params['fromTab'];
+      // Check for return navigation parameters
+      if (params['returnTo']) {
+        this.returnTo = params['returnTo'];
+      }
+      if (params['houseId']) {
+        this.houseId = params['houseId'];
       }
     });
   
@@ -48,15 +53,18 @@ export class ViewProfileComponent implements OnInit {
   }
   
   handleGoBack(): void {
-    this.router.navigate(['/employee-profiles'], {
-      queryParams: { tab: this.fromTab }
-    });
+    // Check if we should return to a specific house detail page
+    if (this.returnTo === 'house' && this.houseId) {
+      this.router.navigate(['/housing', this.houseId]);
+    } else {
+      // Default behavior - go back to employee profiles list
+      this.router.navigate(['/employee-profiles']);
+    }
   }
 
   handleGoToVisaStatusPage(employeeId: string): void {
     this.router.navigate(['/visa-status', employeeId]);
   }
-
 
   // TODO: Implement S3
   handleDownloadDocument(document: any): void {

@@ -136,33 +136,35 @@
       <mat-card-title>Contact Information</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <div class="info-pair">
-        <mat-icon>phone</mat-icon>
-        <div class="info-content">
-          <div class="label">Cell Phone</div>
-          <div class="value">{{ application?.contactInfo?.cellPhone || 'Not provided' }}</div>
-        </div>
-      </div>
-      <div class="info-pair">
-        <mat-icon>business</mat-icon>
-        <div class="info-content">
-          <div class="label">Work Phone</div>
-          <div class="value">{{ application?.contactInfo?.workPhone || 'Not provided' }}</div>
-        </div>
-      </div>
-      <div class="info-pair">
-        <mat-icon>home</mat-icon>
-        <div class="info-content">
-          <div class="label">Address</div>
-          <div class="value" *ngIf="application?.address?.street; else noAddress">
-            {{ application?.address?.building ? application?.address.building + ', ' : '' }}
-            {{ application?.address?.street }}<br />
-            {{ application?.address?.city }}, {{ application?.address?.state }}
-            {{ application?.address?.zip }}
+      <div class="info-grid">
+        <div class="info-pair">
+          <mat-icon>phone</mat-icon>
+          <div class="info-content">
+            <div class="label">Cell Phone</div>
+            <div class="value">{{ application?.contactInfo?.cellPhone || 'Not provided' }}</div>
           </div>
-          <ng-template #noAddress>
-            <div class="value not-provided">Not provided</div>
-          </ng-template>
+        </div>
+        <div class="info-pair">
+          <mat-icon>business</mat-icon>
+          <div class="info-content">
+            <div class="label">Work Phone</div>
+            <div class="value">{{ application?.contactInfo?.workPhone || 'Not provided' }}</div>
+          </div>
+        </div>
+        <div class="info-pair">
+          <mat-icon>home</mat-icon>
+          <div class="info-content">
+            <div class="label">Address</div>
+            <div class="value" *ngIf="application?.address?.street; else noAddress">
+              {{ application?.address?.building ? application?.address.building + ', ' : '' }}
+              {{ application?.address?.street }}<br />
+              {{ application?.address?.city }}, {{ application?.address?.state }}
+              {{ application?.address?.zip }}
+            </div>
+            <ng-template #noAddress>
+              <div class="value not-provided">Not provided</div>
+            </ng-template>
+          </div>
         </div>
       </div>
     </mat-card-content>
@@ -175,7 +177,7 @@
     </mat-card-header>
     <mat-card-content>
       <div class="citizenship-status" [ngClass]="citizenshipClass">
-        <mat-icon>{{ application?.isCitizenOrPR ? 'check_circle' : 'work' }}</mat-icon>
+        <mat-icon>{{ application?.isCitizenOrPR ? 'verified_user' : 'work' }}</mat-icon>
         <span>
           {{
             application?.isCitizenOrPR !== undefined
@@ -189,44 +191,55 @@
       </div>
 
       <div *ngIf="!application?.isCitizenOrPR && application?.visaInfo" class="visa-details">
-        <div class="info-row">
-          <span class="label">Visa Type</span>
-          <span class="value">
-            {{
-              application?.visaInfo.workAuthorization?.type === 'Other'
-                ? application?.visaInfo.workAuthorization?.title || 'Other'
-                : application?.visaInfo.workAuthorization?.type
-            }}
-          </span>
-        </div>
-
-        <!-- Show Visa Title if type is "Other" -->
-        <div class="info-row" *ngIf="application?.visaInfo.workAuthorization.type === 'Other'">
-          <span class="label">Visa Title</span>
-          <span class="value">
-            {{ application?.visaInfo.workAuthorization.otherTitle || 'Not provided' }}
-          </span>
-        </div>
-
-        <div class="info-row">
-          <span class="label">Start Date</span>
-          <span class="value">
-            {{ application?.visaInfo.workAuthorization?.startDate | date: 'mediumDate' }}
-          </span>
-        </div>
-
-        <div class="info-row">
-          <span class="label">End Date</span>
-          <span class="value">
-            {{ application?.visaInfo.workAuthorization?.endDate | date: 'mediumDate' }}
-          </span>
+        <div class="info-grid">
+          <div class="info-pair">
+            <mat-icon>article</mat-icon>
+            <div class="info-content">
+              <div class="label">Visa Type</div>
+              <div class="value">
+                {{
+                  application?.visaInfo.workAuthorization?.type === 'Other'
+                    ? application?.visaInfo.workAuthorization?.title || 'Other'
+                    : application?.visaInfo.workAuthorization?.type
+                }}
+              </div>
+            </div>
+          </div>
+          <!-- Show Visa Title if type is "Other" -->
+          <div class="info-pair" *ngIf="application?.visaInfo.workAuthorization.type === 'Other'">
+            <mat-icon>description</mat-icon>
+            <div class="info-content">
+              <div class="label">Visa Title</div>
+              <div class="value">
+                {{ application?.visaInfo.workAuthorization.otherTitle || 'Not provided' }}
+              </div>
+            </div>
+          </div>
+          <div class="info-pair">
+            <mat-icon>calendar_today</mat-icon>
+            <div class="info-content">
+              <div class="label">Start Date</div>
+              <div class="value">
+                {{ application?.visaInfo.workAuthorization?.startDate | date: 'mediumDate' }}
+              </div>
+            </div>
+          </div>
+          <div class="info-pair">
+            <mat-icon>event_busy</mat-icon>
+            <div class="info-content">
+              <div class="label">End Date</div>
+              <div class="value">
+                {{ application?.visaInfo.workAuthorization?.endDate | date: 'mediumDate' }}
+              </div>
+            </div>
+          </div>
         </div>
 
         <div
           *ngIf="application?.visaInfo?.workAuthorization?.type === 'F1'"
           class="f1-visa-info-box"
         >
-          <mat-icon color="accent">info</mat-icon>
+          <mat-icon color="accent">school</mat-icon>
           <span>
             This employee is on an <strong>F1 visa</strong>. Please review all related documents and
             approvals in the <strong>Visa Status Management</strong> section.
@@ -238,7 +251,7 @@
       </div>
 
       <div *ngIf="!application?.isCitizenOrPR && !application?.visaInfo" class="empty-section">
-        <mat-icon>info</mat-icon>
+        <mat-icon>no_accounts</mat-icon>
         <span>No visa information provided</span>
       </div>
     </mat-card-content>
@@ -251,16 +264,27 @@
     </mat-card-header>
     <mat-card-content>
       <div *ngIf="application?.driverLicense?.number; else noDriverLicense">
-        <div class="info-row">
-          <span class="label">License Number: </span>
-          <span class="value">{{ application?.driverLicense.number }}</span>
+        <div class="info-grid">
+          <div class="info-pair">
+            <mat-icon>badge</mat-icon>
+            <div class="info-content">
+              <div class="label">License Number</div>
+              <div class="value">{{ application?.driverLicense.number || 'Not provided' }}</div>
+            </div>
+          </div>
+          <div class="info-pair">
+            <mat-icon>event</mat-icon>
+            <div class="info-content">
+              <div class="label">Expiration Date</div>
+              <div class="value">
+                {{
+                  application?.driverLicense.expirationDate | date: 'mediumDate' || 'Not provided'
+                }}
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="info-row">
-          <span class="label">Expiration Date: </span>
-          <span class="value">{{
-            application?.driverLicense.expirationDate | date: 'mediumDate'
-          }}</span>
-        </div>
+
         <button
           mat-stroked-button
           color="primary"
@@ -275,6 +299,46 @@
         <div class="empty-section">
           <mat-icon>info</mat-icon>
           <span>No driver's license information provided</span>
+        </div>
+      </ng-template>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Car Information -->
+  <mat-card class="section-card">
+    <mat-card-header>
+      <mat-card-title>Car Information</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="application?.carInfo?.make; else noCarInfo">
+        <div class="info-grid">
+          <div class="info-pair">
+            <mat-icon>directions_car</mat-icon>
+            <div class="info-content">
+              <div class="label">Make</div>
+              <div class="value">{{ application?.carInfo.make || 'Not provided' }}</div>
+            </div>
+          </div>
+          <div class="info-pair">
+            <mat-icon>commute</mat-icon>
+            <div class="info-content">
+              <div class="label">Model</div>
+              <div class="value">{{ application?.carInfo.model || 'Not provided' }}</div>
+            </div>
+          </div>
+          <div class="info-pair">
+            <mat-icon>palette</mat-icon>
+            <div class="info-content">
+              <div class="label">Color</div>
+              <div class="value">{{ application?.carInfo.color || 'Not provided' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ng-template #noCarInfo>
+        <div class="empty-section">
+          <mat-icon>directions_car_off</mat-icon>
+          <span>No car information provided</span>
         </div>
       </ng-template>
     </mat-card-content>
@@ -346,32 +410,6 @@
         <div class="empty-section">
           <mat-icon>info</mat-icon>
           <span>No emergency contacts provided</span>
-        </div>
-      </ng-template>
-    </mat-card-content>
-  </mat-card>
-
-  <!-- Car Information -->
-  <mat-card class="section-card">
-    <mat-card-header>
-      <mat-card-title>Car Information</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div *ngIf="application?.carInfo?.make; else noCarInfo">
-        <div class="info-pair">
-          <mat-icon>directions_car</mat-icon>
-          <div class="info-content">
-            <div class="value">
-              {{ application?.carInfo.color }} {{ application?.carInfo.make }}
-              {{ application?.carInfo.model }}
-            </div>
-          </div>
-        </div>
-      </div>
-      <ng-template #noCarInfo>
-        <div class="empty-section">
-          <mat-icon>info</mat-icon>
-          <span>No car information provided</span>
         </div>
       </ng-template>
     </mat-card-content>

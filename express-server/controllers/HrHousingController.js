@@ -57,6 +57,23 @@ export const deleteHouse = async (req, res) => {
 };
 
 /**
+ * @desc    Get a house by ID
+ * @route   GET /api/hr/housing/:id
+ * @access  HR only
+ */
+export const getHouseById = async (req, res) => {
+  try {
+    const house = await Housing.findById(req.params.id);
+    if (!house) {
+      return res.status(404).json({ message: 'House not found' });
+    }
+    res.status(200).json(house);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch house', error: err.message });
+  }
+};
+
+/**
  * @desc    Get list of residents for a house
  * @route   GET /api/hr/housing/:id/residents
  * @access  HR only
@@ -65,6 +82,7 @@ export const getResidentsByHouseId = async (req, res) => {
   try {
     const residents = await Employee.find({ houseId: req.params.id })
       .select('firstName lastName preferredName contactInfo.cellPhone email carInfo')
+      .populate('userId', 'email')
       .lean();
     res.status(200).json(residents);
   } catch (err) {
@@ -77,14 +95,23 @@ export const getResidentsByHouseId = async (req, res) => {
  * @route   GET /api/hr/housing/:id/reports
  * @access  HR only
  */
-export const getFacilityReportsByHouseId = async (req, res) => {
+export const getReportsByHouseId = async (req, res) => {
   try {
     const reports = await FacilityReport.find({ houseId: req.params.id })
       .sort({ createdAt: -1 })
-      .populate('createdBy', 'username')
+      .populate({
+        path: 'comments.createdBy',
+        select: 'employeeId',
+        populate: {
+          path: 'employeeId',
+          select: 'preferredName firstName lastName',
+        },
+      })
       .lean();
+
     res.status(200).json(reports);
   } catch (err) {
+    console.error('[FacilityReport Error]', err);
     res.status(500).json({ message: 'Failed to fetch reports', error: err.message });
   }
 };
@@ -104,14 +131,23 @@ export const addComment = async (req, res) => {
       return res.status(404).json({ message: 'Report not found' });
     }
 
+    // Check for first comment + 'Open' status
+    const isFirstComment = report.comments.length === 0;
+    const isOpen = report.status === 'Open';
+
     report.comments.push({
       createdBy: req.user.id,
       description,
       timestamp: new Date(),
     });
 
+    // Auto-update status to 'In Progress' if needed
+    if (isOpen && isFirstComment) {
+      report.status = 'In Progress';
+    }
+
     await report.save();
-    res.status(201).json({ message: 'Comment added' });
+    res.status(201).json({ message: 'Comment added', updatedStatus: report.status });
   } catch (err) {
     res.status(500).json({ message: 'Failed to add comment', error: err.message });
   }
@@ -128,9 +164,18 @@ export const updateComment = async (req, res) => {
     const { description } = req.body;
 
     const report = await FacilityReport.findById(reportId);
+    if (!report) {
+      return res.status(404).json({ message: 'Report not found' });
+    }
+
     const comment = report.comments.id(commentId);
     if (!comment) {
       return res.status(404).json({ message: 'Comment not found' });
+    }
+
+    // 🔐 Check if the logged-in user is the one who created the comment
+    if (String(comment.createdBy) !== req.user.id) {
+      return res.status(403).json({ message: 'You are not allowed to edit this comment' });
     }
 
     comment.description = description;
@@ -139,6 +184,7 @@ export const updateComment = async (req, res) => {
 
     res.status(200).json({ message: 'Comment updated' });
   } catch (err) {
+    console.error('Error updating comment:', err);
     res.status(500).json({ message: 'Failed to update comment', error: err.message });
   }
 };

@@ -1,1 +1,295 @@
-<p>house-detail works!</p>
+<div *ngIf="loading" class="loading-container">
+  <mat-spinner></mat-spinner>
+</div>
+
+<div class="house-detail-container" *ngIf="!loading && house">
+  <!-- Back navigation -->
+  <div class="back-navigation">
+    <button mat-icon-button [routerLink]="['/housing']">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <span class="page-title">House Details</span>
+  </div>
+
+  <!-- Address Card -->
+  <mat-card class="section-card">
+    <mat-card-header>
+      <mat-card-title>Address</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="info-grid">
+        <div class="info-pair">
+          <mat-icon>location_on</mat-icon>
+          <div class="info-content">
+            <div class="value">
+              {{ house.address.building ? house.address.building + ', ' : '' }}
+              {{ house.address.street }}
+            </div>
+            <div class="value">
+              {{ house.address.city }}, {{ house.address.state }} {{ house.address.zip }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Landlord Information -->
+  <mat-card class="section-card">
+    <mat-card-header>
+      <mat-card-title>Landlord Information</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="info-grid">
+        <div class="info-pair">
+          <mat-icon>person</mat-icon>
+          <div class="info-content">
+            <div class="label">Name</div>
+            <div class="value">{{ house.landlord.fullName || 'Not provided' }}</div>
+          </div>
+        </div>
+
+        <div class="info-pair">
+          <mat-icon>phone</mat-icon>
+          <div class="info-content">
+            <div class="label">Phone</div>
+            <div class="value">{{ house.landlord.phone || 'Not provided' }}</div>
+          </div>
+        </div>
+
+        <div class="info-pair">
+          <mat-icon>email</mat-icon>
+          <div class="info-content">
+            <div class="label">Email</div>
+            <div class="value">{{ house.landlord.email || 'Not provided' }}</div>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Facility Information -->
+  <mat-card class="section-card">
+    <mat-card-header>
+      <mat-card-title>Facility Information</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="info-grid">
+        <div class="info-pair">
+          <mat-icon>bed</mat-icon>
+          <div class="info-content">
+            <div class="label">Beds</div>
+            <div class="value">{{ house.facility.beds || '0' }}</div>
+          </div>
+        </div>
+
+        <div class="info-pair">
+          <mat-icon>hotel</mat-icon>
+          <div class="info-content">
+            <div class="label">Mattresses</div>
+            <div class="value">{{ house.facility.mattresses || '0' }}</div>
+          </div>
+        </div>
+
+        <div class="info-pair">
+          <mat-icon>table_bar</mat-icon>
+          <div class="info-content">
+            <div class="label">Tables</div>
+            <div class="value">{{ house.facility.tables || '0' }}</div>
+          </div>
+        </div>
+
+        <div class="info-pair">
+          <mat-icon>chair</mat-icon>
+          <div class="info-content">
+            <div class="label">Chairs</div>
+            <div class="value">{{ house.facility.chairs || '0' }}</div>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Residents -->
+  <mat-card class="section-card">
+    <mat-card-header>
+      <mat-card-title>Residents</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="residents.length > 0; else noResidents" class="residents-list">
+        <div *ngFor="let resident of residents" class="resident-card">
+          <div class="resident-info">
+            <div class="resident-header">
+              <h3>{{ resident.preferredName || resident.firstName }} {{ resident.lastName }}</h3>
+            </div>
+            <div class="resident-details">
+              <div class="contact-item" *ngIf="resident.contactInfo?.cellPhone">
+                <mat-icon>phone</mat-icon>
+                <span>{{ resident.contactInfo.cellPhone }}</span>
+              </div>
+              <div class="contact-item">
+                <mat-icon>email</mat-icon>
+                <span>{{ resident.userId?.email || 'No email provided' }}</span>
+              </div>
+              <div class="contact-item" *ngIf="resident.carInfo?.make">
+                <mat-icon>directions_car</mat-icon>
+                <span>
+                  {{ resident.carInfo.make }} {{ resident.carInfo.model }}
+                  <span *ngIf="resident.carInfo.color">({{ resident.carInfo.color }})</span>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="resident-actions">
+            <button
+              mat-stroked-button
+              color="primary"
+              [routerLink]="['/employee-profiles', resident._id]"
+              [queryParams]="{ returnTo: 'house', houseId: house._id }"
+            >
+              <mat-icon>visibility</mat-icon>
+              View Resident
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noResidents>
+        <div class="empty-section">
+          <mat-icon>people_outline</mat-icon>
+          <span>No residents assigned to this house yet</span>
+        </div>
+      </ng-template>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Facility Reports -->
+  <mat-card class="section-card">
+    <mat-card-header>
+      <mat-card-title>Facility Reports</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="reports.length > 0; else noReports">
+        <div *ngFor="let report of paginatedReports()" class="report-card">
+          <div class="report-header">
+            <h3>{{ report.title }}</h3>
+            <mat-chip [ngClass]="getReportStatusClass(report.status)" selected>
+              {{ report.status }}
+            </mat-chip>
+          </div>
+
+          <p class="report-description">{{ report.description }}</p>
+
+          <p class="report-meta">
+            Reported by {{ report.createdBy?.username || 'Unknown' }} on
+            {{ report.createdAt | date: 'medium' }}
+          </p>
+
+          <!-- Comments Section -->
+          <div class="comment-thread">
+            <h4>Comments</h4>
+            <div *ngIf="report.comments && report.comments.length > 0; else noComments">
+              <div *ngFor="let comment of report.comments" class="comment-box">
+                <div *ngIf="editingCommentId !== comment._id; else editMode">
+                  <p>{{ comment.description }}</p>
+                  <p class="meta">
+                    By
+                    {{
+                      comment.createdBy.employeeId?.preferredName ||
+                        comment.createdBy.employeeId?.firstName
+                    }}
+                    {{ comment.createdBy.employeeId?.lastName || 'Unknown' }}
+                    on {{ comment.timestamp | date: 'short' }}
+                  </p>
+
+                  <!-- Only show edit button if current user wrote the comment -->
+                  <button
+                    *ngIf="comment.createdBy?._id === currentUserId"
+                    mat-icon-button
+                    matTooltip="Edit comment"
+                    (click)="startEditing(comment)"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                </div>
+
+                <ng-template #editMode>
+                  <div class="edit-comment-box">
+                    <mat-form-field class="edit-textarea" appearance="outline">
+                      <textarea
+                        matInput
+                        [(ngModel)]="editedCommentText"
+                        rows="3"
+                        placeholder="Edit your comment"
+                      ></textarea>
+                    </mat-form-field>
+
+                    <div class="edit-action-buttons">
+                      <button
+                        mat-flat-button
+                        color="primary"
+                        (click)="saveComment(report._id, comment._id)"
+                      >
+                        <mat-icon>save</mat-icon>
+                        Save
+                      </button>
+
+                      <button mat-button (click)="cancelEdit()">Cancel</button>
+                    </div>
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+            <ng-template #noComments>
+              <div class="empty-comments">
+                <mat-icon>forum</mat-icon>
+                <span>No comments yet</span>
+              </div>
+            </ng-template>
+          </div>
+
+          <!-- Add Comment -->
+          <div class="add-comment">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Add a comment</mat-label>
+              <textarea
+                matInput
+                [(ngModel)]="newComments[report._id]"
+                placeholder="Write your comment here..."
+                rows="3"
+              ></textarea>
+            </mat-form-field>
+
+            <button
+              mat-raised-button
+              color="primary"
+              [disabled]="!(newComments[report._id] && newComments[report._id].trim())"
+              (click)="submitComment(report._id)"
+            >
+              <mat-icon>send</mat-icon>
+              Post Comment
+            </button>
+          </div>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="pagination-controls" *ngIf="reports.length > pageSize">
+          <button mat-button (click)="prevPage()" [disabled]="currentPage === 1">
+            <mat-icon>chevron_left</mat-icon> Previous
+          </button>
+          <span>Page {{ currentPage }} of {{ getTotalPages() }}</span>
+          <button mat-button (click)="nextPage()" [disabled]="endOfReports()">
+            Next <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <ng-template #noReports>
+        <div class="empty-section">
+          <mat-icon>assignment_late</mat-icon>
+          <span>No facility reports available for this house</span>
+        </div>
+      </ng-template>
+    </mat-card-content>
+  </mat-card>
+</div>

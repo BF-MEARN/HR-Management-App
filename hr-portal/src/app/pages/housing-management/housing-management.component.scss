@@ -1,28 +1,321 @@
+// Variables
+$primary-color: #3f51b5;
+$accent-color: #ff4081;
+$background-color: #fcfcfc;
+$card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+$border-radius: 12px;
+$transition-time: 0.3s;
+
 .housing-wrapper {
   padding: 24px;
+  min-height: calc(100vh - 64px); // Adjust based on your navbar height
+  background-color: $background-color;
+  position: relative;
+}
 
-  .page-header {
-    font-size: 32px;
+.page-header {
+  font-size: 32px;
+  font-weight: 500;
+  margin: 0 0 20px 0;
+  color: #2c3e50;
+}
+
+.controls-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 30px;
+
+  .search-container {
+    flex: 1;
+    max-width: 600px;
+    position: relative;
+    height: 48px;
+
+    .search-input {
+      width: 100%;
+      height: 100%;
+      border: 1px solid #d0d0d0;
+      border-radius: 4px;
+      padding: 0 16px 0 40px;
+      font-size: 16px;
+      color: #333;
+      background-color: #fcfcfc;
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+        box-shadow: 0 0 0 1px $primary-color;
+      }
+
+      &::placeholder {
+        color: #999;
+      }
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #666;
+      pointer-events: none;
+    }
+  }
+
+  .add-house-btn-inline {
+    height: 48px;
+    padding: 0 16px;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    background-color: $primary-color;
+    color: #fcfcfc;
     font-weight: 500;
-    margin-bottom: 16px;
-    margin-top: 12px;
+    border-radius: 4px;
+
+    mat-icon {
+      margin-right: 8px;
+    }
+
+    &:hover {
+      background-color: darken($primary-color, 10%);
+    }
   }
 }
 
+// Empty state styling
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  background-color: #fcfcfc;
+  border-radius: $border-radius;
+  box-shadow: $card-shadow;
+  text-align: center;
+  margin: 40px auto;
+  max-width: 500px;
+
+  mat-icon {
+    font-size: 64px;
+    height: 64px;
+    width: 64px;
+    color: lighten($primary-color, 20%);
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: #2c3e50;
+  }
+
+  p {
+    color: #7f8c8d;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  button {
+    padding: 0 24px;
+  }
+}
+
+// Card grid layout
 .card-grid {
   display: grid;
-  gap: 1.5rem;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  column-gap: 24px;
+  row-gap: 60px;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  margin-bottom: 32px;
 }
 
+// House card styling
 .house-card {
-  padding: 0.5rem;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+  border-radius: $border-radius;
+  overflow: hidden;
+  box-shadow: $card-shadow;
+  transition:
+    transform $transition-time,
+    box-shadow $transition-time;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #fcfcfc;
+
+  &.highlight {
+    animation: highlight-pulse 2s ease-in-out;
+  }
+
+  .house-image-container {
+    position: relative;
+    padding: 30px 0;
+    background-color: lighten($primary-color, 40%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .house-image {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      mat-icon {
+        font-size: 64px;
+        height: 64px;
+        width: 64px;
+        color: $primary-color;
+      }
+    }
+
+    .resident-count {
+      position: absolute;
+      bottom: -12px;
+      right: 16px;
+      background-color: $primary-color;
+      color: #fcfcfc;
+      border-radius: 24px;
+      padding: 4px 16px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+      mat-icon {
+        font-size: 18px;
+        height: 18px;
+        width: 18px;
+        margin-right: 4px;
+      }
+
+      span {
+        font-weight: 600;
+      }
+    }
+  }
+
+  .card-content-wrapper {
+    padding: 16px 16px 8px 16px; // Reduced bottom padding
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .address-block {
+    margin-bottom: 24px;
+
+    .house-title {
+      font-size: 20px;
+      font-weight: 500;
+      margin: 0 0 4px 0;
+      color: #2c3e50;
+    }
+
+    .house-subtitle {
+      font-size: 14px;
+      color: #7f8c8d;
+      margin: 0;
+    }
+  }
+
+  .info-section {
+    margin-bottom: 0; // Reduced from 8px
+    flex: 1;
+  }
+
+  .info-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px; // Reduced from 8px
+
+    &:last-child {
+      margin-bottom: 0; // Remove margin from last item
+    }
+
+    mat-icon {
+      font-size: 18px;
+      height: 18px;
+      width: 18px;
+      margin-right: 8px;
+      color: #7f8c8d;
+    }
+
+    span {
+      font-size: 14px;
+      color: #34495e;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  mat-divider {
+    margin: 0; // Remove any margin
+  }
+
+  .card-actions {
+    padding: 4px 16px 8px; // Reduced top padding
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0; // Remove any margin
+
+    .view-details-btn {
+      flex: 1;
+      margin: 0;
+      padding: 4px 8px;
+
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+
+    .delete-btn {
+      margin-left: 16px;
+    }
+  }
 }
 
-.add-house-btn {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  z-index: 100;
+// Add house button styling
+.add-house-btn-inline {
+  background-color: $primary-color;
+  color: #fcfcfc;
+  transition: background-color $transition-time;
+
+  &:hover {
+    background-color: darken($primary-color, 10%);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .controls-container {
+    flex-direction: column;
+    align-items: stretch;
+
+    .search-container {
+      max-width: 100%;
+    }
+
+    .add-house-btn-inline {
+      width: 100%;
+    }
+  }
+
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .housing-wrapper {
+    padding: 16px;
+  }
+
+  .page-header {
+    font-size: 28px;
+  }
 }
