@@ -345,6 +345,25 @@ export const editDocuments = async (req, res, next) => {
       }
     }
 
+    if (req.files && req.files.i983File) {
+      const file = req.files.i983File;
+      const fileExtension = path.extname(file.name);
+      const key = `employees/${userId}/i983${fileExtension}`;
+
+      i983FileResult = await putObject(file.data, key, file.mimetype);
+      if (i983FileResult) {
+        if (!visa.i983) visa.i983 = {};
+        console.log(visa.i983)
+        visa.i983.file = optReceiptFileResult.key;
+        visa.i983.status = 'Pending Approval';
+      } else {
+        console.warn(`I-983 upload failed for user ${userId}`);
+        return res.status(500).json({
+          message: 'I-983 upload failed.'
+        });
+      }
+    }
+    
     // if (req.files && req.files.optReceiptFile) {
     //   const file = req.files.optReceiptFile;
     //   const fileExtension = path.extname(file.name);
@@ -363,7 +382,7 @@ export const editDocuments = async (req, res, next) => {
     //     });
     //   }
     // }
-
+    
     // --- Handle Metadata Updates from req.body ---
     const { driverLicense: driverLicenseMetadata, profilePicture: profilePictureMetadata } =
       req.body;
