@@ -273,13 +273,16 @@ export const editDocuments = async (req, res, next) => {
       return res.status(404).json({ message: `Employee profile not found.` });
     }
 
+    const visa = await VisaStatus.findById(employee.visaInfo);
+    console.log(visa)
+
     // --- Handle File Uploads ---
-    let profilePictureResult, driverLicenseFileResult;
+    let profilePictureResult, driverLicenseFileResult, optReceiptFileResult, optEADFileResult, i983FileResult, i20FileResult;
 
     if (req.files && req.files.profilePictureFile) {
       const file = req.files.profilePictureFile;
       const fileExtension = path.extname(file.name);
-      const key = `employees/${userId}/profile-${Date.now()}${fileExtension}`;
+      const key = `employees/${userId}/profile${fileExtension}`;
 
       profilePictureResult = await putObject(file.data, key, file.mimetype);
       if (profilePictureResult) {
@@ -293,7 +296,7 @@ export const editDocuments = async (req, res, next) => {
     if (req.files && req.files.driverLicenseFile) {
       const file = req.files.driverLicenseFile;
       const fileExtension = path.extname(file.name);
-      const key = `employees/${userId}/driversLicense-${Date.now()}${fileExtension}`;
+      const key = `employees/${userId}/driversLicense${fileExtension}`;
 
       driverLicenseFileResult = await putObject(file.data, key, file.mimetype);
       if (driverLicenseFileResult) {
@@ -302,6 +305,25 @@ export const editDocuments = async (req, res, next) => {
       } else {
         console.warn(`Driver's license upload failed for user ${userId}`);
         return res.status(500).json({ message: 'Driver license upload failed.' });
+      }
+    }
+
+    if (req.files && req.files.optReceiptFile) {
+      const file = req.files.optReceiptFile;
+      const fileExtension = path.extname(file.name);
+      const key = `employees/${userId}/optReceipt${fileExtension}`;
+
+      optReceiptFileResult = await putObject(file.data, key, file.mimetype);
+      if (optReceiptFileResult) {
+        if (!visa.optReceipt) visa.optReceipt = {};
+        console.log(visa.optReceipt)
+        visa.optReceipt.file = optReceiptFileResult.key;
+        visa.optReceipt.status = 'Pending Approval';
+      } else {
+        console.warn(`OPT Receipt upload failed for user ${userId}`);
+        return res.status(500).json({
+          message: 'OPT Receipt upload failed.'
+        });
       }
     }
 
@@ -331,6 +353,7 @@ export const editDocuments = async (req, res, next) => {
 
     // --- Save and Respond ---
     await employee.save();
+    await visa.save();
     const updatedPopulatedEmployee = await findEmployeeByAuthUser(userId);
 
     res.status(200).json({
