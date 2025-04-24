@@ -336,7 +336,6 @@ export const editDocuments = async (req, res, next) => {
         if (!visa.optEAD) visa.optEAD = {};
         visa.optEAD.file = optEADFileResult.key;
         visa.optEAD.status = 'Pending Approval';
-        console.log(visa.optEAD)
       } else {
         console.warn(`OPT EAD upload failed for user ${userId}`);
         return res.status(500).json({
@@ -353,7 +352,6 @@ export const editDocuments = async (req, res, next) => {
       i983FileResult = await putObject(file.data, key, file.mimetype);
       if (i983FileResult) {
         if (!visa.i983) visa.i983 = {};
-        console.log(visa.i983)
         visa.i983.file = optReceiptFileResult.key;
         visa.i983.status = 'Pending Approval';
       } else {
@@ -364,24 +362,24 @@ export const editDocuments = async (req, res, next) => {
       }
     }
     
-    // if (req.files && req.files.optReceiptFile) {
-    //   const file = req.files.optReceiptFile;
-    //   const fileExtension = path.extname(file.name);
-    //   const key = `employees/${userId}/optReceipt${fileExtension}`;
+    if (req.files && req.files.i20File) {
+      const file = req.files.i20File;
+      const fileExtension = path.extname(file.name);
+      const key = `employees/${userId}/i20${fileExtension}`;
 
-    //   optReceiptFileResult = await putObject(file.data, key, file.mimetype);
-    //   if (optReceiptFileResult) {
-    //     if (!visa.optReceipt) visa.optReceipt = {};
-    //     console.log(visa.optReceipt)
-    //     visa.optReceipt.file = optReceiptFileResult.key;
-    //     visa.optReceipt.status = 'Pending Approval';
-    //   } else {
-    //     console.warn(`OPT Receipt upload failed for user ${userId}`);
-    //     return res.status(500).json({
-    //       message: 'OPT Receipt upload failed.'
-    //     });
-    //   }
-    // }
+      i20FileResult = await putObject(file.data, key, file.mimetype);
+      if (i20FileResult) {
+        if (!visa.i20) visa.i20 = {};
+        console.log(visa.i20)
+        visa.i20.file = i20FileResult.key;
+        visa.i20.status = 'Pending Approval';
+      } else {
+        console.warn(`I-20 upload failed for user ${userId}`);
+        return res.status(500).json({
+          message: 'I-20 Receipt upload failed.'
+        });
+      }
+    }
     
     // --- Handle Metadata Updates from req.body ---
     const { driverLicense: driverLicenseMetadata, profilePicture: profilePictureMetadata } =
