@@ -316,7 +316,6 @@ export const editDocuments = async (req, res, next) => {
       optReceiptFileResult = await putObject(file.data, key, file.mimetype);
       if (optReceiptFileResult) {
         if (!visa.optReceipt) visa.optReceipt = {};
-        console.log(visa.optReceipt)
         visa.optReceipt.file = optReceiptFileResult.key;
         visa.optReceipt.status = 'Pending Approval';
       } else {
@@ -326,6 +325,44 @@ export const editDocuments = async (req, res, next) => {
         });
       }
     }
+
+    if (req.files && req.files.optEADFile) {
+      const file = req.files.optEADFile;
+      const fileExtension = path.extname(file.name);
+      const key = `employees/${userId}/optEAD${fileExtension}`;
+
+      optEADFileResult = await putObject(file.data, key, file.mimetype);
+      if (optEADFileResult) {
+        if (!visa.optEAD) visa.optEAD = {};
+        visa.optEAD.file = optEADFileResult.key;
+        visa.optEAD.status = 'Pending Approval';
+        console.log(visa.optEAD)
+      } else {
+        console.warn(`OPT EAD upload failed for user ${userId}`);
+        return res.status(500).json({
+          message: 'OPT EAD upload failed.'
+        });
+      }
+    }
+
+    // if (req.files && req.files.optReceiptFile) {
+    //   const file = req.files.optReceiptFile;
+    //   const fileExtension = path.extname(file.name);
+    //   const key = `employees/${userId}/optReceipt${fileExtension}`;
+
+    //   optReceiptFileResult = await putObject(file.data, key, file.mimetype);
+    //   if (optReceiptFileResult) {
+    //     if (!visa.optReceipt) visa.optReceipt = {};
+    //     console.log(visa.optReceipt)
+    //     visa.optReceipt.file = optReceiptFileResult.key;
+    //     visa.optReceipt.status = 'Pending Approval';
+    //   } else {
+    //     console.warn(`OPT Receipt upload failed for user ${userId}`);
+    //     return res.status(500).json({
+    //       message: 'OPT Receipt upload failed.'
+    //     });
+    //   }
+    // }
 
     // --- Handle Metadata Updates from req.body ---
     const { driverLicense: driverLicenseMetadata, profilePicture: profilePictureMetadata } =
