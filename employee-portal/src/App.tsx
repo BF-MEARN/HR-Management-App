@@ -2,10 +2,10 @@ import { useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router';
 
 import NavBar from './components/NavBar';
+import HousingPage from './pages/Housing';
 import LoginPage from './pages/Login';
 import OnboardingApplicationPage from './pages/OnboardingApplication';
 import RegisterPage from './pages/Register';
-import HousingPage from './pages/housing_without_backend/Housing';
 import { useAppDispatch, useAppSelector } from './store';
 import { fetchMe } from './store/slices/userSlice';
 

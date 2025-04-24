@@ -2,7 +2,7 @@ import { memo, useState } from 'react';
 
 import { Button, TextField } from '@mui/material';
 
-import { Comment, Report } from '../Housing';
+import { Comment, Report } from '../../../pages/Housing';
 import CommentSection from '../comments/CommentSection';
 
 interface ExistingFacilityReportProps {

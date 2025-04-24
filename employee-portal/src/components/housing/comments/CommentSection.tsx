@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { Button, Collapse } from '@mui/material';
 
-import { Comment, Report } from '../Housing';
+import { Comment, Report } from '../../../pages/Housing';
 import CommentForm from './CommentForm';
 import ExistingComment from './ExistingComment';
 

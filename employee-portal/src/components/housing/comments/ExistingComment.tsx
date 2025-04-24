@@ -2,7 +2,7 @@ import { FormEvent, useState } from 'react';
 
 import { Button, TextField } from '@mui/material';
 
-import { Comment, Report } from '../Housing';
+import { Comment, Report } from '../../../pages/Housing';
 
 interface CommentProps {
   comment: Comment;

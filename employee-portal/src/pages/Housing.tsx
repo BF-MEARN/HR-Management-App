@@ -2,9 +2,9 @@ import { useState } from 'react';
 
 import { Paper } from '@mui/material';
 
-import HousingDetails from './HousingDetails';
-import ExistingFacilityReport from './reports/ExistingFacilityReport';
-import FacilityReportForm from './reports/FacilityReportForm';
+import HousingDetails from '../components/housing/HousingDetails';
+import ExistingFacilityReport from '../components/housing/reports/ExistingFacilityReport';
+import FacilityReportForm from '../components/housing/reports/FacilityReportForm';
 
 export interface Comment {
   id: string;

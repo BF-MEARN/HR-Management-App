@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button, TextField } from '@mui/material';
 import { v4 as randomId } from 'uuid';
 
-import { Report } from '../Housing';
+import { Report } from '../../../pages/Housing';
 
 interface CommentFormProps {
   reportIndex: number;
