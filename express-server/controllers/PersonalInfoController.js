@@ -274,10 +274,14 @@ export const editDocuments = async (req, res, next) => {
     }
 
     const visa = await VisaStatus.findById(employee.visaInfo);
-    console.log(visa)
 
     // --- Handle File Uploads ---
-    let profilePictureResult, driverLicenseFileResult, optReceiptFileResult, optEADFileResult, i983FileResult, i20FileResult;
+    let profilePictureResult,
+      driverLicenseFileResult,
+      optReceiptFileResult,
+      optEADFileResult,
+      i983FileResult,
+      i20FileResult;
 
     if (req.files && req.files.profilePictureFile) {
       const file = req.files.profilePictureFile;
@@ -321,7 +325,7 @@ export const editDocuments = async (req, res, next) => {
       } else {
         console.warn(`OPT Receipt upload failed for user ${userId}`);
         return res.status(500).json({
-          message: 'OPT Receipt upload failed.'
+          message: 'OPT Receipt upload failed.',
         });
       }
     }
@@ -339,7 +343,7 @@ export const editDocuments = async (req, res, next) => {
       } else {
         console.warn(`OPT EAD upload failed for user ${userId}`);
         return res.status(500).json({
-          message: 'OPT EAD upload failed.'
+          message: 'OPT EAD upload failed.',
         });
       }
     }
@@ -357,11 +361,11 @@ export const editDocuments = async (req, res, next) => {
       } else {
         console.warn(`I-983 upload failed for user ${userId}`);
         return res.status(500).json({
-          message: 'I-983 upload failed.'
+          message: 'I-983 upload failed.',
         });
       }
     }
-    
+
     if (req.files && req.files.i20File) {
       const file = req.files.i20File;
       const fileExtension = path.extname(file.name);
@@ -370,17 +374,16 @@ export const editDocuments = async (req, res, next) => {
       i20FileResult = await putObject(file.data, key, file.mimetype);
       if (i20FileResult) {
         if (!visa.i20) visa.i20 = {};
-        console.log(visa.i20)
         visa.i20.file = i20FileResult.key;
         visa.i20.status = 'Pending Approval';
       } else {
         console.warn(`I-20 upload failed for user ${userId}`);
         return res.status(500).json({
-          message: 'I-20 Receipt upload failed.'
+          message: 'I-20 Receipt upload failed.',
         });
       }
     }
-    
+
     // --- Handle Metadata Updates from req.body ---
     const { driverLicense: driverLicenseMetadata, profilePicture: profilePictureMetadata } =
       req.body;
