@@ -1,44 +1,98 @@
 <div class="housing-wrapper">
   <h1 class="page-header">Housing Management</h1>
 
+  <div class="controls-container">
+    <div class="search-container">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search houses"
+        [(ngModel)]="searchQuery"
+        (input)="filterHouses()"
+      />
+      <mat-icon class="search-icon">search</mat-icon>
+    </div>
+
+    <button
+      mat-flat-button
+      color="primary"
+      class="add-house-btn-inline"
+      (click)="openAddHouseDialog()"
+    >
+      <mat-icon>add</mat-icon>
+      Add House
+    </button>
+  </div>
+
+  <div *ngIf="(filteredHouses$ | async)?.length === 0" class="empty-state">
+    <mat-icon>home_work</mat-icon>
+    <h3>No houses found</h3>
+    <p>There are no houses matching your criteria. Try adjusting your search or add a new house.</p>
+    <button mat-raised-button color="primary" (click)="openAddHouseDialog()">Add New House</button>
+  </div>
+
   <div class="card-grid">
-    <mat-card *ngFor="let house of houses$ | async" class="house-card">
-      <mat-card-header>
-        <mat-card-title> {{ house.address.street }}, {{ house.address.city }} </mat-card-title>
-        <mat-card-subtitle> {{ house.address.state }} {{ house.address.zip }} </mat-card-subtitle>
-      </mat-card-header>
+    <mat-card
+      *ngFor="let house of filteredHouses$ | async"
+      class="house-card"
+      [class.highlight]="isNewlyAdded(house._id)"
+    >
+      <div class="house-image-container">
+        <div class="house-image">
+          <mat-icon>home</mat-icon>
+        </div>
+        <div class="resident-count">
+          <mat-icon>people</mat-icon>
+          <span>{{ house.residents.length }}</span>
+        </div>
+      </div>
 
-      <mat-card-content>
-        <p><strong>Landlord:</strong> {{ house.landlord.fullName }}</p>
-        <p><strong>Phone:</strong> {{ house.landlord.phone }}</p>
-        <p><strong>Email:</strong> {{ house.landlord.email }}</p>
-        <p><strong>Residents:</strong> {{ house.residents.length }}</p>
-      </mat-card-content>
+      <div class="card-content-wrapper">
+        <div class="address-block">
+          <h2 class="house-title">{{ house.address.street }}</h2>
+          <p class="house-subtitle">
+            {{ house.address.city }}, {{ house.address.state }} {{ house.address.zip }}
+          </p>
+        </div>
 
-      <mat-card-actions align="end">
+        <div class="info-section">
+          <div class="info-row">
+            <mat-icon>person</mat-icon>
+            <span>{{ house.landlord.fullName || 'No landlord specified' }}</span>
+          </div>
+          <div class="info-row">
+            <mat-icon>phone</mat-icon>
+            <span>{{ house.landlord.phone || 'No phone specified' }}</span>
+          </div>
+          <div class="info-row">
+            <mat-icon>email</mat-icon>
+            <span>{{ house.landlord.email || 'No email specified' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="card-actions">
         <button
-          mat-icon-button
+          mat-stroked-button
           color="primary"
+          class="view-details-btn"
           (click)="openDetailsDialog(house)"
-          matTooltip="View Details"
         >
           <mat-icon>visibility</mat-icon>
+          View Details
         </button>
-
         <button
           mat-icon-button
           color="warn"
           (click)="deleteHouse(house._id)"
           matTooltip="Delete House"
+          class="delete-btn"
         >
           <mat-icon>delete</mat-icon>
         </button>
-      </mat-card-actions>
+      </div>
     </mat-card>
   </div>
-
-  <!-- Floating Action Button -->
-  <button mat-fab color="primary" class="add-house-btn" (click)="openAddHouseDialog()">
-    <mat-icon>add</mat-icon>
-  </button>
 </div>

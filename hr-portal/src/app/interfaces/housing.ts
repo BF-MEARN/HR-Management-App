@@ -26,3 +26,52 @@ export interface Housing {
   facility: Facility;
   residents: string[];
 }
+
+export interface Resident {
+  _id: string;
+  preferredName?: string;
+  firstName?: string;
+  lastName?: string;
+  contactInfo?: {
+    cellPhone?: string;
+  };
+  email?: string;
+  carInfo?: {
+    make?: string;
+    model?: string;
+    color?: string;
+  };
+  userId?: {
+    email?: string;
+  };
+}
+
+export interface FacilityReport {
+  _id: string;
+  houseId: string;
+  employeeId: string;
+  title: string;
+  description: string;
+  status: 'Open' | 'In Progress' | 'Closed';
+  createdBy?: {
+    _id: string;
+    username: string;
+  };
+  comments: Comment[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Comment {
+  _id: string;
+  description: string;
+  timestamp: string;
+  createdBy: {
+    _id: string;
+    employeeId?: {
+      preferredName?: string;
+      firstName?: string;
+      lastName?: string;
+    };
+  };
+}

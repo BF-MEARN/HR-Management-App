@@ -1,0 +1,19 @@
+<app-profile-section
+  *ngIf="!loading"
+  [application]="application"
+  [showActionButtons]="false"
+  [pageTitle]="'Employee Profile'"
+  (goBackEvent)="handleGoBack()"
+  (downloadDocumentEvent)="handleDownloadDocument($event)"
+  (goToVisaStatusPageEvent)="handleGoToVisaStatusPage($event)"
+></app-profile-section>
+
+<div *ngIf="loading" class="loading-container">
+  <mat-spinner></mat-spinner>
+  <p>Loading profile...</p>
+</div>
+
+<div *ngIf="error" class="error-container">
+  <mat-icon color="warn">error</mat-icon>
+  <p>{{ error }}</p>
+</div>

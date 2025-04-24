@@ -26,10 +26,10 @@ const routes: Routes = [
       ),
   },
   {
-    path: 'view-profile/:id',
+    path: 'employee-profiles/:id',
     canActivate: [AuthGuard],
     loadChildren: () =>
-      import('./pages/view-profile/view-profile.module').then(m => m.ViewProfileModule),
+      import('./pages/employee-profiles/view-profile/view-profile.module').then(m => m.ViewProfileModule),
   },
   { 
     path: 'visa', 
@@ -47,10 +47,10 @@ const routes: Routes = [
       ),
   },
   {
-    path: 'application-review/:id',
+    path: 'hiring/application/:id',
     canActivate: [AuthGuard],
     loadChildren: () =>
-      import('./pages/application-review/application-review.module').then(
+      import('./pages/hiring-management/application-review/application-review.module').then(
         m => m.ApplicationReviewModule
       ),
   },
@@ -59,6 +59,12 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     loadChildren: () => import('./pages/housing-management/housing-management.module').then(
       m => m.HousingManagementModule
+    ) 
+  },
+  { 
+    path: 'housing/:id', 
+    loadChildren: () => import('./pages/housing-management/house-detail/house-detail.module').then(
+      m => m.HouseDetailModule
     ) 
   },
   { path: '**', redirectTo: 'home', pathMatch: 'full' },

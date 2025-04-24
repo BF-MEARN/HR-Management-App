@@ -16,9 +16,13 @@ import { AuthEffects } from './store/auth/auth.effects';
 import { authReducer } from './store/auth/auth.reducer';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { ProfileSectionModule } from './components/profile-section/profile-section.module';
 
 @NgModule({
-  declarations: [AppComponent, NavigationBarComponent],
+  declarations: [
+    AppComponent, 
+    NavigationBarComponent
+  ],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -30,6 +34,7 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     MatIconModule,
     MatListModule,
     MatButtonModule,
+    ProfileSectionModule
   ],
   providers: [
     {

@@ -12,7 +12,7 @@
           <div>Action</div>
         </div>
 
-        <div class="application-table-row" *ngFor="let employee of pending">
+        <div class="application-table-row" *ngFor="let employee of pending$ | async">
           <div>{{ employee.firstName }} {{ employee.lastName }}</div>
           <div>{{ employee.userId?.email }}</div>
           <div>
@@ -48,7 +48,7 @@
           <div>Action</div>
         </div>
 
-        <div class="application-table-row" *ngFor="let employee of rejected">
+        <div class="application-table-row" *ngFor="let employee of rejected$ | async">
           <div>{{ employee.firstName }} {{ employee.lastName }}</div>
           <div>{{ employee.userId?.email }}</div>
           <div>
@@ -84,7 +84,7 @@
           <div>Action</div>
         </div>
 
-        <div class="application-table-row" *ngFor="let employee of approved">
+        <div class="application-table-row" *ngFor="let employee of approved$ | async">
           <div>{{ employee.firstName }} {{ employee.lastName }}</div>
           <div>{{ employee.userId?.email }}</div>
           <div>

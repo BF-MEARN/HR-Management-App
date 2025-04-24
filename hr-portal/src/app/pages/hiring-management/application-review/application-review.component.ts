@@ -15,11 +15,9 @@ export class ApplicationReviewComponent implements OnInit {
   application: any = null;
   loading = true;
   error = '';
-  showReject = false;
   feedback = '';
   isLoading = false;
   fromTab: string = 'pending';
-  showFullSSN: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -54,49 +52,13 @@ export class ApplicationReviewComponent implements OnInit {
     });
   }
   
-
-
-  get statusClass(): any {
-    return {
-      pending: this.application?.onboardingStatus === 'Pending',
-      approved: this.application?.onboardingStatus === 'Approved',
-      rejected: this.application?.onboardingStatus === 'Rejected',
-    };
-  }
-  
-  getStatusColor(status: string): string {
-    switch (status?.toLowerCase()) {
-      case 'pending':
-        return 'accent';
-      case 'approved':
-        return 'primary';
-      case 'rejected':
-        return 'warn';
-      default:
-        return '';
-    }
+  handleGoBack(): void {
+    this.router.navigate(['/hiring'], {
+      queryParams: { tab: this.fromTab }
+    });
   }
 
-  formatGender(gender: string | undefined): string {
-    if (!gender) return 'Not provided';
-    return gender.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
-  }
-  
-
-  get citizenshipClass(): Record<string, boolean> {
-    return {
-      citizen: this.application?.isCitizenOrPR === true,
-      'non-citizen': this.application?.isCitizenOrPR === false,
-    };
-  }
-  
-  
-  toggleSSNVisibility(): void {
-    this.showFullSSN = !this.showFullSSN;
-  }
-
-  
-  approve(): void {
+  handleApprove(): void {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       data: {
         title: 'Approve Application',
@@ -118,7 +80,6 @@ export class ApplicationReviewComponent implements OnInit {
             this.router.navigate(['/hiring'], {
               queryParams: { tab: this.fromTab }
             });
-            
           },
           error: (error) => {
             this.isLoading = false;
@@ -132,7 +93,7 @@ export class ApplicationReviewComponent implements OnInit {
     });
   }
 
-  reject(): void {
+  handleReject(): void {
     if (!this.feedback || this.feedback.trim().length < 10) {
       this.snackBar.open('Feedback must be at least 10 characters long', 'Close', {
         duration: 3000,
@@ -155,7 +116,6 @@ export class ApplicationReviewComponent implements OnInit {
           next: () => {
             this.application.onboardingStatus = 'Rejected';
             this.application.onboardingFeedback = this.feedback;
-            this.showReject = false;
             this.isLoading = false;
             this.snackBar.open('Application rejected. Feedback sent to applicant.', 'Close', {
               duration: 3000,
@@ -164,7 +124,6 @@ export class ApplicationReviewComponent implements OnInit {
             this.router.navigate(['/hiring'], {
               queryParams: { tab: this.fromTab }
             });
-            
           },
           error: (error) => {
             this.isLoading = false;
@@ -178,19 +137,12 @@ export class ApplicationReviewComponent implements OnInit {
     });
   }
 
-  goBack(): void {
-    this.router.navigate(['/hiring'], {
-      queryParams: { tab: this.fromTab }
-    });
-  }
-  
-  goToVisaStatusPage(employeeId: string): void {
+  handleGoToVisaStatusPage(employeeId: string): void {
     this.router.navigate(['/visa-status', employeeId]);
   }
-  
 
-  downloadDocument(document: any): void {
-    // TODO: Implement download logic & S3
+  // TODO: Implement S3
+  handleDownloadDocument(document: any): void {
     if (document?.file) {
       window.open(document.file, '_blank');
     } else {
@@ -199,5 +151,9 @@ export class ApplicationReviewComponent implements OnInit {
         panelClass: ['error-snackbar']
       });
     }
+  }
+  
+  handleFeedbackChange(value: string): void {
+    this.feedback = value;
   }
 }

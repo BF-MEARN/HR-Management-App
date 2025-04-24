@@ -1,11 +1,11 @@
 // Variables
 $card-border-radius: 12px;
-$max-content-width: 800px;
+$max-content-width: 1000px;
 $section-spacing: 20px;
 
 :host {
   display: block;
-  background-color: #fff;
+  background-color: #fcfcfc;
   min-height: 100vh;
   padding-bottom: 40px;
   padding-top: 20px;
@@ -45,15 +45,15 @@ $section-spacing: 20px;
   padding: 0;
   margin: 0;
   border-radius: $card-border-radius;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background-color: #fcfcfc;
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
   overflow: hidden;
 
   mat-card-header {
-    background-color: #f5f6fa;
+    background-color: #f3f4f7;
     padding: 16px 24px;
     border-bottom: 1px solid #eee;
 
@@ -85,7 +85,7 @@ $section-spacing: 20px;
 
 .profile-card {
   .profile-header {
-    background-color: white;
+    background-color: #fcfcfc;
     padding: 24px;
     display: flex;
     align-items: center;
@@ -144,17 +144,17 @@ $section-spacing: 20px;
 
       &.pending {
         background-color: #ff9800 !important;
-        color: white !important;
+        color: #fcfcfc !important;
       }
 
       &.approved {
         background-color: #4caf50 !important;
-        color: white !important;
+        color: #fcfcfc !important;
       }
 
       &.rejected {
         background-color: #f44336 !important;
-        color: white !important;
+        color: #fcfcfc !important;
       }
     }
   }
@@ -205,7 +205,7 @@ $section-spacing: 20px;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background-color: #f9f9f9;
+  background-color: #f1f1ed;
   border-radius: 8px;
   color: #888;
   font-style: italic;
@@ -278,18 +278,6 @@ $section-spacing: 20px;
   }
 }
 
-.document-button {
-  width: 100%;
-  margin-top: 16px;
-  height: 48px;
-  font-size: 15px;
-  border-width: 2px;
-
-  mat-icon {
-    margin-right: 8px;
-  }
-}
-
 .f1-visa-info-box {
   margin-top: 16px;
   padding: 16px;
@@ -320,6 +308,18 @@ $section-spacing: 20px;
   button {
     margin-left: auto;
     white-space: nowrap;
+  }
+}
+
+.document-button {
+  width: 100%;
+  margin-top: 16px;
+  height: 48px;
+  font-size: 15px;
+  border-width: 2px;
+
+  mat-icon {
+    margin-right: 8px;
   }
 }
 
@@ -376,39 +376,6 @@ $section-spacing: 20px;
 
       span {
         color: #555;
-      }
-    }
-  }
-}
-
-mat-expansion-panel {
-  margin: 8px 0;
-  border-radius: 8px !important;
-  overflow: hidden;
-
-  &::ng-deep {
-    .mat-expansion-panel-header {
-      padding: 0 16px;
-      height: 56px;
-    }
-
-    .mat-expansion-panel-body {
-      padding: 16px;
-    }
-  }
-
-  .contact-details {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-
-    .contact-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-
-      mat-icon {
-        color: #777;
       }
     }
   }
