@@ -7,19 +7,6 @@
 </div>
 
 <div class="content-container">
-  <!-- Rejection Feedback (if applicable) -->
-  <mat-card
-    class="section-card feedback-card"
-    *ngIf="application?.onboardingStatus === 'Rejected' && application?.onboardingFeedback"
-  >
-    <mat-card-header>
-      <mat-card-title>Rejection Feedback</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <p>{{ application?.onboardingFeedback }}</p>
-    </mat-card-content>
-  </mat-card>
-
   <!-- Profile Card -->
   <mat-card class="section-card profile-card">
     <div class="profile-header">
@@ -34,10 +21,56 @@
         </div>
         <p class="sub-email">{{ application?.userId?.email }}</p>
       </div>
-      <mat-chip [ngClass]="statusClass" selected>
-        {{ application?.onboardingStatus }}
-      </mat-chip>
     </div>
+  </mat-card>
+
+  <!-- Application Status -->
+  <mat-card class="section-card">
+    <mat-card-header>
+      <mat-card-title>Application Status</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="status-container" [ngClass]="statusClass">
+        <mat-icon>{{ getStatusIcon() }}</mat-icon>
+        <div class="status-content">
+          <div class="status-title">{{ application?.onboardingStatus }}</div>
+          <div class="status-message" *ngIf="application?.onboardingStatus === 'Pending'">
+            This application is pending review. HR will evaluate the information and documents
+            provided.
+          </div>
+          <div class="status-message" *ngIf="application?.onboardingStatus === 'Approved'">
+            This application has been approved. The employee has completed the onboarding process.
+          </div>
+          <div class="status-message" *ngIf="application?.onboardingStatus === 'Rejected'">
+            This application has been rejected. Please review the feedback below.
+          </div>
+        </div>
+      </div>
+
+      <!-- Display rejection feedback inside the status card -->
+      <div
+        class="feedback-section"
+        *ngIf="application?.onboardingStatus === 'Rejected' && application?.onboardingFeedback"
+      >
+        <mat-divider></mat-divider>
+        <div class="feedback-content">
+          <h3>Rejection Feedback:</h3>
+          <p>{{ application?.onboardingFeedback }}</p>
+        </div>
+      </div>
+
+      <!-- Display approval feedback inside the status card if exists -->
+      <div
+        class="feedback-section"
+        *ngIf="application?.onboardingStatus === 'Approved' && application?.onboardingFeedback"
+      >
+        <mat-divider></mat-divider>
+        <div class="feedback-content">
+          <h3>Approval Comments:</h3>
+          <p>{{ application?.onboardingFeedback }}</p>
+        </div>
+      </div>
+    </mat-card-content>
   </mat-card>
 
   <!-- Personal Information -->
@@ -235,6 +268,142 @@
           </div>
         </div>
 
+        <!-- Document List for F1 visa holders -->
+        <div
+          *ngIf="application?.visaInfo?.workAuthorization?.type === 'F1'"
+          class="visa-documents-section"
+        >
+          <div class="document-list">
+            <!-- OPT Receipt -->
+            <div *ngIf="application?.visaInfo?.optReceipt" class="document-item">
+              <div class="document-info">
+                <div class="document-name">
+                  <mat-icon>description</mat-icon>
+                  <span>OPT Receipt</span>
+                </div>
+                <div
+                  class="document-status"
+                  [ngClass]="getDocumentStatusClass(application?.visaInfo?.optReceipt?.status)"
+                >
+                  {{ application?.visaInfo?.optReceipt?.status || 'Not Uploaded' }}
+                </div>
+              </div>
+              <div
+                class="document-actions"
+                *ngIf="
+                  application?.visaInfo?.optReceipt?.file &&
+                  application?.visaInfo?.optReceipt?.status === 'Approved'
+                "
+              >
+                <button mat-stroked-button color="primary" (click)="previewDocument('optReceipt')">
+                  <mat-icon>visibility</mat-icon>
+                  Preview
+                </button>
+                <button mat-stroked-button color="accent" (click)="downloadDocument('optReceipt')">
+                  <mat-icon>cloud_download</mat-icon>
+                  Download
+                </button>
+              </div>
+            </div>
+
+            <!-- OPT EAD -->
+            <div *ngIf="application?.visaInfo?.optEAD" class="document-item">
+              <div class="document-info">
+                <div class="document-name">
+                  <mat-icon>description</mat-icon>
+                  <span>OPT EAD</span>
+                </div>
+                <div
+                  class="document-status"
+                  [ngClass]="getDocumentStatusClass(application?.visaInfo?.optEAD?.status)"
+                >
+                  {{ application?.visaInfo?.optEAD?.status || 'Not Uploaded' }}
+                </div>
+              </div>
+              <div
+                class="document-actions"
+                *ngIf="
+                  application?.visaInfo?.optEAD?.file &&
+                  application?.visaInfo?.optEAD?.status === 'Approved'
+                "
+              >
+                <button mat-stroked-button color="primary" (click)="previewDocument('optEAD')">
+                  <mat-icon>visibility</mat-icon>
+                  Preview
+                </button>
+                <button mat-stroked-button color="accent" (click)="downloadDocument('optEAD')">
+                  <mat-icon>cloud_download</mat-icon>
+                  Download
+                </button>
+              </div>
+            </div>
+
+            <!-- I-983 Form -->
+            <div *ngIf="application?.visaInfo?.i983" class="document-item">
+              <div class="document-info">
+                <div class="document-name">
+                  <mat-icon>description</mat-icon>
+                  <span>I-983 Form</span>
+                </div>
+                <div
+                  class="document-status"
+                  [ngClass]="getDocumentStatusClass(application?.visaInfo?.i983?.status)"
+                >
+                  {{ application?.visaInfo?.i983?.status || 'Not Uploaded' }}
+                </div>
+              </div>
+              <div
+                class="document-actions"
+                *ngIf="
+                  application?.visaInfo?.i983?.file &&
+                  application?.visaInfo?.i983?.status === 'Approved'
+                "
+              >
+                <button mat-stroked-button color="primary" (click)="previewDocument('i983')">
+                  <mat-icon>visibility</mat-icon>
+                  Preview
+                </button>
+                <button mat-stroked-button color="accent" (click)="downloadDocument('i983')">
+                  <mat-icon>cloud_download</mat-icon>
+                  Download
+                </button>
+              </div>
+            </div>
+
+            <!-- I-20 Form -->
+            <div *ngIf="application?.visaInfo?.i20" class="document-item">
+              <div class="document-info">
+                <div class="document-name">
+                  <mat-icon>description</mat-icon>
+                  <span>I-20 Form</span>
+                </div>
+                <div
+                  class="document-status"
+                  [ngClass]="getDocumentStatusClass(application?.visaInfo?.i20?.status)"
+                >
+                  {{ application?.visaInfo?.i20?.status || 'Not Uploaded' }}
+                </div>
+              </div>
+              <div
+                class="document-actions"
+                *ngIf="
+                  application?.visaInfo?.i20?.file &&
+                  application?.visaInfo?.i20?.status === 'Approved'
+                "
+              >
+                <button mat-stroked-button color="primary" (click)="previewDocument('i20')">
+                  <mat-icon>visibility</mat-icon>
+                  Preview
+                </button>
+                <button mat-stroked-button color="accent" (click)="downloadDocument('i20')">
+                  <mat-icon>cloud_download</mat-icon>
+                  Download
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div
           *ngIf="application?.visaInfo?.workAuthorization?.type === 'F1'"
           class="f1-visa-info-box"
@@ -285,15 +454,24 @@
           </div>
         </div>
 
-        <button
-          mat-stroked-button
-          color="primary"
-          class="document-button"
-          (click)="downloadDocument(application?.driverLicense)"
-        >
-          <mat-icon>file_download</mat-icon>
-          View Driver's License
-        </button>
+        <div class="document-actions">
+          <button
+            mat-stroked-button
+            color="primary"
+            (click)="previewDocument(application?.driverLicense)"
+          >
+            <mat-icon>visibility</mat-icon>
+            Preview Document
+          </button>
+          <button
+            mat-stroked-button
+            color="accent"
+            (click)="downloadDocument(application?.driverLicense)"
+          >
+            <mat-icon>cloud_download</mat-icon>
+            Download
+          </button>
+        </div>
       </div>
       <ng-template #noDriverLicense>
         <div class="empty-section">

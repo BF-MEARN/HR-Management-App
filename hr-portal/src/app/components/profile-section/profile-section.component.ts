@@ -18,6 +18,7 @@ export class ProfileSectionComponent {
   @Output() downloadDocumentEvent = new EventEmitter<any>();
   @Output() goToVisaStatusPageEvent = new EventEmitter<string>();
   @Output() feedbackChange = new EventEmitter<string>();
+  @Output() previewDocumentEvent = new EventEmitter<any>();
 
   showFullSSN = false;
 
@@ -34,6 +35,19 @@ export class ProfileSectionComponent {
       citizen: this.application?.isCitizenOrPR === true,
       'non-citizen': this.application?.isCitizenOrPR === false,
     };
+  }
+
+  getStatusIcon(): string {
+    switch (this.application?.onboardingStatus) {
+      case 'Pending':
+        return 'hourglass_empty';
+      case 'Approved':
+        return 'check_circle';
+      case 'Rejected':
+        return 'cancel';
+      default:
+        return 'help';
+    }
   }
 
   formatGender(gender: string | undefined): string {
@@ -57,16 +71,47 @@ export class ProfileSectionComponent {
     this.rejectEvent.emit();
   }
 
-  downloadDocument(document: any): void {
-    this.downloadDocumentEvent.emit(document);
+  downloadDocument(documentType: string | any): void {
+    // If a string is passed, it's a visa document type
+    if (typeof documentType === 'string') {
+      this.downloadDocumentEvent.emit({
+        type: documentType,
+        file: this.application?.visaInfo?.[documentType]?.file
+      });
+    } else {
+      // Otherwise, it's an existing document object
+      this.downloadDocumentEvent.emit(documentType);
+    }
   }
 
-  goToVisaStatusPage(employeeId: string): void {
-    this.goToVisaStatusPageEvent.emit(employeeId);
+  previewDocument(documentType: string | any): void {
+    // If a string is passed, it's a visa document type
+    if (typeof documentType === 'string') {
+      this.previewDocumentEvent.emit({
+        type: documentType,
+        file: this.application?.visaInfo?.[documentType]?.file
+      });
+    } else {
+      // Otherwise, it's an existing document object
+      this.previewDocumentEvent.emit(documentType);
+    }
+  }
+
+  goToVisaStatusPage(visaInfoId: string): void {
+    this.goToVisaStatusPageEvent.emit(visaInfoId);
   }
 
   onFeedbackChange(value: string): void {
     this.feedback = value;
     this.feedbackChange.emit(value);
+  }
+
+  getDocumentStatusClass(status: string | undefined): Record<string, boolean> {
+    return {
+      'status-not-uploaded': status === 'Not Uploaded' || !status,
+      'status-pending': status === 'Pending Approval',
+      'status-approved': status === 'Approved',
+      'status-rejected': status === 'Rejected'
+    };
   }
 }

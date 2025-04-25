@@ -11,6 +11,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
 import { ProfileSectionModule } from 'src/app/components/profile-section/profile-section.module';
 import { MatButtonModule } from '@angular/material/button';
+import { S3DocumentService } from 'src/app/services/s3-document.service';
 
 @NgModule({
   declarations: [
@@ -27,5 +28,8 @@ import { MatButtonModule } from '@angular/material/button';
     MatButtonModule,
     ProfileSectionModule
   ],
+  providers: [
+    S3DocumentService
+  ]
 })
 export class ApplicationReviewModule {}

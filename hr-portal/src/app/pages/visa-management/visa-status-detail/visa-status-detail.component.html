@@ -1,0 +1,219 @@
+<!-- Back navigation -->
+<div class="back-navigation">
+  <button mat-icon-button (click)="goBack()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <span class="page-title">Visa Status Details</span>
+</div>
+
+<div class="content-container">
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading visa details...</p>
+  </div>
+
+  <ng-container *ngIf="!loading && visaStatus">
+    <!-- Profile Card -->
+    <mat-card class="section-card profile-card">
+      <div class="profile-header">
+        <div class="avatar-icon">
+          <mat-icon>person</mat-icon>
+        </div>
+        <div class="profile-info">
+          <div class="name-status-wrapper">
+            <h2>
+              {{ visaStatus.employeeId.preferredName || visaStatus.employeeId.firstName }}
+              {{ visaStatus.employeeId.lastName }}
+            </h2>
+          </div>
+          <p class="sub-email">{{ visaStatus.employeeId.userId?.email }}</p>
+        </div>
+      </div>
+    </mat-card>
+
+    <!-- Visa Information -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>Work Authorization Details</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-pair">
+            <mat-icon>work</mat-icon>
+            <div class="info-content">
+              <div class="label">Visa Type</div>
+              <div class="value">{{ visaStatus.workAuthorization.type }}</div>
+            </div>
+          </div>
+
+          <div class="info-pair">
+            <mat-icon>event</mat-icon>
+            <div class="info-content">
+              <div class="label">Start Date</div>
+              <div class="value">
+                {{ visaStatus.workAuthorization.startDate | date: 'mediumDate' }}
+              </div>
+            </div>
+          </div>
+
+          <div class="info-pair">
+            <mat-icon>event_busy</mat-icon>
+            <div class="info-content">
+              <div class="label">End Date</div>
+              <div class="value">
+                {{ visaStatus.workAuthorization.endDate | date: 'mediumDate' }}
+              </div>
+            </div>
+          </div>
+
+          <div class="info-pair">
+            <mat-icon>timer</mat-icon>
+            <div class="info-content">
+              <div class="label">Days Remaining</div>
+              <div class="value" [ngClass]="getDaysRemainingClass()">
+                {{ getDaysRemaining() }} days
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Documents Card - All documents in one card -->
+    <mat-card class="section-card documents-card">
+      <mat-card-header>
+        <mat-card-title>Visa Documents</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <!-- Loop through each document -->
+        <ng-container *ngFor="let doc of visaDocKeys">
+          <div
+            class="document-subcard"
+            *ngIf="visaStatus[doc]"
+            [ngClass]="getStatusClass(visaStatus[doc].status)"
+          >
+            <div class="document-header">
+              <h3>{{ formatDocumentName(doc) }}</h3>
+              <span class="pill status-pill" [ngClass]="getStatusClass(visaStatus[doc].status)">
+                {{ visaStatus[doc].status }}
+              </span>
+            </div>
+
+            <div *ngIf="visaStatus[doc].feedback" class="feedback-container">
+              <mat-icon color="warn">feedback</mat-icon>
+              <div class="feedback-content">
+                <div class="feedback-label">Feedback</div>
+                <div class="feedback-text">{{ visaStatus[doc].feedback }}</div>
+              </div>
+            </div>
+
+            <div
+              class="document-actions"
+              *ngIf="visaStatus[doc].status !== 'Not Uploaded' && visaStatus[doc].file"
+            >
+              <button mat-stroked-button color="primary" (click)="openFile(visaStatus[doc].file)">
+                <mat-icon>visibility</mat-icon>
+                Preview Document
+              </button>
+              <button
+                mat-stroked-button
+                color="accent"
+                (click)="downloadFile(visaStatus[doc].file)"
+              >
+                <mat-icon>cloud_download</mat-icon>
+                Download
+              </button>
+            </div>
+
+            <!-- Admin Actions -->
+            <div class="admin-actions" *ngIf="getCurrentPendingDoc() === doc">
+              <mat-divider></mat-divider>
+              <h3 class="admin-section-title">Admin Actions</h3>
+
+              <div *ngIf="visaStatus[doc].status === 'Pending Approval'" class="action-buttons">
+                <button mat-raised-button color="warn" (click)="openRejectDialog(doc)">
+                  <mat-icon>cancel</mat-icon>
+                  Reject
+                </button>
+                <button mat-raised-button color="primary" (click)="approveDocument(doc)">
+                  <mat-icon>check_circle</mat-icon>
+                  Approve
+                </button>
+              </div>
+
+              <div *ngIf="visaStatus[doc].status === 'Not Uploaded'">
+                <button mat-raised-button color="accent" (click)="sendReminder()">
+                  <mat-icon>notification_important</mat-icon>
+                  Send Reminder Email
+                </button>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- No documents message -->
+        <div *ngIf="!hasAnyDocuments()" class="empty-section">
+          <mat-icon>description</mat-icon>
+          <span>No visa documents available</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Next Steps Card -->
+    <mat-card *ngIf="getCurrentPendingDoc()" class="section-card next-steps-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>assignment</mat-icon>
+          Next Steps
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="next-step-content">
+          <p>
+            <strong>Current Status:</strong>
+            {{ getCurrentStepDescription() }}
+          </p>
+          <ng-container *ngIf="getCurrentPendingDoc() as currentDoc">
+            <button
+              *ngIf="visaStatus[currentDoc]?.status === 'Not Uploaded'"
+              mat-raised-button
+              color="accent"
+              (click)="sendReminder()"
+            >
+              <mat-icon>mail</mat-icon>
+              Send Reminder
+            </button>
+          </ng-container>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- All Documents Complete Card -->
+    <mat-card *ngIf="!getCurrentPendingDoc()" class="section-card complete-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>verified</mat-icon>
+          Process Complete
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="complete-content">
+          <p>All required documents have been submitted and approved.</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </ng-container>
+
+  <!-- No Data Found -->
+  <mat-card *ngIf="!loading && !visaStatus" class="section-card error-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>error</mat-icon>
+        Error
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p>No visa status data found. Please try again or contact support.</p>
+    </mat-card-content>
+  </mat-card>
+</div>

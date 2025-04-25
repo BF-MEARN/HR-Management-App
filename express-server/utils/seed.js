@@ -1,6 +1,8 @@
 import { faker } from '@faker-js/faker';
 import bcrypt from 'bcryptjs';
+import fs from 'fs';
 import mongoose from 'mongoose';
+import path from 'path';
 
 import db from '../config/connection.js';
 import Employee from '../models/Employee.js';
@@ -9,6 +11,7 @@ import Housing from '../models/Housing.js';
 import RegistrationToken from '../models/RegistrationToken.js';
 import User from '../models/User.js';
 import VisaStatus from '../models/VisaStatus.js';
+import { putObject } from './putObject.js';
 
 const SALT_ROUNDS = 10;
 const amountHousing = 5;
@@ -235,9 +238,52 @@ const seedDatabase = async () => {
 
       let newVisaStatus = null;
       if (!isCitizenOrPR) {
-        // Non-citizen case
         const workAuthType = faker.helpers.arrayElement(['H1-B', 'L2', 'F1', 'H4', 'Other']);
         const isOpt = workAuthType === 'F1';
+
+        const visaDocStatus = {};
+
+        if (isOpt) {
+          const testDir = path.join(process.cwd(), 'test-files');
+          const uploadSeedDoc = (fileName, s3KeyName) => {
+            const filePath = path.join(testDir, fileName);
+            const buffer = fs.readFileSync(filePath);
+            const key = `employees/${newEmployee._id}/${s3KeyName}.pdf`;
+            return putObject(buffer, key, 'application/pdf').then(() => key);
+          };
+
+          const visaDocs = ['optReceipt', 'optEAD', 'i983', 'i20'];
+          const fileKeys = {};
+
+          // Upload all 4 test files to S3
+          for (const doc of visaDocs) {
+            fileKeys[doc] = await uploadSeedDoc(`${doc}.pdf`, doc);
+          }
+
+          // Randomly pick the highest stage reached (0 = nothing, 4 = all uploaded)
+          const currentProgression = faker.number.int({ min: 0, max: 4 });
+
+          for (let i = 0; i < visaDocs.length; i++) {
+            const doc = visaDocs[i];
+
+            if (i < currentProgression - 1) {
+              visaDocStatus[doc] = {
+                file: fileKeys[doc],
+                status: 'Approved',
+              };
+            } else if (i === currentProgression - 1) {
+              visaDocStatus[doc] = {
+                file: fileKeys[doc],
+                status: 'Pending Approval',
+              };
+            } else {
+              // Can't upload if previous isn't approved
+              visaDocStatus[doc] = {
+                status: 'Not Uploaded',
+              };
+            }
+          }
+        }
         newVisaStatus = new VisaStatus({
           employeeId: newEmployee._id,
           workAuthorization: {
@@ -246,21 +292,16 @@ const seedDatabase = async () => {
             endDate: faker.date.future({ years: 3 }),
             otherTitle: workAuthType === 'Other' ? faker.lorem.words(2) : undefined,
           },
-          optReceipt: { status: isOpt ? 'Not Uploaded' : undefined },
-          optEAD: { status: isOpt ? 'Not Uploaded' : undefined },
-          i983: { status: isOpt ? 'Not Uploaded' : undefined },
-          i20: { status: isOpt ? 'Not Uploaded' : undefined },
+          ...visaDocStatus,
         });
       } else {
-        // Add this new case for Citizens and Permanent Residents
+        // Citizen or PR
         const citizenshipType = faker.helpers.arrayElement(['Green Card', 'Citizen']);
         newVisaStatus = new VisaStatus({
           employeeId: newEmployee._id,
           workAuthorization: {
             type: citizenshipType,
-            // For citizens/PR, we might not need start/end dates, but setting them for consistency
             startDate: faker.date.past({ years: 5 }),
-            // For citizens, end date could be far in future or null
             endDate: citizenshipType === 'Citizen' ? null : faker.date.future({ years: 10 }),
           },
           // No need for OPT documents for citizens/PRs
