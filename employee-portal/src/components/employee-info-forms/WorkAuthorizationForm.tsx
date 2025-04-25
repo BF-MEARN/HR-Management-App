@@ -161,6 +161,7 @@ export default function WorkAuthorizationForm({
                 <FileUploadWithPreview
                   previewURL={formData.extraAuthInfo.optReceipt?.url}
                   fileName={formData.extraAuthInfo.optReceipt?.name}
+                  previewOnly={readOnly}
                   type="document"
                   buttonText="Upload OPT Receipt"
                   onFileSelect={(f) => {
