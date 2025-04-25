@@ -19,23 +19,28 @@ import { useErrorMap, useTextFieldProps } from '../useTextFieldProps';
 import { EmployeeFormProps } from './formProps';
 
 function ContactForm({
+  id,
+  used,
   contact,
   updateContact,
-  onFormStatusChange,
+  updateErrorMap,
   forceCheck,
-  readOnly = false,
+  readOnly,
 }: {
+  id: string;
   contact: Contact;
   updateContact: (patch: Partial<Contact>) => void;
-} & EmployeeFormProps) {
-  const updateErrorMap = useErrorMap(onFormStatusChange);
-
+  updateErrorMap: (key: string, error: string | undefined) => void;
+  used: boolean;
+  readOnly: boolean;
+  forceCheck: boolean;
+}) {
   const firstNameProps = useTextFieldProps(
     {
-      name: 'firstName',
+      name: `${id}-firstName`,
       get: () => contact.firstName ?? '',
       set: (v) => updateContact({ firstName: v }),
-      required: true,
+      required: used,
       readOnly,
     },
     forceCheck,
@@ -44,10 +49,10 @@ function ContactForm({
 
   const lastNameProps = useTextFieldProps(
     {
-      name: 'lastName',
+      name: `${id}-lastName`,
       get: () => contact.lastName ?? '',
       set: (v) => updateContact({ lastName: v }),
-      required: true,
+      required: used,
       readOnly,
     },
     forceCheck,
@@ -56,7 +61,7 @@ function ContactForm({
 
   const middleNameProps = useTextFieldProps(
     {
-      name: 'middleName',
+      name: `${id}-middleName`,
       get: () => contact.middleName ?? '',
       set: (v) => updateContact({ middleName: v }),
       required: false,
@@ -68,10 +73,10 @@ function ContactForm({
 
   const cellPhoneProps = useTextFieldProps(
     {
-      name: 'cellPhone',
+      name: `${id}-cellPhone`,
       get: () => contact.phone ?? '',
       set: (v) => updateContact({ phone: v }),
-      required: true,
+      required: used,
       type: 'phone',
       readOnly,
     },
@@ -81,10 +86,10 @@ function ContactForm({
 
   const emailProps = useTextFieldProps(
     {
-      name: 'email',
+      name: `${id}-email`,
       get: () => contact.email ?? '',
       set: (v) => updateContact({ email: v }),
-      required: true,
+      required: used,
       type: 'email',
       readOnly,
     },
@@ -94,10 +99,10 @@ function ContactForm({
 
   const relationshipProps = useTextFieldProps(
     {
-      name: 'relationship',
+      name: `${id}-relationship`,
       get: () => contact.relationship ?? '',
       set: (v) => updateContact({ relationship: v }),
-      required: true,
+      required: used,
       readOnly,
     },
     forceCheck,
@@ -133,10 +138,11 @@ export type ReferenceAndEmergencyContactFormProps = EmployeeFormProps;
 export default function ReferenceAndEmergencyContactForm(
   props: ReferenceAndEmergencyContactFormProps
 ) {
-  const { readOnly } = props;
+  const { readOnly, onFormStatusChange } = props;
 
   const formData = useAppSelector((state) => state.employeeForm.contacts);
   const dispatch = useAppDispatch();
+  const updateErrorMap = useErrorMap(onFormStatusChange);
 
   const updateEmergencyContact = (index: number, patch: Partial<Contact>) => {
     const newArray = [...formData.emergencyContacts];
@@ -166,7 +172,7 @@ export default function ReferenceAndEmergencyContactForm(
         control={
           <Checkbox
             checked={formData.hasReference}
-            readOnly={readOnly}
+            disabled={readOnly}
             onChange={(e) => dispatch(updateContacts({ hasReference: e.target.checked }))}
           />
         }
@@ -179,6 +185,9 @@ export default function ReferenceAndEmergencyContactForm(
               Referral
             </Typography>
             <ContactForm
+              id="form-reference"
+              updateErrorMap={updateErrorMap}
+              used={formData.hasReference}
               contact={formData.reference!}
               updateContact={(e) => dispatch(updateContacts({ reference: e }))}
               {...props}
@@ -200,7 +209,10 @@ export default function ReferenceAndEmergencyContactForm(
               Emergency Contact {i + 1}
             </Typography>
             <ContactForm
+              id={`form-emergency-${i}`}
+              used={formData.emergencyContacts.includes(contact)}
               contact={contact}
+              updateErrorMap={updateErrorMap}
               updateContact={(updated) => updateEmergencyContact(i, updated)}
               {...props}
             />

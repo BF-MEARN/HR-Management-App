@@ -26,7 +26,7 @@ function PersonalInfoForm({
   onProfilePictureFileChange,
   onFormStatusChange,
   forceCheck,
-  readOnly = false,
+  readOnly,
 }: PersonalInfoFormProps) {
   const formData = useAppSelector((state) => state.employeeForm.personalInfo);
   const userEmail = useAppSelector((state) => state.user.user?.email);
@@ -257,7 +257,7 @@ function PersonalInfoForm({
             label="Email"
             fullWidth
             value={formData.email ?? ''}
-            slotProps={{ input: { readOnly: true } }}
+            slotProps={{ input: { disabled: true } }}
           />
         </Grid>
       </Grid>
@@ -308,6 +308,7 @@ function PersonalInfoForm({
               labelId="gender-label"
               value={formData.gender}
               label="Gender"
+              disabled={readOnly}
               onChange={(e) => dispatch(updatePersonalInfo({ gender: e.target.value as Gender }))}
             >
               <MenuItem value="male">Male</MenuItem>

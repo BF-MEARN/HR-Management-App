@@ -43,6 +43,9 @@ export const postOnboardingSubmission = createAsyncThunk(
     const payload: OnboardingApplicationPayload = {
       firstName: forms.personalInfo.firstName,
       lastName: forms.personalInfo.lastName,
+      middleName: forms.personalInfo.middleName,
+      preferredName: forms.personalInfo.preferredName,
+      profilePicture: forms.personalInfo.profilePicture?.url, // TODO: replace with s3
       ssn: forms.personalInfo.ssn,
       dob: forms.personalInfo.dob,
       address: forms.personalInfo.address,
@@ -51,6 +54,13 @@ export const postOnboardingSubmission = createAsyncThunk(
         cellPhone: forms.personalInfo.cellPhone,
         workPhone: forms.personalInfo.workPhone,
       },
+      driverLicense: forms.driverAndCar.hasDriverLicense
+        ? {
+            ...forms.driverAndCar.driverLicense,
+            file: forms.driverAndCar.driverLicense.license.url, // TODO: replace with s3
+          }
+        : undefined,
+      carInfo: forms.driverAndCar.hasCar ? forms.driverAndCar.carInfo : undefined,
       isCitizenOrPR: forms.workAuth.isCitizenOrPermanentResident,
       visaInfo: {
         workAuthorization: {
@@ -62,11 +72,11 @@ export const postOnboardingSubmission = createAsyncThunk(
         optReceipt:
           forms.workAuth.authorizationType === 'F1'
             ? {
-                file: forms.workAuth.extraAuthInfo.optReceipt?.url,
+                file: forms.workAuth.extraAuthInfo.optReceipt?.url, // TODO: replace with s3
               }
             : undefined,
       },
-      reference: forms.contacts.reference,
+      reference: forms.contacts.hasReference ? forms.contacts.reference : undefined,
       emergencyContacts: forms.contacts.emergencyContacts,
     };
     try {

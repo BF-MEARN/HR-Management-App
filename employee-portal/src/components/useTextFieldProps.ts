@@ -22,7 +22,7 @@ function validate(
   { extraValidate, required, type }: StringFormField
 ): string | undefined {
   const requiredValue = typeof required === 'function' ? required() : required;
-  const isEmpty = validator.isEmpty(value);
+  const isEmpty = validator.isEmpty(value.trim());
   if (requiredValue && isEmpty) {
     return 'This field is required.';
   }
@@ -60,21 +60,24 @@ export function useTextFieldProps(
   updateErrorMap?: (key: string, error: string | undefined) => void
 ): TextFieldPropsGenerator {
   const [error, setError] = useState<string | undefined>();
+  const [touched, setTouched] = useState<boolean>(forceCheck);
   const { name, get, set, required, readOnly } = field;
 
   useEffect(() => {
-    if (forceCheck) {
-      const error = validate(get(), field);
-      setError(error);
-      if (updateErrorMap) {
-        updateErrorMap(name, error);
-      }
+    const newError = validate(get(), field);
+    setError(newError);
+    if (updateErrorMap) {
+      updateErrorMap(name, newError);
     }
-    // return () => {
-    //   if (updateErrorMap) {
-    //     updateErrorMap(name, undefined);
-    //   }
-    // };
+    if (forceCheck) {
+      setTouched(forceCheck);
+    }
+
+    return () => {
+      if (updateErrorMap) {
+        updateErrorMap(name, undefined);
+      }
+    };
   }, [field, forceCheck, get, name, updateErrorMap]);
 
   const props: TextFieldPropsGenerator = useCallback(
@@ -85,6 +88,7 @@ export function useTextFieldProps(
         name,
         value: get(),
         onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+          setTouched(true);
           set(e.target.value);
           const error = validate(e.target.value, field);
           setError(error);
@@ -92,17 +96,17 @@ export function useTextFieldProps(
             updateErrorMap(name, error);
           }
         },
-        error: !!error,
-        helperText: error,
+        error: touched ? !!error : undefined,
+        helperText: touched ? error : undefined,
         required: requiredValue,
+        ...overrides,
         slotProps: {
-          input: { readOnly, ...overrides?.slotProps?.input },
+          input: { disabled: readOnly, ...overrides?.slotProps?.input },
           ...overrides?.slotProps,
         },
-        ...overrides,
       };
     },
-    [error, field, get, name, readOnly, required, set, updateErrorMap]
+    [error, field, get, name, readOnly, required, set, touched, updateErrorMap]
   );
 
   return props;

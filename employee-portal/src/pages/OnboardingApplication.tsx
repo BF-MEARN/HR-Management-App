@@ -1,13 +1,14 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 
-import { Box, Button, Paper, Snackbar, Step, StepLabel, Stepper, Typography } from '@mui/material';
+import { Alert, Box, Button, Paper, Snackbar, Step, StepLabel, Stepper } from '@mui/material';
 
 import DocumentConfirmation from '../components/employee-info-forms/DocumentConfirmation';
 import DriverAndCarInfoForm from '../components/employee-info-forms/DriverAndCarInfoForm';
 import PersonalInfoForm from '../components/employee-info-forms/PersonalInfoForm';
 import ReferenceAndEmergencyContactForm from '../components/employee-info-forms/ReferenceAndEmergencyContactForm';
 import WorkAuthorizationForm from '../components/employee-info-forms/WorkAuthorizationForm';
-import { useAppDispatch } from '../store';
+import { useAppDispatch, useAppSelector } from '../store';
 import { postOnboardingSubmission } from '../store/slices/employeeFormSlice';
 
 interface OnboardingStep<T> {
@@ -20,7 +21,7 @@ interface OnboardingStep<T> {
 function FinishedStep() {
   return (
     <>
-      <Typography sx={{ mt: 2, mb: 1 }}>All steps completed!</Typography>
+      <Alert severity="success">Your onboarding application is submitted!</Alert>
     </>
   );
 }
@@ -48,8 +49,36 @@ export default function OnBoardingApplicationPage() {
   const f1OptDocRef = React.useRef<File | null>(null);
 
   const [forceCheckEnabled, setForceCheckEnabled] = React.useState(false);
-  const [formStatus, setFormStatus] = React.useState(false);
+
   const [proceeding, setProceeding] = React.useState(false);
+
+  const employeeOnboardingStatus = useAppSelector(
+    (state) => state.employee.employee?.onboardingStatus
+  );
+
+  const employeeOnboardingFeedback = useAppSelector(
+    (state) => state.employee.employee?.onboardingFeedback
+  );
+
+  const [formStatus, setFormStatus] = React.useState(false);
+
+  const navigate = useNavigate();
+  const [showStatusAlter, setShowStatusAlter] = useState(
+    employeeOnboardingStatus === 'Pending' || employeeOnboardingStatus === 'Rejected'
+  );
+  const statusAlterText =
+    employeeOnboardingStatus === 'Pending'
+      ? 'Your application is pending. You can view the current application.'
+      : `Your application is rejected: ${employeeOnboardingFeedback}. You can make a new submission.`;
+
+  useEffect(() => {
+    if (employeeOnboardingStatus === 'Approved') {
+      navigate('/personal-info');
+    }
+  }, [employeeOnboardingStatus, navigate]);
+
+  const readOnly = employeeOnboardingStatus === 'Pending';
+
   const dispatch = useAppDispatch();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const steps: OnboardingStep<any>[] = [
@@ -61,6 +90,7 @@ export default function OnBoardingApplicationPage() {
         onProfilePictureFileChange: (f: File) => (profilePictureRef.current = f),
         forceCheck: forceCheckEnabled,
         onFormStatusChange: setFormStatus,
+        readOnly,
       },
     },
     {
@@ -71,6 +101,7 @@ export default function OnBoardingApplicationPage() {
         onDriverLicenseFileChange: (f: File) => (driverLicenseDocRef.current = f),
         forceCheck: forceCheckEnabled,
         onFormStatusChange: setFormStatus,
+        readOnly,
       },
     },
     {
@@ -80,6 +111,7 @@ export default function OnBoardingApplicationPage() {
         onF1OptDocumentChange: (f: File) => (f1OptDocRef.current = f),
         forceCheck: forceCheckEnabled,
         onFormStatusChange: setFormStatus,
+        readOnly,
       },
       component: WorkAuthorizationForm,
     },
@@ -90,6 +122,7 @@ export default function OnBoardingApplicationPage() {
       props: {
         forceCheck: forceCheckEnabled,
         onFormStatusChange: setFormStatus,
+        readOnly,
       },
     },
     { id: 'documents', name: 'Document Confirmation', component: DocumentConfirmation },
@@ -105,9 +138,11 @@ export default function OnBoardingApplicationPage() {
       if (formStatus) {
         setActiveStepIndex((prev) => prev + 1);
         setForceCheckEnabled(false);
+        setFormStatus(false);
+      } else {
+        setProceeding(false);
       }
     }
-    setProceeding(false);
   }, [forceCheckEnabled, formStatus, proceeding]);
 
   React.useEffect(() => {
@@ -136,6 +171,11 @@ export default function OnBoardingApplicationPage() {
       />
 
       <Paper elevation={1} sx={{ width: '80%', margin: 'auto', padding: '2rem' }}>
+        {showStatusAlter && (
+          <Alert sx={{ mb: '3rem' }} severity="info" onClose={() => setShowStatusAlter(false)}>
+            {statusAlterText}
+          </Alert>
+        )}
         {finished ? (
           <FinishedStep />
         ) : (

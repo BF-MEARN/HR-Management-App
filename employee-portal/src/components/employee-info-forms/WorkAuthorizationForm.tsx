@@ -29,7 +29,7 @@ export default function WorkAuthorizationForm({
   onF1OptDocumentChange,
   onFormStatusChange,
   forceCheck,
-  readOnly = false,
+  readOnly,
 }: WorkAuthorizationFormProps) {
   const formData = useAppSelector((state) => state.employeeForm.workAuth);
   const dispatch = useAppDispatch();
@@ -112,6 +112,7 @@ export default function WorkAuthorizationForm({
         control={
           <Checkbox
             checked={formData.isCitizenOrPermanentResident}
+            disabled={readOnly}
             onChange={(e) => {
               const types = e.target.checked
                 ? workAuthorizationCategories.citizenOrPermanentResidentTypes
@@ -132,6 +133,7 @@ export default function WorkAuthorizationForm({
         <Select
           labelId="citizen-label"
           value={formData.authorizationType}
+          disabled={readOnly}
           label="Authorization Type"
           onChange={(e) =>
             dispatch(

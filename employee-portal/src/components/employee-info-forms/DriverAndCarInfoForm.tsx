@@ -89,6 +89,7 @@ function DriverAndCarInfoForm({
       <FormControlLabel
         control={
           <Checkbox
+            disabled={readOnly}
             checked={formData.hasDriverLicense}
             onChange={(e) => dispatch(updateDriverAndCar({ hasDriverLicense: e.target.checked }))}
           />
@@ -113,6 +114,7 @@ function DriverAndCarInfoForm({
               type="document"
               fileName={formData.driverLicense.license.name}
               buttonText="Upload Driver's License"
+              previewOnly={readOnly}
               onFileSelect={(f) => {
                 dispatch(
                   updateDriverAndCar({
@@ -133,6 +135,7 @@ function DriverAndCarInfoForm({
       <FormControlLabel
         control={
           <Checkbox
+            disabled={readOnly}
             checked={formData.hasCar}
             onChange={(e) => dispatch(updateDriverAndCar({ hasCar: e.target.checked }))}
           />
