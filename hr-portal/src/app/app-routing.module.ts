@@ -32,10 +32,17 @@ const routes: Routes = [
       import('./pages/employee-profiles/view-profile/view-profile.module').then(m => m.ViewProfileModule),
   },
   { 
-    path: 'visa', 
+    path: 'visa-status', 
     canActivate: [AuthGuard],
     loadChildren: () => import('./pages/visa-management/visa-management.module').then(
       m => m.VisaManagementModule
+    ) 
+  },
+  { 
+    path: 'visa-status/:id',
+    canActivate: [AuthGuard], 
+    loadChildren: () => import('./pages/visa-management/visa-status-detail/visa-status-detail.module').then(
+      m => m.VisaStatusDetailModule
     ) 
   },
   {
