@@ -36,6 +36,7 @@ const userSlice = createSlice({
   reducers: {
     setUser: (state, action: PayloadAction<UserEntry>) => {
       state.user = action.payload;
+      state.status = 'succeeded';
     },
     resetUser: () => initialState,
   },
@@ -46,7 +47,7 @@ const userSlice = createSlice({
       })
       .addCase(fetchMe.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.user = action.payload['user'];
+        state.user = action.payload['user'] as UserEntry;
       })
       .addCase(fetchMe.rejected, (state, action) => {
         state.status = 'failed';
