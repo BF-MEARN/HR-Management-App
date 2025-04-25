@@ -37,7 +37,10 @@ export const getCurrentEmployeeHouse = async (req, res) => {
     });
 
     const { houseId } = findEmployeeByUserId;
-    const findEmployeeHouse = await Housing.findById(houseId);
+    const findEmployeeHouse = await Housing.findById(houseId).populate({
+      path: 'residents',
+      select: 'firstName lastName middleName preferredName contactInfo.cellPhone -_id',
+    });
 
     res.status(200).json({
       message: "Successfully found the user's assigned employee house",

@@ -1,5 +1,6 @@
 import Employee from '../models/Employee.js';
 import FacilityReport from '../models/FacilityReport.js';
+import User from '../models/User.js';
 
 /**
  * Helper Function
@@ -29,7 +30,16 @@ export const getCurrentUserFacilityReportsByHouseId = async (req, res) => {
     const facilityReports = await FacilityReport.find({
       houseId,
       employeeId,
-    });
+    })
+      .select('title description status comments')
+      .populate({
+        path: 'comments.createdBy',
+        select: 'employeeId -_id',
+        populate: {
+          path: 'employeeId',
+          select: 'preferredName firstName middleName lastName -_id',
+        },
+      });
 
     res.status(200).json(facilityReports);
   } catch (error) {
@@ -89,7 +99,7 @@ export const updateFacilityReport = async (req, res) => {
     const { newTitle, newDescription } = req.body;
 
     const facilityReport = await FacilityReport.findById(facilityReportId).select(
-      'title description employeeId status'
+      'title description employeeId status createdAt updatedAt'
     );
     if (await thisReportWasNotCreatedByUser(req, facilityReport)) {
       return res.status(403).json({
@@ -113,6 +123,7 @@ export const updateFacilityReport = async (req, res) => {
       oldDescription,
       newTitle,
       newDescription,
+      facilityReport,
     });
   } catch (error) {
     res
