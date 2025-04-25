@@ -19,6 +19,7 @@ import {
 import Box from '@mui/material/Box';
 
 import { useAppDispatch, useAppSelector } from '../store';
+import { resetEmployeeForm } from '../store/slices/employeeFormSlice';
 import { resetEmployee } from '../store/slices/employeeSlice';
 import { resetUser } from '../store/slices/userSlice';
 import { api } from '../utils/utils';
@@ -45,6 +46,7 @@ export default function NavDrawer() {
     });
     dispatch(resetUser());
     dispatch(resetEmployee());
+    dispatch(resetEmployeeForm());
     navigate('/');
   };
 

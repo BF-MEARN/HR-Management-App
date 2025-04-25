@@ -181,7 +181,7 @@ const employeeFormSlice = createSlice({
     updateContacts: (state, action: PayloadAction<DeepPartial<ContactFormData>>) => {
       smartUpdate(state.contacts, action.payload);
     },
-    resetEmployeeFormForm: () => initialState,
+    resetEmployeeForm: () => initialState,
   },
   extraReducers: (builder) => {
     builder
@@ -205,5 +205,6 @@ export const {
   updateDriverAndCar,
   updateWorkAuth,
   updateContacts,
+  resetEmployeeForm,
 } = employeeFormSlice.actions;
 export default employeeFormSlice.reducer;
