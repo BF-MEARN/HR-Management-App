@@ -161,6 +161,12 @@ const employeeFormSlice = createSlice({
           startDate: formatDateString(visaInfo.workAuthorization.startDate),
           endDate: formatDateString(visaInfo.workAuthorization.endDate),
           visaTitle: visaInfo.workAuthorization.otherTitle,
+          optReceipt: visaInfo.optReceipt?.file
+            ? {
+                name: visaInfo.optReceipt?.file,
+                url: visaInfo.optReceipt?.file,
+              }
+            : undefined,
         },
       };
       state.contacts = {

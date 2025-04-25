@@ -29,17 +29,20 @@ function FinishedStep() {
 function StepperFooter(props: {
   isFirst: boolean;
   isLast: boolean;
+  nextDisabled: boolean;
   handleBack: () => void;
   handleNext: () => void;
 }) {
-  const { isFirst, isLast, handleBack, handleNext } = props;
+  const { isFirst, isLast, handleBack, nextDisabled, handleNext } = props;
   return (
     <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
       <Button color="inherit" disabled={isFirst} onClick={handleBack} sx={{ mr: 1 }}>
         Back
       </Button>
       <Box sx={{ flex: '1 1 auto' }} />
-      <Button onClick={handleNext}>{isLast ? 'Finish' : 'Next'}</Button>
+      <Button onClick={handleNext} disabled={nextDisabled}>
+        {isLast ? 'Finish' : 'Next'}
+      </Button>
     </Box>
   );
 }
@@ -133,6 +136,8 @@ export default function OnBoardingApplicationPage() {
 
   const { component: StepComponent, props } = finished ? {} : steps[activeStepIndex];
 
+  const nextDisabled = readOnly && activeStepIndex === steps.length - 1;
+
   React.useEffect(() => {
     if (forceCheckEnabled && proceeding) {
       if (formStatus) {
@@ -145,10 +150,10 @@ export default function OnBoardingApplicationPage() {
   }, [forceCheckEnabled, formStatus, proceeding]);
 
   React.useEffect(() => {
-    if (activeStepIndex === steps.length) {
+    if (finished) {
       dispatch(postOnboardingSubmission());
     }
-  }, [activeStepIndex, dispatch, steps.length]);
+  }, [activeStepIndex, dispatch, finished, steps.length]);
 
   const handleNext = () => {
     setForceCheckEnabled(true);
@@ -203,6 +208,7 @@ export default function OnBoardingApplicationPage() {
               isLast={activeStepIndex == steps.length - 1}
               handleBack={handleBack}
               handleNext={handleNext}
+              nextDisabled={nextDisabled}
             />
           </>
         )}
