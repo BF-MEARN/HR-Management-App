@@ -6,8 +6,8 @@ import {
   createNewEmployee,
   getEmployeeData,
   getVisaStatus,
-  validateRegistrationToken,
   updateVisaStatus,
+  validateRegistrationToken,
 } from '../controllers/EmployeeOnboardingController.js';
 
 const employeeOnboardingRouter = Router();
@@ -26,7 +26,7 @@ employeeOnboardingRouter.post('/post-housing', createHousing);
 employeeOnboardingRouter.post('/add-resident-to-housing', addResidentToHousing);
 employeeOnboardingRouter.get('/employee-data', getEmployeeData);
 employeeOnboardingRouter.get('/visa-status', getVisaStatus);
-employeeOnboardingRouter.patch('/update-visa', updateVisaStatus)
+employeeOnboardingRouter.patch('/update-visa', updateVisaStatus);
 employeeOnboardingRouter.get('/registration-token/:tokenUUID', validateRegistrationToken);
 
 export default employeeOnboardingRouter;

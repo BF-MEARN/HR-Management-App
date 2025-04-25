@@ -266,7 +266,7 @@ export const editEmergencyContact = async (req, res, next) => {
  */
 export const editDocuments = async (req, res, next) => {
   try {
-    console.log('req', req)
+    console.log('req', req);
 
     const userId = req.user.id;
     const employee = await findEmployeeByAuthUser(userId);

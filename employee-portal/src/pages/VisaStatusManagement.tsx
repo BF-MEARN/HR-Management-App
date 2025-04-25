@@ -67,10 +67,9 @@ const VisaStatusManagementPage = () => {
   };
 
   const handleUpload = async (fileType: string) => {
-
     if (!file) {
-      alert('No file uploaded')
-      return
+      alert('No file uploaded');
+      return;
     }
 
     const formData = new FormData();
@@ -82,19 +81,18 @@ const VisaStatusManagementPage = () => {
       });
 
       if (res.status === 200) {
-
         const updateData = {
           _id: userData?._id,
           documentUpdate: {
-            type: fileType.slice(0, fileType.length - 4)
-          }
-        }
+            type: fileType.slice(0, fileType.length - 4),
+          },
+        };
 
         try {
-          await axios.patch("http://localhost:3000/api/onboarding/update-visa", updateData)
-          fetchUserData()
+          await axios.patch('http://localhost:3000/api/onboarding/update-visa', updateData);
+          fetchUserData();
         } catch (error) {
-          console.log(error)
+          console.log(error);
         }
       }
     } catch (err) {
@@ -150,7 +148,9 @@ const VisaStatusManagementPage = () => {
                   {file && (
                     <>
                       <p>File selected: {file.name}</p>
-                      <Button variant="contained" onClick={() => handleUpload("optReceiptFile")}>Submit</Button>
+                      <Button variant="contained" onClick={() => handleUpload('optReceiptFile')}>
+                        Submit
+                      </Button>
                     </>
                   )}
                 </div>
@@ -158,19 +158,25 @@ const VisaStatusManagementPage = () => {
             case 'Pending Approval':
               return (
                 <>
-                  <div style={{ color: "#FDD835", fontWeight: 600 }}>Waiting for HR to approve your OPT Receipt</div>
+                  <div style={{ color: '#FDD835', fontWeight: 600 }}>
+                    Waiting for HR to approve your OPT Receipt
+                  </div>
                 </>
               );
             case 'Approved':
               return (
                 <>
-                  <div style={{ color: "#16A34A", fontWeight: 600 }}>Approved. Please download and fill out the OPT-EAD form.</div>
+                  <div style={{ color: '#16A34A', fontWeight: 600 }}>
+                    Approved. Please download and fill out the OPT-EAD form.
+                  </div>
                 </>
               );
             case 'Rejected':
               return (
                 <>
-                  <div style={{ color: "#FF0000", fontWeight: 600 }}>Rejected. {userVisaStatus.optReceipt.feedback}</div>
+                  <div style={{ color: '#FF0000', fontWeight: 600 }}>
+                    Rejected. {userVisaStatus.optReceipt.feedback}
+                  </div>
                   <div>
                     <input
                       accept="*"
@@ -184,7 +190,14 @@ const VisaStatusManagementPage = () => {
                         Upload File
                       </Button>
                     </label>
-                    {file && <><p>File selected: {file.name}</p><Button variant="contained" onClick={() => handleUpload("optReceiptFile")}>Submit</Button></>}
+                    {file && (
+                      <>
+                        <p>File selected: {file.name}</p>
+                        <Button variant="contained" onClick={() => handleUpload('optReceiptFile')}>
+                          Submit
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </>
               );
@@ -223,7 +236,14 @@ const VisaStatusManagementPage = () => {
                           Upload File
                         </Button>
                       </label>
-                      {file && <><p>File selected: {file.name}</p><Button variant="contained" onClick={() => handleUpload("optEADFile")}>Submit</Button></>}
+                      {file && (
+                        <>
+                          <p>File selected: {file.name}</p>
+                          <Button variant="contained" onClick={() => handleUpload('optEADFile')}>
+                            Submit
+                          </Button>
+                        </>
+                      )}
                     </div>
                   ) : (
                     <>
@@ -234,7 +254,6 @@ const VisaStatusManagementPage = () => {
                         type="file"
                         onChange={handleChange}
                         style={{ display: 'none' }}
-
                       />
                       <label htmlFor="file-upload">
                         <Button variant="contained" component="span" disabled>
@@ -248,19 +267,25 @@ const VisaStatusManagementPage = () => {
             case 'Pending Approval':
               return (
                 <>
-                  <div style={{ color: "#FDD835", fontWeight: 600 }}>Waiting for HR to approve your OPT receipt</div>
+                  <div style={{ color: '#FDD835', fontWeight: 600 }}>
+                    Waiting for HR to approve your OPT receipt
+                  </div>
                 </>
               );
             case 'Approved':
               return (
                 <>
-                  <div style={{ color: "#16A34A", fontWeight: 600 }}>Please download and fill out the I-983 form</div>
+                  <div style={{ color: '#16A34A', fontWeight: 600 }}>
+                    Please download and fill out the I-983 form
+                  </div>
                 </>
               );
             case 'Rejected':
               return (
                 <>
-                  <div style={{ color: "#FF0000", fontWeight: 600 }}>Rejected. {userVisaStatus.optEAD.feedback}</div>
+                  <div style={{ color: '#FF0000', fontWeight: 600 }}>
+                    Rejected. {userVisaStatus.optEAD.feedback}
+                  </div>
                   <div>
                     <input
                       accept="*"
@@ -274,7 +299,14 @@ const VisaStatusManagementPage = () => {
                         Upload File
                       </Button>
                     </label>
-                    {file && <><p>File selected: {file.name}</p><Button variant="contained" onClick={() => handleUpload("optEADFile")}>Submit</Button></>}
+                    {file && (
+                      <>
+                        <p>File selected: {file.name}</p>
+                        <Button variant="contained" onClick={() => handleUpload('optEADFile')}>
+                          Submit
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </>
               );
@@ -309,11 +341,18 @@ const VisaStatusManagementPage = () => {
                         style={{ display: 'none' }}
                       />
                       <label htmlFor="file-upload">
-                        <Button variant="contained" component="span" >
+                        <Button variant="contained" component="span">
                           Upload File
                         </Button>
                       </label>
-                      {file && <><p>File selected: {file.name}</p><Button variant="contained" onClick={() => handleUpload("i983File")}>Submit</Button></>}
+                      {file && (
+                        <>
+                          <p>File selected: {file.name}</p>
+                          <Button variant="contained" onClick={() => handleUpload('i983File')}>
+                            Submit
+                          </Button>
+                        </>
+                      )}
                     </div>
                   ) : (
                     <>
@@ -337,20 +376,26 @@ const VisaStatusManagementPage = () => {
             case 'Pending Approval':
               return (
                 <>
-                  <div style={{ color: "#FDD835", fontWeight: 600 }}>Waiting for HR to approve
-                    and sign your I-983</div>
+                  <div style={{ color: '#FDD835', fontWeight: 600 }}>
+                    Waiting for HR to approve and sign your I-983
+                  </div>
                 </>
               );
             case 'Approved':
               return (
                 <>
-                  <div style={{ color: "#16A34A", fontWeight: 600 }}>Approved. Please send the I-983 along with all necessary documents to your school and upload the new I-20</div>
+                  <div style={{ color: '#16A34A', fontWeight: 600 }}>
+                    Approved. Please send the I-983 along with all necessary documents to your
+                    school and upload the new I-20
+                  </div>
                 </>
               );
             case 'Rejected':
               return (
                 <>
-                  <div style={{ color: "#FF0000", fontWeight: 600 }}>Rejected. {userVisaStatus.i983.feedback}</div>
+                  <div style={{ color: '#FF0000', fontWeight: 600 }}>
+                    Rejected. {userVisaStatus.i983.feedback}
+                  </div>
                   <div>
                     <input
                       accept="*"
@@ -364,7 +409,14 @@ const VisaStatusManagementPage = () => {
                         Upload File
                       </Button>
                     </label>
-                    {file && <><p>File selected: {file.name}</p><Button variant="contained" onClick={() => handleUpload("i983File")}>Submit</Button></>}
+                    {file && (
+                      <>
+                        <p>File selected: {file.name}</p>
+                        <Button variant="contained" onClick={() => handleUpload('i983File')}>
+                          Submit
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </>
               );
@@ -403,7 +455,14 @@ const VisaStatusManagementPage = () => {
                           Upload File
                         </Button>
                       </label>
-                      {file && <><p>File selected: {file.name}</p><Button variant="contained" onClick={() => handleUpload("i20File")}>Submit</Button></>}
+                      {file && (
+                        <>
+                          <p>File selected: {file.name}</p>
+                          <Button variant="contained" onClick={() => handleUpload('i20File')}>
+                            Submit
+                          </Button>
+                        </>
+                      )}
                     </div>
                   ) : (
                     <>
@@ -427,19 +486,25 @@ const VisaStatusManagementPage = () => {
             case 'Pending Approval':
               return (
                 <>
-                  <div style={{ color: "#FDD835", fontWeight: 600 }}>Waiting for HR to approve your I-20</div>
+                  <div style={{ color: '#FDD835', fontWeight: 600 }}>
+                    Waiting for HR to approve your I-20
+                  </div>
                 </>
               );
             case 'Approved':
               return (
                 <>
-                  <div style={{ color: "#16A34A", fontWeight: 600 }}>All documents have been approved.</div>
+                  <div style={{ color: '#16A34A', fontWeight: 600 }}>
+                    All documents have been approved.
+                  </div>
                 </>
               );
             case 'Rejected':
               return (
                 <>
-                  <div style={{ color: "#FF0000", fontWeight: 600 }}>Rejected. {userVisaStatus.i20.feedback}</div>
+                  <div style={{ color: '#FF0000', fontWeight: 600 }}>
+                    Rejected. {userVisaStatus.i20.feedback}
+                  </div>
                   <div>
                     <input
                       accept="*"
@@ -453,7 +518,14 @@ const VisaStatusManagementPage = () => {
                         Upload File
                       </Button>
                     </label>
-                    {file && <><p>File selected: {file.name}</p><Button variant="contained" onClick={() => handleUpload("i20File")}>Submit</Button></>}
+                    {file && (
+                      <>
+                        <p>File selected: {file.name}</p>
+                        <Button variant="contained" onClick={() => handleUpload('i20File')}>
+                          Submit
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </>
               );
