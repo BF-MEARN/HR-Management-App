@@ -248,7 +248,7 @@ const seedDatabase = async () => {
           const uploadSeedDoc = (fileName, s3KeyName) => {
             const filePath = path.join(testDir, fileName);
             const buffer = fs.readFileSync(filePath);
-            const key = `employees/${newUser._id}/${s3KeyName}.pdf`;
+            const key = `employees/${newEmployee._id}/${s3KeyName}.pdf`;
             return putObject(buffer, key, 'application/pdf').then(() => key);
           };
 

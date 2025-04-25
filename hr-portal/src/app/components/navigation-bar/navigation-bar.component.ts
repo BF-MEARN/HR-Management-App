@@ -14,7 +14,7 @@ export class NavigationBarComponent implements OnInit {
     { path: '/home', label: 'Home', icon: 'home' },
     { path: '/employee-profiles', label: 'Employee Profiles', icon: 'people' },
     {
-      path: '/visa',
+      path: '/visa-status',
       label: 'Visa Status Management',
       icon: 'article',
       queryParams: { tab: 'in-progress' }

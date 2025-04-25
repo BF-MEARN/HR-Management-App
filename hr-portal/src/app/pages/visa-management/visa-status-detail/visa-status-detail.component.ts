@@ -246,7 +246,7 @@ export class VisaStatusDetailComponent implements OnInit {
   rejectDocument(docKey: VisaDocKey, feedback: string): void {
     if (!this.visaStatus?._id) return;
     
-    this.visaService.rejectDocument(this.visaStatus._id, docKey, feedback).subscribe({
+    this.visaService.rejectDocument(this.visaStatus.employeeId._id, docKey, feedback).subscribe({
       next: () => {
         if (this.visaStatus && this.visaStatus[docKey]) {
           this.visaStatus[docKey].status = 'Rejected';
@@ -265,10 +265,10 @@ export class VisaStatusDetailComponent implements OnInit {
     });
   }
 
-  approve(docKey: VisaDocKey): void {
+  approveDocument(docKey: VisaDocKey): void {
     if (!this.visaStatus?._id) return;
     
-    this.visaService.approveDocument(this.visaStatus._id, docKey).subscribe({
+    this.visaService.approveDocument(this.visaStatus.employeeId._id, docKey).subscribe({
       next: () => {
         if (this.visaStatus && this.visaStatus[docKey]) {
           this.visaStatus[docKey].status = 'Approved';
@@ -290,7 +290,7 @@ export class VisaStatusDetailComponent implements OnInit {
   sendReminder(): void {
     if (!this.visaStatus?._id) return;
     
-    this.visaService.sendReminder(this.visaStatus._id).subscribe({
+    this.visaService.sendReminder(this.visaStatus.employeeId._id).subscribe({
       next: () => {
         this.snackBar.open('Reminder email sent successfully', 'Close', {
           duration: 3000

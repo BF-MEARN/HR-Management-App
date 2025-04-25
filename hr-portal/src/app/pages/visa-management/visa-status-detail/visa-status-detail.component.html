@@ -107,7 +107,10 @@
               </div>
             </div>
 
-            <div class="document-actions">
+            <div
+              class="document-actions"
+              *ngIf="visaStatus[doc].status !== 'Not Uploaded' && visaStatus[doc].file"
+            >
               <button mat-stroked-button color="primary" (click)="openFile(visaStatus[doc].file)">
                 <mat-icon>visibility</mat-icon>
                 Preview Document
@@ -132,7 +135,7 @@
                   <mat-icon>cancel</mat-icon>
                   Reject
                 </button>
-                <button mat-raised-button color="primary" (click)="approve(doc)">
+                <button mat-raised-button color="primary" (click)="approveDocument(doc)">
                   <mat-icon>check_circle</mat-icon>
                   Approve
                 </button>

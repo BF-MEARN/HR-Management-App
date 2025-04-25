@@ -268,6 +268,142 @@
           </div>
         </div>
 
+        <!-- Document List for F1 visa holders -->
+        <div
+          *ngIf="application?.visaInfo?.workAuthorization?.type === 'F1'"
+          class="visa-documents-section"
+        >
+          <div class="document-list">
+            <!-- OPT Receipt -->
+            <div *ngIf="application?.visaInfo?.optReceipt" class="document-item">
+              <div class="document-info">
+                <div class="document-name">
+                  <mat-icon>description</mat-icon>
+                  <span>OPT Receipt</span>
+                </div>
+                <div
+                  class="document-status"
+                  [ngClass]="getDocumentStatusClass(application?.visaInfo?.optReceipt?.status)"
+                >
+                  {{ application?.visaInfo?.optReceipt?.status || 'Not Uploaded' }}
+                </div>
+              </div>
+              <div
+                class="document-actions"
+                *ngIf="
+                  application?.visaInfo?.optReceipt?.file &&
+                  application?.visaInfo?.optReceipt?.status === 'Approved'
+                "
+              >
+                <button mat-stroked-button color="primary" (click)="previewDocument('optReceipt')">
+                  <mat-icon>visibility</mat-icon>
+                  Preview
+                </button>
+                <button mat-stroked-button color="accent" (click)="downloadDocument('optReceipt')">
+                  <mat-icon>cloud_download</mat-icon>
+                  Download
+                </button>
+              </div>
+            </div>
+
+            <!-- OPT EAD -->
+            <div *ngIf="application?.visaInfo?.optEAD" class="document-item">
+              <div class="document-info">
+                <div class="document-name">
+                  <mat-icon>description</mat-icon>
+                  <span>OPT EAD</span>
+                </div>
+                <div
+                  class="document-status"
+                  [ngClass]="getDocumentStatusClass(application?.visaInfo?.optEAD?.status)"
+                >
+                  {{ application?.visaInfo?.optEAD?.status || 'Not Uploaded' }}
+                </div>
+              </div>
+              <div
+                class="document-actions"
+                *ngIf="
+                  application?.visaInfo?.optEAD?.file &&
+                  application?.visaInfo?.optEAD?.status === 'Approved'
+                "
+              >
+                <button mat-stroked-button color="primary" (click)="previewDocument('optEAD')">
+                  <mat-icon>visibility</mat-icon>
+                  Preview
+                </button>
+                <button mat-stroked-button color="accent" (click)="downloadDocument('optEAD')">
+                  <mat-icon>cloud_download</mat-icon>
+                  Download
+                </button>
+              </div>
+            </div>
+
+            <!-- I-983 Form -->
+            <div *ngIf="application?.visaInfo?.i983" class="document-item">
+              <div class="document-info">
+                <div class="document-name">
+                  <mat-icon>description</mat-icon>
+                  <span>I-983 Form</span>
+                </div>
+                <div
+                  class="document-status"
+                  [ngClass]="getDocumentStatusClass(application?.visaInfo?.i983?.status)"
+                >
+                  {{ application?.visaInfo?.i983?.status || 'Not Uploaded' }}
+                </div>
+              </div>
+              <div
+                class="document-actions"
+                *ngIf="
+                  application?.visaInfo?.i983?.file &&
+                  application?.visaInfo?.i983?.status === 'Approved'
+                "
+              >
+                <button mat-stroked-button color="primary" (click)="previewDocument('i983')">
+                  <mat-icon>visibility</mat-icon>
+                  Preview
+                </button>
+                <button mat-stroked-button color="accent" (click)="downloadDocument('i983')">
+                  <mat-icon>cloud_download</mat-icon>
+                  Download
+                </button>
+              </div>
+            </div>
+
+            <!-- I-20 Form -->
+            <div *ngIf="application?.visaInfo?.i20" class="document-item">
+              <div class="document-info">
+                <div class="document-name">
+                  <mat-icon>description</mat-icon>
+                  <span>I-20 Form</span>
+                </div>
+                <div
+                  class="document-status"
+                  [ngClass]="getDocumentStatusClass(application?.visaInfo?.i20?.status)"
+                >
+                  {{ application?.visaInfo?.i20?.status || 'Not Uploaded' }}
+                </div>
+              </div>
+              <div
+                class="document-actions"
+                *ngIf="
+                  application?.visaInfo?.i20?.file &&
+                  application?.visaInfo?.i20?.status === 'Approved'
+                "
+              >
+                <button mat-stroked-button color="primary" (click)="previewDocument('i20')">
+                  <mat-icon>visibility</mat-icon>
+                  Preview
+                </button>
+                <button mat-stroked-button color="accent" (click)="downloadDocument('i20')">
+                  <mat-icon>cloud_download</mat-icon>
+                  Download
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div
           *ngIf="application?.visaInfo?.workAuthorization?.type === 'F1'"
           class="f1-visa-info-box"

@@ -25,6 +25,7 @@
       [routerLink]="item.path"
       [queryParams]="item.queryParams || null"
       routerLinkActive="active-link"
+      [routerLinkActiveOptions]="{ exact: false }"
       class="nav-item"
     >
       <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>

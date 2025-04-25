@@ -71,12 +71,34 @@ export class ProfileSectionComponent {
     this.rejectEvent.emit();
   }
 
-  downloadDocument(document: any): void {
-    this.downloadDocumentEvent.emit(document);
+  downloadDocument(documentType: string | any): void {
+    // If a string is passed, it's a visa document type
+    if (typeof documentType === 'string') {
+      this.downloadDocumentEvent.emit({
+        type: documentType,
+        file: this.application?.visaInfo?.[documentType]?.file
+      });
+    } else {
+      // Otherwise, it's an existing document object
+      this.downloadDocumentEvent.emit(documentType);
+    }
   }
 
-  goToVisaStatusPage(employeeId: string): void {
-    this.goToVisaStatusPageEvent.emit(employeeId);
+  previewDocument(documentType: string | any): void {
+    // If a string is passed, it's a visa document type
+    if (typeof documentType === 'string') {
+      this.previewDocumentEvent.emit({
+        type: documentType,
+        file: this.application?.visaInfo?.[documentType]?.file
+      });
+    } else {
+      // Otherwise, it's an existing document object
+      this.previewDocumentEvent.emit(documentType);
+    }
+  }
+
+  goToVisaStatusPage(visaInfoId: string): void {
+    this.goToVisaStatusPageEvent.emit(visaInfoId);
   }
 
   onFeedbackChange(value: string): void {
@@ -84,8 +106,12 @@ export class ProfileSectionComponent {
     this.feedbackChange.emit(value);
   }
 
-
-  previewDocument(document: any): void {
-    this.previewDocumentEvent.emit(document);
+  getDocumentStatusClass(status: string | undefined): Record<string, boolean> {
+    return {
+      'status-not-uploaded': status === 'Not Uploaded' || !status,
+      'status-pending': status === 'Pending Approval',
+      'status-approved': status === 'Approved',
+      'status-rejected': status === 'Rejected'
+    };
   }
 }

@@ -59,8 +59,7 @@ export const getAllVisaStatuses = async (req, res) => {
 
 export const getVisaStatusById = async (req, res) => {
   try {
-    const { id } = req.params;
-    const visa = await VisaStatus.findById(id)
+    const visa = await VisaStatus.findOne({ employeeId: req.params.id })
       .populate({
         path: 'employeeId',
         populate: {
@@ -88,7 +87,7 @@ export const approveVisaDocument = async (req, res) => {
     const { id } = req.params;
     const { documentType } = req.body;
 
-    const visa = await VisaStatus.findById(id);
+    const visa = await VisaStatus.findOne({ employeeId: id });
     if (!visa || !visa[documentType]) {
       return res.status(400).json({ message: 'Invalid visa document type' });
     }
@@ -113,7 +112,7 @@ export const rejectVisaDocument = async (req, res) => {
     const { id } = req.params;
     const { documentType, feedback } = req.body;
 
-    const visa = await VisaStatus.findById(id);
+    const visa = await VisaStatus.findOne({ employeeId: id });
     if (!visa || !visa[documentType]) {
       return res.status(400).json({ message: 'Invalid visa document type' });
     }
@@ -137,7 +136,7 @@ export const notifyEmployeeForNextStep = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const visa = await VisaStatus.findById(id)
+    const visa = await VisaStatus.findOne({ employeeId: id })
       .populate({
         path: 'employeeId',
         populate: {
