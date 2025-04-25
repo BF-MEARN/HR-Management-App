@@ -5,10 +5,10 @@ import Housing from '../models/Housing.js';
 import User from '../models/User.js';
 import VisaStatus from '../models/VisaStatus.js';
 
-async function updateVisaInfo(employee, inputVisaInfo) {
+function updateVisaInfo(employee, inputVisaInfo) {
   let visaInfo = employee.visaInfo;
   if (!visaInfo) {
-    visaInfo = await VisaStatus.create({
+    visaInfo = new VisaStatus({
       employeeId: employee._id,
     });
     employee.visaInfo = visaInfo._id;
@@ -21,7 +21,7 @@ async function updateVisaInfo(employee, inputVisaInfo) {
   if (inputVisaInfo?.optReceipt) {
     visaInfo.set({
       optReceipt: {
-        file: inputVisaInfo?.optReceipt,
+        file: inputVisaInfo?.optReceipt.file,
         status: 'Pending Approval',
       },
     });

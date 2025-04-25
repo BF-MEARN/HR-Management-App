@@ -60,7 +60,7 @@ export default function OnBoardingApplicationPage() {
     (state) => state.employee.employee?.onboardingFeedback
   );
 
-  const [formStatus, setFormStatus] = React.useState(false);
+  const [formStatus, setFormStatus] = React.useState(true);
 
   const navigate = useNavigate();
   const [showStatusAlter, setShowStatusAlter] = useState(
@@ -138,10 +138,9 @@ export default function OnBoardingApplicationPage() {
       if (formStatus) {
         setActiveStepIndex((prev) => prev + 1);
         setForceCheckEnabled(false);
-        setFormStatus(false);
-      } else {
-        setProceeding(false);
+        setFormStatus(true);
       }
+      setProceeding(false);
     }
   }, [forceCheckEnabled, formStatus, proceeding]);
 
@@ -149,7 +148,6 @@ export default function OnBoardingApplicationPage() {
     if (activeStepIndex === steps.length) {
       dispatch(postOnboardingSubmission());
     }
-    setProceeding(false);
   }, [activeStepIndex, dispatch, steps.length]);
 
   const handleNext = () => {
