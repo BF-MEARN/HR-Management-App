@@ -8,17 +8,32 @@ import RegisterPage from './pages/Register';
 import VisaStatusManagementPage from './pages/VisaStatusManagement';
 import HousingPage from './pages/housing_without_backend/Housing';
 import { useAppDispatch, useAppSelector } from './store';
+import { updateFormsWithEmployee } from './store/slices/employeeFormSlice';
+import { fetchEmployeeData } from './store/slices/employeeSlice';
 import { fetchMe } from './store/slices/userSlice';
 
 function App() {
   const dispatch = useAppDispatch();
-  const status = useAppSelector((state) => state.user.status);
-
+  const userStatus = useAppSelector((state) => state.user.status);
+  const employeeStatus = useAppSelector((state) => state.employee.status);
+  const employee = useAppSelector((state) => state.employee.employee);
   useEffect(() => {
-    if (status === 'idle') {
+    if (userStatus === 'idle') {
       dispatch(fetchMe());
     }
-  }, [status, dispatch]);
+  }, [userStatus, dispatch]);
+
+  useEffect(() => {
+    if (userStatus === 'succeeded' && employeeStatus === 'idle') {
+      dispatch(fetchEmployeeData());
+    }
+  }, [userStatus, dispatch, employeeStatus]);
+
+  useEffect(() => {
+    if (employeeStatus === 'succeeded' && employee) {
+      dispatch(updateFormsWithEmployee(employee));
+    }
+  }, [userStatus, dispatch, employeeStatus, employee]);
   return (
     <>
       <BrowserRouter>

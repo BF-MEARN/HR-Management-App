@@ -21,9 +21,11 @@ export default function RegisterPage() {
     const checkRegToken = async () => {
       const tokenId = params['token'];
       if (!tokenId) return;
-      const res = await api(`/onboarding/registration-token/${tokenId}`);
-      const { token } = await res.json();
-      if (!token.used) setRegToken(token);
+      const res = await api(`/user/register/${tokenId}`);
+      if (res.ok) {
+        const { token } = await res.json();
+        setRegToken(token);
+      }
     };
     checkRegToken();
   }, [params]);

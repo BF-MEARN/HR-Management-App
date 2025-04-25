@@ -4,18 +4,13 @@ import { useAppSelector } from '../../store';
 import FileUploadWithPreview from '../FileUploadWithPreview';
 
 export default function DocumentConfirmation() {
-  const profilePicture = {
-    name: useAppSelector((state) => state.employeeForm.personalInfo.profilePictureFileName),
-    url: useAppSelector((state) => state.employeeForm.personalInfo.profilePicturePreview),
-  };
-  const driverLicense = {
-    name: useAppSelector((state) => state.employeeForm.driverAndCar.driverLicense.licenseFileName),
-    url: useAppSelector((state) => state.employeeForm.driverAndCar.driverLicense.licensePreview),
-  };
-  const authDocument = {
-    name: useAppSelector((state) => state.employeeForm.workAuth.extraAuthInfo.f1DocumentName),
-    url: useAppSelector((state) => state.employeeForm.workAuth.extraAuthInfo.f1DocumentPreview),
-  };
+  const profilePicture = useAppSelector((state) => state.employeeForm.personalInfo.profilePicture);
+  const driverLicense = useAppSelector(
+    (state) => state.employeeForm.driverAndCar.driverLicense.license
+  );
+  const authDocument = useAppSelector(
+    (state) => state.employeeForm.workAuth.extraAuthInfo.optReceipt
+  );
 
   return (
     <>
@@ -24,11 +19,13 @@ export default function DocumentConfirmation() {
           <Typography variant="h6" mt={4} mb={1}>
             Profile Picture
           </Typography>
-          {!profilePicture.name ? (
+          {!profilePicture?.name ? (
             <Typography variant="body1">Nothing uploaded</Typography>
           ) : (
             <FileUploadWithPreview
               previewOnly
+              width="200px"
+              height="200px"
               previewURL={profilePicture.url}
               fileName={profilePicture.name}
               type="image"
@@ -39,12 +36,11 @@ export default function DocumentConfirmation() {
           <Typography variant="h6" mt={4} mb={1}>
             Driver&apos;s License
           </Typography>
-          {!driverLicense.name ? (
+          {!driverLicense?.name ? (
             <Typography variant="body1">Nothing uploaded</Typography>
           ) : (
             <FileUploadWithPreview
               previewOnly
-              height="2rem"
               previewURL={driverLicense.url}
               fileName={driverLicense.name}
               type="document"
@@ -55,12 +51,11 @@ export default function DocumentConfirmation() {
           <Typography variant="h6" mt={4} mb={1}>
             Work Authorization Documents
           </Typography>
-          {!authDocument.name ? (
+          {!authDocument?.name ? (
             <Typography variant="body1">Nothing uploaded</Typography>
           ) : (
             <FileUploadWithPreview
               previewOnly
-              height="2rem"
               previewURL={authDocument.url}
               fileName={authDocument.name}
               type="document"

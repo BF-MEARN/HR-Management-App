@@ -42,7 +42,6 @@ app.use(
 // Common routes
 // Allow anyone to login/register
 app.use('/api/user', userRouter);
-app.use('/api/onboarding', employeeOnboardingRouter);
 
 // HR specific routes
 app.use('/api/hr/documents', userAuth, requireHR, hrDocumentRouter);
@@ -53,12 +52,11 @@ app.use('/api/hr/housing', userAuth, requireHR, hrHousingRouter);
 app.use('/api/hr/visa', userAuth, requireHR, hrVisaRouter);
 
 // Employee specific routes
+app.use('/api/employee/onboarding', userAuth, requireEmployee, employeeOnboardingRouter);
+app.use('/api/employee/personal-info', userAuth, requireEmployee, personalInfoRouter);
+
 app.use('/api/employee/facilityReport', userAuth, requireEmployee, employeeFacilityReportRouter);
 app.use('/api/employee/housing', employeeHousingRouter);
-
-// Personal Info Routers (*reminder add middleware after)
-
-app.use('/api/personal-info', userAuth, requireEmployee, personalInfoRouter);
 
 // Fallback route
 app.get('*', (req, res) => {

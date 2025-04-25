@@ -2,73 +2,96 @@ import mongoose from 'mongoose';
 
 import Employee from '../models/Employee.js';
 import Housing from '../models/Housing.js';
-import RegistrationToken from '../models/RegistrationToken.js';
+import User from '../models/User.js';
 import VisaStatus from '../models/VisaStatus.js';
 
-export const validateRegistrationToken = async (req, res) => {
-  try {
-    const { tokenUUID } = req.params;
-
-    // not expired, not used
-    const token = await RegistrationToken.findOne({
-      token: tokenUUID,
-      expiresAt: { $gt: new Date() },
-      used: false,
+function updateVisaInfo(employee, inputVisaInfo) {
+  let visaInfo = employee.visaInfo;
+  if (!visaInfo) {
+    visaInfo = new VisaStatus({
+      employeeId: employee._id,
     });
-    if (!token) {
-      return res.status(404).json({ message: 'Registration token not found or invalid.' });
-    }
-    return res.status(200).json({ token });
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to validate employee registration token ', error });
+    employee.visaInfo = visaInfo._id;
   }
-};
 
-export const createNewEmployee = async (req, res) => {
+  visaInfo.set({
+    workAuthorization: inputVisaInfo?.workAuthorization,
+  });
+
+  if (inputVisaInfo?.optReceipt) {
+    visaInfo.set({
+      optReceipt: {
+        file: inputVisaInfo?.optReceipt.file,
+        status: 'Pending Approval',
+      },
+    });
+  }
+  return visaInfo;
+}
+
+export const acceptEmployeeOnboardingSubmission = async (req, res) => {
   try {
     const {
-      userId,
-      houseId,
-      visaInfo,
       firstName,
       lastName,
       middleName,
+      preferredName,
       profilePicture,
       ssn,
       dob,
-      gender,
-      isCitizenOrPR,
-      emergencyContacts,
-      contactInfo,
       address,
+      gender,
+      contactInfo,
+      isCitizenOrPR,
+      visaInfo,
+      driverLicense,
+      carInfo,
+      reference,
+      emergencyContacts,
     } = req.body;
 
-    const existingEmployee = await Employee.findOne({ ssn });
+    const user = await User.findById(req.user.id).populate({
+      path: 'employeeId',
+      populate: {
+        path: 'visaInfo',
+      },
+    });
+    let employee = user.employeeId;
 
-    if (existingEmployee) {
-      return res.status(400).json({ message: 'SSN already registered.' });
+    if (employee) {
+      if (employee.onboardingStatus != 'Rejected') {
+        return res.status(400).json({ message: 'You cannot make new submission yet.' });
+      }
+    } else {
+      employee = new Employee({
+        userId: user._id,
+      });
+      user.employeeId = employee._id;
     }
-
-    const newEmployee = new Employee({
-      userId,
-      houseId,
-      visaInfo,
+    employee.set({
       firstName,
       lastName,
       middleName,
+      preferredName,
       profilePicture,
       dob,
       ssn,
       gender,
       isCitizenOrPR,
-      emergencyContacts,
       contactInfo,
       address,
+      driverLicense,
+      carInfo,
+      reference,
+      emergencyContacts,
+      onboardingStatus: 'Pending',
     });
 
-    await newEmployee.save();
+    const updatedVisaInfo = await updateVisaInfo(employee, visaInfo);
+    user.isOnboardingSubmitted = true;
+    await Promise.all([employee.save(), updatedVisaInfo.save(), user.save()]);
 
-    res.status(201).json({ message: `Employee registration successful!` });
+    res.status(201).json({ message: `Onboard application submitted successfully!` });
   } catch (error) {
     console.error('Error creating new employee:', error);
     res.status(500).json({ message: 'Failed to post new employee information in system: ', error });
@@ -153,10 +176,8 @@ export const addResidentToHousing = async (req, res) => {
 
 export const getEmployeeData = async (req, res) => {
   try {
-    const { _id } = req.params;
-
+    const _id = req.user.employeeId;
     const employee = await Employee.findOne({ _id });
-
     if (!employee) {
       res.status(400).json({ message: 'employee could not be found with given _id' });
     }

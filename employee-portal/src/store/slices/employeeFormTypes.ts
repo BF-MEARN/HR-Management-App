@@ -1,3 +1,10 @@
+import { Contact } from './employeeTypes';
+
+export type UploadedFile = {
+  name: string;
+  url: string;
+};
+
 export type Gender = 'male' | 'female' | 'prefer_not_to_say';
 export interface PersonalInfoFormData {
   // Names
@@ -21,8 +28,7 @@ export interface PersonalInfoFormData {
   };
 
   // Profile
-  profilePictureFileName?: string; // actual file handled by component ref
-  profilePicturePreview?: string;
+  profilePicture?: UploadedFile;
 
   // Identity
   ssn: string; // ###-##-####
@@ -56,8 +62,7 @@ export interface DriverAndCarFormData {
   driverLicense: {
     number: string;
     expirationDate: string;
-    licenseFileName?: string;
-    licensePreview?: string;
+    license: UploadedFile;
   };
   hasCar: boolean;
   carInfo: {
@@ -67,9 +72,9 @@ export interface DriverAndCarFormData {
   };
 }
 
-const emptyLicenseEntry = { number: '', expirationDate: '' };
+export const emptyLicenseEntry = { number: '', expirationDate: '', license: { url: '', name: '' } };
 
-const emptyCarEntry = {
+export const emptyCarEntry = {
   make: '',
   model: '',
   color: '',
@@ -86,7 +91,7 @@ const citizenOrPermanentResidentTypes = {
   citizen: 'Citizen',
   green_card: 'Permanent Resident (Green Card)',
 };
-const foreignerTypes = { 'h1-b': 'H1-B', l2: 'L2', f1: 'F1 (CPT/OPT)', h4: 'H4', other: 'Other' };
+const foreignerTypes = { 'H1-B': 'H1-B', L2: 'L2', F1: 'F1 (CPT/OPT)', H4: 'H4', other: 'Other' };
 
 export const workAuthorizationCategories = {
   citizenOrPermanentResidentTypes,
@@ -101,32 +106,18 @@ export interface WorkAuthorizationFormData {
   isCitizenOrPermanentResident: boolean;
   authorizationType: WorkAuthorizationType;
   extraAuthInfo: {
-    f1DocumentName?: string;
-    f1DocumentPreview?: string;
+    optReceipt?: UploadedFile;
     visaTitle?: string;
-    startDate: string;
-    endDate: string;
+    startDate?: string;
+    endDate?: string;
   };
 }
 
 export const emptyWorkAuthorizationFormData: WorkAuthorizationFormData = {
   isCitizenOrPermanentResident: true,
   authorizationType: 'citizen',
-  extraAuthInfo: {
-    startDate: '',
-    endDate: '',
-  },
+  extraAuthInfo: {},
 };
-
-export interface Contact {
-  firstName: string;
-  lastName: string;
-  middleName?: string;
-
-  phone: string;
-  email: string;
-  relationship: string;
-}
 
 export const emptyContact: Contact = {
   firstName: '',
@@ -147,3 +138,55 @@ export const emptyContactFormData = {
   reference: emptyContact,
   emergencyContacts: [],
 };
+
+export interface OnboardingApplicationPayload {
+  firstName: string;
+  lastName: string;
+  middleName?: string;
+  preferredName?: string;
+  profilePicture?: string;
+  ssn: string;
+  dob: string;
+  address: {
+    building?: string;
+    street: string;
+    city: string;
+    state: string;
+    zip: string;
+  };
+  gender: 'male' | 'female' | 'prefer_not_to_say';
+  contactInfo: {
+    cellPhone: string;
+    workPhone?: string;
+  };
+
+  isCitizenOrPR: boolean;
+
+  visaInfo: {
+    workAuthorization: {
+      type: string;
+      startDate?: string;
+      endDate?: string;
+      otherTitle?: string;
+    };
+    optReceipt?: {
+      file?: string;
+    };
+  };
+
+  driverLicense?: {
+    number: string;
+    expirationDate: string;
+    file: string;
+  };
+
+  carInfo?: {
+    make: string;
+    model: string;
+    color: string;
+  };
+
+  reference?: Contact;
+
+  emergencyContacts: Contact[];
+}

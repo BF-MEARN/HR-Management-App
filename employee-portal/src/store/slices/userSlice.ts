@@ -23,34 +23,35 @@ export interface UserEntry {
 }
 
 export interface UserState {
-  entry: UserEntry | null;
-  status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  user: UserEntry | null;
+  status: 'idle' | 'pending' | 'succeeded' | 'failed';
   error?: string;
 }
 
-const initialState: UserState = { entry: null, status: 'idle' };
+const initialState: UserState = { user: null, status: 'idle' };
 
 const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<UserEntry | null>) => {
-      state.entry = action.payload;
+    setUser: (state, action: PayloadAction<UserEntry>) => {
+      state.user = action.payload;
+      state.status = 'succeeded';
     },
     resetUser: () => initialState,
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchMe.pending, (state) => {
-        state.status = 'loading';
+        state.status = 'pending';
       })
       .addCase(fetchMe.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.entry = action.payload['user'];
+        state.user = action.payload['user'] as UserEntry;
       })
       .addCase(fetchMe.rejected, (state, action) => {
         state.status = 'failed';
-        state.entry = null;
+        state.user = null;
         state.error = action.payload as string;
       });
   },

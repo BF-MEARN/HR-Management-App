@@ -11,13 +11,20 @@ import { api } from '../utils/utils';
 export default function LoginPage() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const user = useAppSelector((state) => state.user.entry);
+  const user = useAppSelector((state) => state.user.user);
+  const employeeOnboardingStatus = useAppSelector(
+    (state) => state.employee.employee?.onboardingStatus
+  );
 
   useEffect(() => {
     if (user) {
-      navigate('/onboard');
+      if (employeeOnboardingStatus === 'Approved') {
+        navigate('/personal-info');
+      } else {
+        navigate('/onboard');
+      }
     }
-  }, [navigate, user]);
+  }, [employeeOnboardingStatus, navigate, user]);
 
   const handleSubmit = async (form: AuthFormData) => {
     const res = await api('/user/login', {
