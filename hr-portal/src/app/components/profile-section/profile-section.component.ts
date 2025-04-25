@@ -18,6 +18,7 @@ export class ProfileSectionComponent {
   @Output() downloadDocumentEvent = new EventEmitter<any>();
   @Output() goToVisaStatusPageEvent = new EventEmitter<string>();
   @Output() feedbackChange = new EventEmitter<string>();
+  @Output() previewDocumentEvent = new EventEmitter<any>();
 
   showFullSSN = false;
 
@@ -34,6 +35,19 @@ export class ProfileSectionComponent {
       citizen: this.application?.isCitizenOrPR === true,
       'non-citizen': this.application?.isCitizenOrPR === false,
     };
+  }
+
+  getStatusIcon(): string {
+    switch (this.application?.onboardingStatus) {
+      case 'Pending':
+        return 'hourglass_empty';
+      case 'Approved':
+        return 'check_circle';
+      case 'Rejected':
+        return 'cancel';
+      default:
+        return 'help';
+    }
   }
 
   formatGender(gender: string | undefined): string {
@@ -68,5 +82,10 @@ export class ProfileSectionComponent {
   onFeedbackChange(value: string): void {
     this.feedback = value;
     this.feedbackChange.emit(value);
+  }
+
+
+  previewDocument(document: any): void {
+    this.previewDocumentEvent.emit(document);
   }
 }

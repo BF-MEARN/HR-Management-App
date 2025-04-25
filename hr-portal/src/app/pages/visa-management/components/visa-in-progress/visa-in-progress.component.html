@@ -1,0 +1,95 @@
+<div class="page-wrapper">
+  <div class="search-section">
+    <mat-form-field appearance="outline" class="search-bar">
+      <mat-label>Search employees</mat-label>
+      <input
+        matInput
+        placeholder="Search by name"
+        [(ngModel)]="searchQuery"
+        (input)="filterList()"
+      />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    <p class="count" *ngIf="!loading">Total Visa Statuses: {{ filteredStatuses.length }}</p>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading visa statuses...</p>
+  </div>
+
+  <div *ngIf="!loading" class="visa-table-container">
+    <table
+      mat-table
+      [dataSource]="filteredStatuses"
+      class="visa-table"
+      *ngIf="filteredStatuses.length > 0"
+    >
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let status">
+          {{ status.employeeId.firstName }} {{ status.employeeId.lastName }}
+        </td>
+      </ng-container>
+
+      <!-- Work Auth Column -->
+      <ng-container matColumnDef="workAuth">
+        <th mat-header-cell *matHeaderCellDef>Work Authorization</th>
+        <td mat-cell *matCellDef="let status">
+          {{ status.workAuthorization.type || 'Not provided' }}
+        </td>
+      </ng-container>
+
+      <!-- Dates Column -->
+      <ng-container matColumnDef="dates">
+        <th mat-header-cell *matHeaderCellDef>Valid Period</th>
+        <td mat-cell *matCellDef="let status">
+          {{ status.workAuthorization.startDate | date: 'mediumDate' }} -
+          {{ status.workAuthorization.endDate | date: 'mediumDate' }}
+        </td>
+      </ng-container>
+
+      <!-- Days Remaining Column -->
+      <ng-container matColumnDef="daysRemaining">
+        <th mat-header-cell *matHeaderCellDef>Days Remaining</th>
+        <td mat-cell *matCellDef="let status">
+          {{
+            getDaysRemaining(status.workAuthorization.startDate, status.workAuthorization.endDate)
+          }}
+        </td>
+      </ng-container>
+
+      <!-- Next Step Column -->
+      <ng-container matColumnDef="nextStep">
+        <th mat-header-cell *matHeaderCellDef>Next Step</th>
+        <td mat-cell *matCellDef="let status">
+          {{ getNextStep(status) }}
+        </td>
+      </ng-container>
+
+      <!-- Action Column -->
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef>Action</th>
+        <td mat-cell *matCellDef="let status">
+          <button
+            mat-stroked-button
+            color="primary"
+            class="view-visa-btn"
+            [routerLink]="['/visa', status._id]"
+          >
+            View Visa Status
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+
+  <p *ngIf="!loading && filteredStatuses.length === 0" class="no-results">
+    No visa statuses found matching your search criteria.
+  </p>
+</div>

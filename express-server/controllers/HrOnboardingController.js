@@ -1,7 +1,6 @@
+/* eslint-disable no-unused-vars */
 import Employee from '../models/Employee.js';
-// eslint-disable-next-line no-unused-vars
 import User from '../models/User.js';
-// eslint-disable-next-line no-unused-vars
 import VisaStatus from '../models/VisaStatus.js';
 
 /**
@@ -96,6 +95,21 @@ export const approveApplication = async (req, res) => {
 
     if (!employee) {
       return res.status(404).json({ message: 'Employee not found' });
+    }
+
+    // Auto-approve OPT Receipt if applicable
+    const visa = await VisaStatus.findOne({ employeeId: employee._id });
+
+    if (
+      visa &&
+      visa.workAuthorization.type === 'F1' &&
+      visa.optReceipt &&
+      visa.optReceipt.status === 'Pending Approval'
+    ) {
+      visa.optReceipt.status = 'Approved';
+      visa.optReceipt.feedback = '';
+      await visa.save();
+      console.log(`[Auto-Approve] OPT Receipt approved for F1 employee ${employee._id}`);
     }
 
     res.status(200).json({ message: 'Application approved', employee });

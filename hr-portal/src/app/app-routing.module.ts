@@ -38,6 +38,13 @@ const routes: Routes = [
       m => m.VisaManagementModule
     ) 
   },
+  { 
+    path: 'visa/:id',
+    canActivate: [AuthGuard], 
+    loadChildren: () => import('./pages/visa-management/visa-status-detail/visa-status-detail.module').then(
+      m => m.VisaStatusDetailModule
+    ) 
+  },
   {
     path: 'hiring',
     canActivate: [AuthGuard],

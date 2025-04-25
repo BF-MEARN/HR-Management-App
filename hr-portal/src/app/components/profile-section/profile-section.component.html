@@ -7,19 +7,6 @@
 </div>
 
 <div class="content-container">
-  <!-- Rejection Feedback (if applicable) -->
-  <mat-card
-    class="section-card feedback-card"
-    *ngIf="application?.onboardingStatus === 'Rejected' && application?.onboardingFeedback"
-  >
-    <mat-card-header>
-      <mat-card-title>Rejection Feedback</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <p>{{ application?.onboardingFeedback }}</p>
-    </mat-card-content>
-  </mat-card>
-
   <!-- Profile Card -->
   <mat-card class="section-card profile-card">
     <div class="profile-header">
@@ -34,10 +21,56 @@
         </div>
         <p class="sub-email">{{ application?.userId?.email }}</p>
       </div>
-      <mat-chip [ngClass]="statusClass" selected>
-        {{ application?.onboardingStatus }}
-      </mat-chip>
     </div>
+  </mat-card>
+
+  <!-- Application Status -->
+  <mat-card class="section-card">
+    <mat-card-header>
+      <mat-card-title>Application Status</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="status-container" [ngClass]="statusClass">
+        <mat-icon>{{ getStatusIcon() }}</mat-icon>
+        <div class="status-content">
+          <div class="status-title">{{ application?.onboardingStatus }}</div>
+          <div class="status-message" *ngIf="application?.onboardingStatus === 'Pending'">
+            This application is pending review. HR will evaluate the information and documents
+            provided.
+          </div>
+          <div class="status-message" *ngIf="application?.onboardingStatus === 'Approved'">
+            This application has been approved. The employee has completed the onboarding process.
+          </div>
+          <div class="status-message" *ngIf="application?.onboardingStatus === 'Rejected'">
+            This application has been rejected. Please review the feedback below.
+          </div>
+        </div>
+      </div>
+
+      <!-- Display rejection feedback inside the status card -->
+      <div
+        class="feedback-section"
+        *ngIf="application?.onboardingStatus === 'Rejected' && application?.onboardingFeedback"
+      >
+        <mat-divider></mat-divider>
+        <div class="feedback-content">
+          <h3>Rejection Feedback:</h3>
+          <p>{{ application?.onboardingFeedback }}</p>
+        </div>
+      </div>
+
+      <!-- Display approval feedback inside the status card if exists -->
+      <div
+        class="feedback-section"
+        *ngIf="application?.onboardingStatus === 'Approved' && application?.onboardingFeedback"
+      >
+        <mat-divider></mat-divider>
+        <div class="feedback-content">
+          <h3>Approval Comments:</h3>
+          <p>{{ application?.onboardingFeedback }}</p>
+        </div>
+      </div>
+    </mat-card-content>
   </mat-card>
 
   <!-- Personal Information -->
@@ -285,15 +318,24 @@
           </div>
         </div>
 
-        <button
-          mat-stroked-button
-          color="primary"
-          class="document-button"
-          (click)="downloadDocument(application?.driverLicense)"
-        >
-          <mat-icon>file_download</mat-icon>
-          View Driver's License
-        </button>
+        <div class="document-actions">
+          <button
+            mat-stroked-button
+            color="primary"
+            (click)="previewDocument(application?.driverLicense)"
+          >
+            <mat-icon>visibility</mat-icon>
+            Preview Document
+          </button>
+          <button
+            mat-stroked-button
+            color="accent"
+            (click)="downloadDocument(application?.driverLicense)"
+          >
+            <mat-icon>cloud_download</mat-icon>
+            Download
+          </button>
+        </div>
       </div>
       <ng-template #noDriverLicense>
         <div class="empty-section">

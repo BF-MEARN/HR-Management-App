@@ -1,1 +1,17 @@
-<p>visa-management works!</p>
+<div class="visa-page-container">
+  <h1 class="page-header">Visa Status Management</h1>
+
+  <mat-tab-group [(selectedIndex)]="tabIndex" (selectedIndexChange)="onTabChange($event)">
+    <mat-tab label="In Progress">
+      <div class="application-list-wrapper">
+        <app-visa-in-progress></app-visa-in-progress>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="All">
+      <div class="application-list-wrapper">
+        <app-visa-all></app-visa-all>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>
