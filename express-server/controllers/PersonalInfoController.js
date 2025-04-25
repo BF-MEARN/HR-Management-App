@@ -266,6 +266,8 @@ export const editEmergencyContact = async (req, res, next) => {
  */
 export const editDocuments = async (req, res, next) => {
   try {
+    console.log('req', req);
+
     const userId = req.user.id;
     const employee = await findEmployeeByAuthUser(userId);
 
@@ -356,7 +358,7 @@ export const editDocuments = async (req, res, next) => {
       i983FileResult = await putObject(file.data, key, file.mimetype);
       if (i983FileResult) {
         if (!visa.i983) visa.i983 = {};
-        visa.i983.file = optReceiptFileResult.key;
+        visa.i983.file = i983FileResult.key;
         visa.i983.status = 'Pending Approval';
       } else {
         console.warn(`I-983 upload failed for user ${userId}`);
