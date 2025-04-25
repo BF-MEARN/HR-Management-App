@@ -1,39 +1,107 @@
-<div class="home-content">
-  <h2>Welcome, HR!</h2>
-  <p>Logged in as: <strong>hr@example.com</strong></p>
-
-  <div class="dashboard-grid">
-    <div class="stats">
-      <mat-card *ngFor="let stat of dashboardStats" class="stat-card">
-        <mat-icon>{{ stat.icon }}</mat-icon>
-        <div>
-          <h3>{{ stat.value }}</h3>
-          <p>{{ stat.label }}</p>
-        </div>
-      </mat-card>
-    </div>
-
-    <div class="reminders">
-      <mat-card>
-        <h3>Reminders</h3>
-        <ul>
-          <li *ngFor="let task of reminders">
-            <mat-icon color="primary">check_circle</mat-icon>
-            {{ task }}
-          </li>
-        </ul>
-      </mat-card>
-    </div>
-
-    <div class="events">
-      <mat-card>
-        <h3>Upcoming Events</h3>
-        <ul>
-          <li *ngFor="let item of upcomingEvents">
-            <strong>{{ item.date }}</strong> — {{ item.event }}
-          </li>
-        </ul>
-      </mat-card>
+<div class="dashboard-container" *ngIf="!isLoading; else loadingTemplate">
+  <div class="dashboard-header">
+    <h1>HR Dashboard</h1>
+    <div class="user-greeting">
+      <span
+        >Welcome, <strong>{{ (user$ | async)?.username }}</strong></span
+      >
+      <button
+        mat-icon-button
+        color="primary"
+        (click)="refreshData()"
+        matTooltip="Refresh dashboard"
+      >
+        <mat-icon>refresh</mat-icon>
+      </button>
     </div>
   </div>
+
+  <!-- Error Alert -->
+  <mat-card class="error-card" *ngIf="hasError">
+    <mat-icon color="warn">error</mat-icon>
+    <p>{{ errorMessage }}</p>
+    <button mat-button color="primary" (click)="refreshData()">Try Again</button>
+  </mat-card>
+
+  <!-- Key Metrics -->
+  <div class="stats-container">
+    <mat-card
+      class="stat-card"
+      *ngFor="let stat of dashboardStats$ | async"
+      [ngStyle]="{ 'border-top': '4px solid ' + stat.color }"
+    >
+      <div class="stat-icon">
+        <mat-icon [ngStyle]="{ color: stat.color }">{{ stat.icon }}</mat-icon>
+      </div>
+      <div class="stat-content">
+        <h2 class="stat-value">{{ stat.value }}</h2>
+        <p class="stat-label">{{ stat.label }}</p>
+      </div>
+    </mat-card>
+  </div>
+
+  <!-- Main Dashboard Grid -->
+  <div class="dashboard-grid">
+    <!-- Tasks Requiring Attention -->
+    <mat-card class="task-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>assignment_late</mat-icon>
+        <mat-card-title>Requires Attention</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-list>
+          <ng-container *ngIf="(pendingTasks$ | async)?.length; else noTasks">
+            <mat-list-item *ngFor="let task of pendingTasks$ | async" [routerLink]="task.route">
+              <mat-icon matListItemIcon [ngClass]="'priority-' + task.priority">{{
+                task.icon
+              }}</mat-icon>
+              <div matListItemTitle>{{ task.title }}</div>
+              <button mat-icon-button matListItemMeta>
+                <mat-icon>chevron_right</mat-icon>
+              </button>
+            </mat-list-item>
+          </ng-container>
+          <ng-template #noTasks>
+            <div class="empty-state">
+              <mat-icon>done_all</mat-icon>
+              <p>No pending tasks requiring attention</p>
+            </div>
+          </ng-template>
+        </mat-list>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Recent Activity -->
+    <mat-card class="activity-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>history</mat-icon>
+        <mat-card-title>Recent Activity</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-list>
+          <ng-container *ngIf="(recentActivities$ | async)?.length; else noActivities">
+            <mat-list-item *ngFor="let activity of recentActivities$ | async">
+              <mat-icon matListItemIcon>{{ activity.icon }}</mat-icon>
+              <div matListItemTitle>{{ activity.message }}</div>
+              <div matListItemLine>{{ activity.timestamp | date: 'short' }}</div>
+            </mat-list-item>
+          </ng-container>
+          <ng-template #noActivities>
+            <div class="empty-state">
+              <mat-icon>notifications_off</mat-icon>
+              <p>No recent activities to display</p>
+            </div>
+          </ng-template>
+        </mat-list>
+      </mat-card-content>
+    </mat-card>
+  </div>
 </div>
+
+<!-- Loading Template -->
+<ng-template #loadingTemplate>
+  <div class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Loading dashboard data...</p>
+  </div>
+</ng-template>

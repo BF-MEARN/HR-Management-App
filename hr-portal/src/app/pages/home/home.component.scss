@@ -1,51 +1,219 @@
-.home-content {
+.dashboard-container {
   padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.dashboard-grid {
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 500;
+  }
+
+  .user-greeting {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+}
+
+// Stats cards
+.stats-container {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 24px;
-  margin-top: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .stat-card {
   display: flex;
-  align-items: center;
-  gap: 16px;
   padding: 16px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 
-  mat-icon {
-    font-size: 36px;
-    color: #3f51b5;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.12);
   }
 
-  h3 {
-    margin: 0;
-    font-size: 1.5rem;
+  .stat-icon {
+    margin-right: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    mat-icon {
+      font-size: 36px;
+      width: 36px;
+      height: 36px;
+    }
   }
 
-  p {
+  .stat-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .stat-value {
     margin: 0;
-    color: #666666;
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .stat-label {
+    margin: 0;
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 14px;
   }
 }
 
-.reminders,
-.events {
-  ul {
-    list-style: none;
-    padding: 0;
+// Main dashboard grid
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 24px;
+}
 
-    li {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin: 8px 0;
+// Tasks, Activity, and Quick Action cards
+.task-card,
+.activity-card,
+.quick-action-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 
-      mat-icon {
-        color: #4caf50;
-      }
+  mat-card-header {
+    margin-bottom: 16px;
+  }
+
+  mat-card-content {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 350px;
+  }
+}
+
+// Task priority indicators
+.priority-high {
+  color: #f44336;
+}
+
+.priority-medium {
+  color: #ff9800;
+}
+
+.priority-low {
+  color: #4caf50;
+}
+
+// Empty state styling
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  color: rgba(0, 0, 0, 0.5);
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    opacity: 0.6;
+  }
+
+  p {
+    text-align: center;
+    font-size: 16px;
+  }
+}
+
+// Quick actions grid
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+
+  button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 90px;
+    white-space: normal;
+    line-height: 1.2;
+    text-align: center;
+    padding: 12px;
+
+    mat-icon {
+      margin-bottom: 8px;
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
     }
+  }
+}
+
+// Error card
+.error-card {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  margin-bottom: 24px;
+  background-color: #ffebee;
+
+  mat-icon {
+    margin-right: 16px;
+  }
+
+  p {
+    flex: 1;
+    margin: 0;
+  }
+}
+
+// Loading container
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px;
+
+  p {
+    margin-top: 24px;
+    color: rgba(0, 0, 0, 0.6);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .stats-container {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-actions-grid {
+    grid-template-columns: 1fr 1fr;
   }
 }
