@@ -1,0 +1,122 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+import { TextFieldProps } from '@mui/material';
+import validator from 'validator';
+
+type ValidateType = 'email' | 'date' | 'phone' | 'ssn';
+
+export type FormField<T> = {
+  name: string;
+  get: () => T;
+  set: (v: T) => void;
+  extraValidate?: (value: T) => string | undefined;
+  required: boolean | (() => boolean);
+  readOnly: boolean;
+  type?: ValidateType;
+};
+
+export type StringFormField = FormField<string>;
+
+function validate(
+  value: string,
+  { extraValidate, required, type }: StringFormField
+): string | undefined {
+  const requiredValue = typeof required === 'function' ? required() : required;
+  const isEmpty = validator.isEmpty(value);
+  if (requiredValue && isEmpty) {
+    return 'This field is required.';
+  }
+
+  switch (type) {
+    case 'email':
+      if (!isEmpty && !validator.isEmail(value)) return 'Invalid email address.';
+      break;
+
+    case 'date':
+      if (!isEmpty && !validator.isDate(value)) return 'Invalid date format.';
+      break;
+
+    case 'phone':
+      if (!isEmpty && !validator.isMobilePhone(value, 'en-US')) return 'Invalid phone number.';
+      break;
+
+    case 'ssn':
+      if (!isEmpty && !/^\d{3}-\d{2}-\d{4}$/.test(value))
+        return 'SSN must be in ###-##-#### format.';
+      break;
+
+    default:
+      break;
+  }
+
+  return extraValidate ? extraValidate(value) : undefined;
+}
+
+type TextFieldPropsGenerator = (overrides?: Partial<TextFieldProps>) => TextFieldProps;
+
+export function useTextFieldProps(
+  field: StringFormField,
+  forceCheck: boolean = false,
+  updateErrorMap?: (key: string, error: string | undefined) => void
+): TextFieldPropsGenerator {
+  const [error, setError] = useState<string | undefined>();
+  const { name, get, set, required, readOnly } = field;
+
+  useEffect(() => {
+    if (forceCheck) {
+      const error = validate(get(), field);
+      setError(error);
+      if (updateErrorMap) {
+        updateErrorMap(name, error);
+      }
+    }
+    // return () => {
+    //   if (updateErrorMap) {
+    //     updateErrorMap(name, undefined);
+    //   }
+    // };
+  }, [field, forceCheck, get, name, updateErrorMap]);
+
+  const props: TextFieldPropsGenerator = useCallback(
+    (overrides) => {
+      const requiredValue = typeof required === 'function' ? required() : required;
+      return {
+        fullWidth: true,
+        name,
+        value: get(),
+        onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+          set(e.target.value);
+          const error = validate(e.target.value, field);
+          setError(error);
+          if (updateErrorMap) {
+            updateErrorMap(name, error);
+          }
+        },
+        error: !!error,
+        helperText: error,
+        required: requiredValue,
+        slotProps: {
+          input: { readOnly, ...overrides?.slotProps?.input },
+          ...overrides?.slotProps,
+        },
+        ...overrides,
+      };
+    },
+    [error, field, get, name, readOnly, required, set, updateErrorMap]
+  );
+
+  return props;
+}
+
+export function useErrorMap(statusCallBack: (value: boolean) => void) {
+  const errorMap = useRef<Record<string, string | undefined>>({});
+
+  const validateAll = () => Object.values(errorMap.current).every((error) => error === undefined);
+
+  const updateErrorMap = (key: string, error: string | undefined) => {
+    errorMap.current[key] = error;
+    statusCallBack(validateAll());
+  };
+
+  return updateErrorMap;
+}

@@ -19,14 +19,15 @@ import {
 import Box from '@mui/material/Box';
 
 import { useAppDispatch, useAppSelector } from '../store';
-import { setUser } from '../store/slices/userSlice';
+import { resetEmployee } from '../store/slices/employeeSlice';
+import { resetUser } from '../store/slices/userSlice';
 import { api } from '../utils/utils';
 
 const drawerWidth = 240;
 
 export default function NavDrawer() {
-  const userStore = useAppSelector((state) => state.user);
-  const user = userStore.entry;
+  const user = useAppSelector((state) => state.user.user);
+  const employee = useAppSelector((state) => state.employee.employee);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -42,9 +43,12 @@ export default function NavDrawer() {
     await api('/user/logout', {
       method: 'post',
     });
-    dispatch(setUser(null));
+    dispatch(resetUser());
+    dispatch(resetEmployee());
     navigate('/');
   };
+
+  const onboarded = employee && employee.onboardingStatus == 'Approved';
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -89,29 +93,37 @@ export default function NavDrawer() {
           </Card>
           {user && (
             <List>
-              <ListItem disablePadding>
-                <ListItemButton onClick={() => navigate('/onboard')}>
-                  <ListItemText primary="Onboard Application" />
-                </ListItemButton>
-              </ListItem>
-              <Divider />
-              <ListItem disablePadding>
-                <ListItemButton onClick={() => navigate('/personal-info')}>
-                  <ListItemText primary="Personal Information" />
-                </ListItemButton>
-              </ListItem>
-              <Divider />
-              <ListItem disablePadding>
-                <ListItemButton onClick={() => navigate('visa')}>
-                  <ListItemText primary="Visa Status" />
-                </ListItemButton>
-              </ListItem>
-              <Divider />
-              <ListItem disablePadding>
-                <ListItemButton onClick={() => navigate('housing')}>
-                  <ListItemText primary="Housing" />
-                </ListItemButton>
-              </ListItem>
+              {onboarded ? (
+                <>
+                  <ListItem disablePadding>
+                    <ListItemButton onClick={() => navigate('/personal-info')}>
+                      <ListItemText primary="Personal Information" />
+                    </ListItemButton>
+                  </ListItem>
+                  <Divider />
+                  <ListItem disablePadding>
+                    <ListItemButton onClick={() => navigate('visa')}>
+                      <ListItemText primary="Visa Status" />
+                    </ListItemButton>
+                  </ListItem>
+                  <Divider />
+                  <ListItem disablePadding>
+                    <ListItemButton onClick={() => navigate('housing')}>
+                      <ListItemText primary="Housing" />
+                    </ListItemButton>
+                  </ListItem>
+                </>
+              ) : (
+                <>
+                  {' '}
+                  <ListItem disablePadding>
+                    <ListItemButton onClick={() => navigate('/onboard')}>
+                      <ListItemText primary="Onboard Application" />
+                    </ListItemButton>
+                  </ListItem>
+                  <Divider />
+                </>
+              )}
             </List>
           )}
         </Drawer>

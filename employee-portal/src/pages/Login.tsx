@@ -11,7 +11,7 @@ import { api } from '../utils/utils';
 export default function LoginPage() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const user = useAppSelector((state) => state.user.entry);
+  const user = useAppSelector((state) => state.user.user);
 
   useEffect(() => {
     if (user) {

@@ -32,18 +32,22 @@ async function updateVisaInfo(employee, inputVisaInfo) {
 export const acceptEmployeeOnboardingSubmission = async (req, res) => {
   try {
     const {
-      visaInfo,
       firstName,
       lastName,
       middleName,
+      preferredName,
       profilePicture,
       ssn,
       dob,
-      gender,
-      isCitizenOrPR,
-      emergencyContacts,
-      contactInfo,
       address,
+      gender,
+      contactInfo,
+      isCitizenOrPR,
+      visaInfo,
+      driverLicense,
+      carInfo,
+      reference,
+      emergencyContacts,
     } = req.body;
 
     const user = await User.findById(req.user.id).populate({
@@ -53,7 +57,6 @@ export const acceptEmployeeOnboardingSubmission = async (req, res) => {
       },
     });
     let employee = user.employeeId;
-    console.log(employee);
 
     if (employee) {
       if (employee.onboardingStatus != 'Rejected') {
@@ -69,14 +72,18 @@ export const acceptEmployeeOnboardingSubmission = async (req, res) => {
       firstName,
       lastName,
       middleName,
+      preferredName,
       profilePicture,
       dob,
       ssn,
       gender,
       isCitizenOrPR,
-      emergencyContacts,
       contactInfo,
       address,
+      driverLicense,
+      carInfo,
+      reference,
+      emergencyContacts,
       onboardingStatus: 'Pending',
     });
 

@@ -13,75 +13,128 @@ import {
 
 import { useAppDispatch, useAppSelector } from '../../store';
 import { updateContacts } from '../../store/slices/employeeFormSlice';
-import { Contact, emptyContact } from '../../store/slices/employeeFormTypes';
+import { emptyContact } from '../../store/slices/employeeFormTypes';
+import { Contact } from '../../store/slices/employeeTypes';
+import { useErrorMap, useTextFieldProps } from '../useTextFieldProps';
+import { EmployeeFormProps } from './formProps';
 
 function ContactForm({
   contact,
   updateContact,
+  onFormStatusChange,
+  forceCheck,
+  readOnly = false,
 }: {
   contact: Contact;
   updateContact: (patch: Partial<Contact>) => void;
-}) {
+} & EmployeeFormProps) {
+  const updateErrorMap = useErrorMap(onFormStatusChange);
+
+  const firstNameProps = useTextFieldProps(
+    {
+      name: 'firstName',
+      get: () => contact.firstName ?? '',
+      set: (v) => updateContact({ firstName: v }),
+      required: true,
+      readOnly,
+    },
+    forceCheck,
+    updateErrorMap
+  );
+
+  const lastNameProps = useTextFieldProps(
+    {
+      name: 'lastName',
+      get: () => contact.lastName ?? '',
+      set: (v) => updateContact({ lastName: v }),
+      required: true,
+      readOnly,
+    },
+    forceCheck,
+    updateErrorMap
+  );
+
+  const middleNameProps = useTextFieldProps(
+    {
+      name: 'middleName',
+      get: () => contact.middleName ?? '',
+      set: (v) => updateContact({ middleName: v }),
+      required: false,
+      readOnly,
+    },
+    forceCheck,
+    updateErrorMap
+  );
+
+  const cellPhoneProps = useTextFieldProps(
+    {
+      name: 'cellPhone',
+      get: () => contact.phone ?? '',
+      set: (v) => updateContact({ phone: v }),
+      required: true,
+      type: 'phone',
+      readOnly,
+    },
+    forceCheck,
+    updateErrorMap
+  );
+
+  const emailProps = useTextFieldProps(
+    {
+      name: 'email',
+      get: () => contact.email ?? '',
+      set: (v) => updateContact({ email: v }),
+      required: true,
+      type: 'email',
+      readOnly,
+    },
+    forceCheck,
+    updateErrorMap
+  );
+
+  const relationshipProps = useTextFieldProps(
+    {
+      name: 'relationship',
+      get: () => contact.relationship ?? '',
+      set: (v) => updateContact({ relationship: v }),
+      required: true,
+      readOnly,
+    },
+    forceCheck,
+    updateErrorMap
+  );
+
   return (
     <Grid container spacing={2}>
       <Grid size={{ xs: 12, sm: 4 }}>
-        <TextField
-          label="First Name"
-          required
-          fullWidth
-          value={contact.firstName}
-          onChange={(e) => updateContact({ firstName: e.target.value })}
-        />
+        <TextField label="First Name" {...firstNameProps()} />
       </Grid>
       <Grid size={{ xs: 12, sm: 4 }}>
-        <TextField
-          label="Last Name"
-          required
-          fullWidth
-          value={contact.lastName}
-          onChange={(e) => updateContact({ lastName: e.target.value })}
-        />
+        <TextField label="Last Name" {...lastNameProps()} />
       </Grid>
       <Grid size={{ xs: 12, sm: 4 }}>
-        <TextField
-          label="Middle Name"
-          fullWidth
-          value={contact.middleName}
-          onChange={(e) => updateContact({ middleName: e.target.value })}
-        />
+        <TextField label="Middle Name" {...middleNameProps()} />
       </Grid>
       <Grid size={{ xs: 12, sm: 6 }}>
-        <TextField
-          label="Cell Phone"
-          required
-          fullWidth
-          value={contact.phone}
-          onChange={(e) => updateContact({ phone: e.target.value })}
-        />
+        <TextField label="Cell Phone" {...cellPhoneProps()} />
       </Grid>
       <Grid size={{ xs: 12, sm: 6 }}>
-        <TextField
-          label="Email"
-          required
-          fullWidth
-          value={contact.email}
-          onChange={(e) => updateContact({ email: e.target.value })}
-        />
+        <TextField label="Email" {...emailProps()} />
       </Grid>
       <Grid size={{ xs: 12 }}>
-        <TextField
-          label="Relationship"
-          required
-          fullWidth
-          value={contact.relationship}
-          onChange={(e) => updateContact({ relationship: e.target.value })}
-        />
+        <TextField label="Relationship" {...relationshipProps()} />
       </Grid>
     </Grid>
   );
 }
 
-export default function ReferenceAndEmergencyContactForm() {
+export type ReferenceAndEmergencyContactFormProps = EmployeeFormProps;
+
+export default function ReferenceAndEmergencyContactForm(
+  props: ReferenceAndEmergencyContactFormProps
+) {
+  const { readOnly } = props;
+
   const formData = useAppSelector((state) => state.employeeForm.contacts);
   const dispatch = useAppDispatch();
 
@@ -91,6 +144,7 @@ export default function ReferenceAndEmergencyContactForm() {
     newArray[index] = patchedContact;
     dispatch(updateContacts({ emergencyContacts: newArray }));
   };
+
   const spliceEmergencyContact = (index: number) => {
     const newArray = [
       ...formData.emergencyContacts.slice(0, index),
@@ -112,6 +166,7 @@ export default function ReferenceAndEmergencyContactForm() {
         control={
           <Checkbox
             checked={formData.hasReference}
+            readOnly={readOnly}
             onChange={(e) => dispatch(updateContacts({ hasReference: e.target.checked }))}
           />
         }
@@ -126,6 +181,7 @@ export default function ReferenceAndEmergencyContactForm() {
             <ContactForm
               contact={formData.reference!}
               updateContact={(e) => dispatch(updateContacts({ reference: e }))}
+              {...props}
             />
           </CardContent>
         </Card>
@@ -146,16 +202,17 @@ export default function ReferenceAndEmergencyContactForm() {
             <ContactForm
               contact={contact}
               updateContact={(updated) => updateEmergencyContact(i, updated)}
+              {...props}
             />
           </CardContent>
           <CardActions>
-            <Button size="small" onClick={() => spliceEmergencyContact(i)}>
+            <Button size="small" disabled={readOnly} onClick={() => spliceEmergencyContact(i)}>
               Remove
             </Button>
           </CardActions>
         </Card>
       ))}
-      <Button sx={{ mt: 1 }} onClick={addNewEmergencyContact}>
+      <Button sx={{ mt: 1 }} disabled={readOnly} onClick={addNewEmergencyContact}>
         Add contact
       </Button>
     </Box>
