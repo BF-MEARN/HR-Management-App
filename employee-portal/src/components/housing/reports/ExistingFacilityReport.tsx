@@ -11,6 +11,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Stack,
   TextField,
   Typography,
 } from '@mui/material';
@@ -161,22 +162,24 @@ const ExistingFacilityReport = ({ report }: { report: FacilityReportEntry }) => 
       >
         <DialogTitle>Edit Report</DialogTitle>
         <DialogContent>
-          <TextField
-            sx={{ mt: 1 }}
-            label="Title"
-            name="title"
-            value={currTitle}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-          <TextField
-            label="Description"
-            name="description"
-            value={currDescription}
-            onChange={(e) => setDescription(e.target.value)}
-            fullWidth
-            required
-          />
+          <Stack gap={2}>
+            <TextField
+              sx={{ mt: 1 }}
+              label="Title"
+              name="title"
+              value={currTitle}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
+            <TextField
+              label="Description"
+              name="description"
+              value={currDescription}
+              onChange={(e) => setDescription(e.target.value)}
+              fullWidth
+              required
+            />
+          </Stack>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCancel}>Cancel</Button>
