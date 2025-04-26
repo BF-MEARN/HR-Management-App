@@ -1,37 +1,37 @@
 import React, { useState } from 'react';
 
 import { Button, TextField } from '@mui/material';
-import { v4 as randomId } from 'uuid';
 
-import { Report } from '../../../pages/Housing';
+import { useAppDispatch } from '../../../store';
+import { addComment } from '../../../store/slices/facilityReportSlice';
+// import { v4 as randomId } from 'uuid';
 
-interface CommentFormProps {
-  reportIndex: number;
-  setReports: React.Dispatch<React.SetStateAction<Report[]>>;
-}
+// import { Report } from '../../../pages/Housing';
 
-export default function CommentForm({ reportIndex, setReports }: CommentFormProps) {
+import { api } from '../../../utils/utils';
+
+export default function CommentForm({ reportId, status }: { reportId: string; status: string }) {
   const [create, setCreate] = useState<boolean>(false);
   const [description, setDescription] = useState<string>('');
+
+  const dispatch = useAppDispatch();
 
   const handleCancel = () => {
     setCreate(() => false);
     setDescription('');
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setReports((prevReports) => {
-      const newReports = [...prevReports];
-      const newComment = {
-        id: randomId(),
-        description,
-        timestamp: new Date(),
-      };
-      newReports[reportIndex].comments = [...newReports[reportIndex].comments];
-      newReports[reportIndex].comments.push(newComment);
-      return newReports;
+    const res = await api(`/employee/facilityReport/${reportId}/comments`, {
+      method: 'POST',
+      body: JSON.stringify({
+        commentDescription: description,
+      }),
     });
+    const { newComment, commenter } = await res.json();
+    newComment.createdBy = commenter;
+    dispatch(addComment({ reportId, newComment }));
     handleCancel();
   };
 
@@ -41,23 +41,27 @@ export default function CommentForm({ reportIndex, setReports }: CommentFormProp
 
   return (
     <>
-      {create ? (
-        <form onSubmit={(e) => handleSubmit(e)}>
-          <TextField
-            label="Description"
-            name="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            fullWidth
-            required
-          />
-          <Button type="button" onClick={handleCancel}>
-            Cancel
-          </Button>
-          <Button type="submit">Submit</Button>
-        </form>
-      ) : (
-        <Button onClick={handleTurnOnCreate}>Reply</Button>
+      {status !== 'Closed' && (
+        <>
+          {create ? (
+            <form onSubmit={(e) => handleSubmit(e)}>
+              <TextField
+                label="Description"
+                name="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                fullWidth
+                required
+              />
+              <Button type="button" onClick={handleCancel}>
+                Cancel
+              </Button>
+              <Button type="submit">Submit</Button>
+            </form>
+          ) : (
+            <Button onClick={handleTurnOnCreate}>Reply</Button>
+          )}
+        </>
       )}
     </>
   );

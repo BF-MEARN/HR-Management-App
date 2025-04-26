@@ -1,35 +1,30 @@
+import { useState } from 'react';
+
 import { Button, Paper, TextField } from '@mui/material';
-import { v4 as randomId } from 'uuid';
 
-import { Report } from '../../../pages/Housing';
+import { useAppDispatch } from '../../../store';
+import { createReport } from '../../../store/slices/facilityReportSlice';
+import { api } from '../../../utils/utils';
 
-interface ExistingFacilityReportFormProps {
-  formTitle: string;
-  setFormTitle: React.Dispatch<React.SetStateAction<string>>;
-  formDescription: string;
-  setFormDescription: React.Dispatch<React.SetStateAction<string>>;
-  setReports: React.Dispatch<React.SetStateAction<Report[]>>;
-}
+export default function FacilityReportForm({ houseId }: { houseId: string }) {
+  const [formTitle, setFormTitle] = useState<string>('');
+  const [formDescription, setFormDescription] = useState<string>('');
 
-export default function FacilityReportForm({
-  formTitle,
-  setFormTitle,
-  formDescription,
-  setFormDescription,
-  setReports,
-}: ExistingFacilityReportFormProps) {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const dispatch = useAppDispatch();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setReports((prevReports: Report[]): Report[] => [
-      ...prevReports,
-      {
-        id: randomId(),
+    const res = await api(`/employee/facilityReport/house/${houseId}/create`, {
+      method: 'POST',
+      body: JSON.stringify({
         title: formTitle,
         description: formDescription,
-        timeframe: new Date(),
-        comments: [],
-      },
-    ]);
+      }),
+    });
+    const {
+      facility_report: { _id, title, description, status, comments, createdAt, updatedAt },
+    } = await res.json();
+    dispatch(createReport({ _id, title, description, status, comments, createdAt, updatedAt }));
     setFormTitle('');
     setFormDescription('');
   };

@@ -18,7 +18,7 @@ const FacilityReportSchema = new Schema(
         createdBy: {
           type: mongoose.Schema.Types.ObjectId,
           // Changed ref from FacilityReport to User
-          ref: 'User',
+          ref: 'Employee',
         },
         description: { type: String },
         timestamp: { type: Date },

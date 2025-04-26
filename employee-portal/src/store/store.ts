@@ -10,7 +10,7 @@ export const store = configureStore({
     employeeForm: employeeFormReducer,
     user: userReducer,
     housing: housingReducer,
-    facilityReport: facilityReportReducer,
+    facilityReports: facilityReportReducer,
   },
 });
 

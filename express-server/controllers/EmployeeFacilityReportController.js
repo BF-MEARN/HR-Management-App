@@ -1,6 +1,5 @@
 import Employee from '../models/Employee.js';
 import FacilityReport from '../models/FacilityReport.js';
-import User from '../models/User.js';
 
 /**
  * Helper Function
@@ -31,14 +30,10 @@ export const getCurrentUserFacilityReportsByHouseId = async (req, res) => {
       houseId,
       employeeId,
     })
-      .select('title description status comments')
+      .select('title description status comments createdAt updatedAt')
       .populate({
         path: 'comments.createdBy',
-        select: 'employeeId -_id',
-        populate: {
-          path: 'employeeId',
-          select: 'preferredName firstName middleName lastName -_id',
-        },
+        select: 'preferredName firstName middleName lastName -_id',
       });
 
     res.status(200).json(facilityReports);
@@ -218,7 +213,7 @@ export const addCommentOnFacilityReport = async (req, res) => {
 
     const { employeeId } = facilityReport;
     const { commentDescription } = req.body;
-    const newComment = {
+    let newComment = {
       createdBy: employeeId,
       description: commentDescription,
       timestamp: new Date(),
@@ -227,10 +222,16 @@ export const addCommentOnFacilityReport = async (req, res) => {
     facilityReport.comments.push(newComment);
     facilityReport.status = 'In Progress';
     await facilityReport.save();
+    newComment = facilityReport.comments[facilityReport.comments.length - 1];
+
+    const findCommenter = await Employee.findById(employeeId).select(
+      'preferredName firstName lastName middleName -_id'
+    );
 
     res.status(200).json({
       message: 'Successfully added a comment on the Facility Report!',
-      facilityReport,
+      newComment,
+      commenter: findCommenter,
     });
   } catch (error) {
     res
@@ -282,12 +283,14 @@ export const updateCommentOnFacilityReport = async (req, res) => {
     const { description: oldDescription } = existingComment;
     const { newDescription } = req.body;
     existingComment.description = newDescription;
+    existingComment.timestamp = new Date();
     await facilityReport.save();
 
     res.status(200).json({
       message: 'Successfully updated the comment',
       oldDescription,
       newDescription,
+      newTimestamp: existingComment.timestamp,
     });
   } catch (error) {
     res.status(500).json({ message: 'Failed to update the comment', error: error.message });

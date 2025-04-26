@@ -2,44 +2,54 @@ import { FormEvent, useState } from 'react';
 
 import { Button, TextField } from '@mui/material';
 
-import { Comment, Report } from '../../../pages/Housing';
+import { useAppDispatch } from '../../../store';
+import { Comment, deleteComment, updateComment } from '../../../store/slices/facilityReportSlice';
+import { api } from '../../../utils/utils';
 
-interface CommentProps {
+export default function ExistingComment({
+  reportId,
+  comment,
+  status,
+}: {
+  reportId: string;
   comment: Comment;
-  index: number;
-  reportIndex: number;
-  setReports: React.Dispatch<React.SetStateAction<Report[]>>;
-}
-
-export default function ExistingComment({ comment, index, reportIndex, setReports }: CommentProps) {
+  status: string;
+}) {
   const [currDescription, setCurrDescription] = useState<string>(comment.description);
   const [edit, setEdit] = useState<boolean>(false);
-  const [isEdited, setIsEdited] = useState<boolean>(false);
+
+  const commentTimestamp = comment && comment.timestamp && new Date(comment.timestamp);
+
+  const dispatch = useAppDispatch();
 
   const handleCancel = () => {
     setEdit(() => false);
     setCurrDescription(() => comment.description);
   };
 
-  const handleDelete = () => {
-    setReports((prevReports) => {
-      const newReports = [...prevReports];
-      newReports[reportIndex].comments = [...newReports[reportIndex].comments];
-      newReports[reportIndex].comments.splice(index, 1);
-      return newReports;
+  const handleDelete = async () => {
+    const res = await api(`/employee/facilityReport/${reportId}/comments/${comment._id}/delete`, {
+      method: 'DELETE',
     });
+    const {
+      existingComment: { _id: commentId },
+    } = await res.json();
+    dispatch(deleteComment({ reportId, commentId }));
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setReports((prevReports) => {
-      const newReports = [...prevReports];
-      newReports[reportIndex].comments = [...newReports[reportIndex].comments];
-      newReports[reportIndex].comments[index].description = currDescription;
-      return newReports;
+    const res = await api(`/employee/facilityReport/${reportId}/comments/${comment._id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        newDescription: currDescription,
+      }),
     });
+
+    const { newDescription, newTimestamp } = await res.json();
+    console.log(newDescription, newTimestamp);
+    dispatch(updateComment({ reportId, commentId: comment._id, newDescription, newTimestamp }));
     setEdit(() => false);
-    setIsEdited(() => true);
   };
 
   const handleTurnOnEdit = () => {
@@ -48,34 +58,45 @@ export default function ExistingComment({ comment, index, reportIndex, setReport
 
   return (
     <>
-      {comment && comment.timestamp && (
-        <div style={{ fontStyle: 'italic' }}>
-          {comment.timestamp.toLocaleDateString()}, {comment.timestamp.toLocaleTimeString('en-GB')}{' '}
-          {isEdited && '(edited)'}
+      {commentTimestamp && (
+        <div style={{ fontStyle: 'italic', marginTop: '40px' }}>
+          {commentTimestamp.toLocaleDateString()}, {commentTimestamp.toLocaleTimeString()}
         </div>
       )}
 
-      {!edit ? (
+      {comment && comment.createdBy && (
+        <h4>
+          {comment.createdBy.firstName} {comment.createdBy.lastName} commented:
+        </h4>
+      )}
+
+      {status !== 'Closed' ? (
         <>
-          <p>{currDescription}</p>
-          <Button onClick={handleDelete}>Delete</Button>
-          <Button onClick={handleTurnOnEdit}>Edit</Button>
+          {!edit ? (
+            <>
+              <p style={{ marginLeft: '20px' }}>{currDescription}</p>
+              <Button onClick={handleDelete}>Delete</Button>
+              <Button onClick={handleTurnOnEdit}>Edit</Button>
+            </>
+          ) : (
+            <form onSubmit={(e) => handleSubmit(e)}>
+              <TextField
+                label="Description"
+                name="description"
+                value={currDescription}
+                onChange={(e) => setCurrDescription(e.target.value)}
+                fullWidth
+                required
+              />
+              <Button type="button" onClick={handleCancel}>
+                Cancel
+              </Button>
+              <Button type="submit">Submit</Button>
+            </form>
+          )}
         </>
       ) : (
-        <form onSubmit={(e) => handleSubmit(e)}>
-          <TextField
-            label="Description"
-            name="description"
-            value={currDescription}
-            onChange={(e) => setCurrDescription(e.target.value)}
-            fullWidth
-            required
-          />
-          <Button type="button" onClick={handleCancel}>
-            Cancel
-          </Button>
-          <Button type="submit">Submit</Button>
-        </form>
+        <p style={{ marginLeft: '20px' }}>{currDescription}</p>
       )}
     </>
   );

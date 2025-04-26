@@ -1,35 +1,28 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-interface Comment {
+export interface Comment {
   _id: string;
   timestamp: Date;
   description: string;
   createdBy: {
-    employeeId: {
-      firstName: string;
-      lastName: string;
-      middleName?: string;
-      preferredName?: string;
-    };
+    firstName: string;
+    lastName: string;
+    middleName?: string;
+    preferredName?: string;
   };
 }
 
-interface FacilityReportEntry {
+export interface FacilityReportEntry {
   _id: string;
   title: string;
   description: string;
   status: string;
   comments: Comment[];
+  createdAt: Date;
   updatedAt: Date;
 }
 
-interface FacilityReportState {
-  facilityReports: FacilityReportEntry[];
-}
-
-const initialState: FacilityReportState = {
-  facilityReports: [],
-};
+const initialState: FacilityReportEntry[] = [];
 
 interface EditReportPayload {
   reportId: string;
@@ -63,46 +56,51 @@ const facilityReportSlice = createSlice({
   name: 'facilityReport',
   initialState,
   reducers: {
-    getAllMyReports: (state, action: PayloadAction<FacilityReportEntry[]>) => {
-      state.facilityReports = action.payload;
+    getAllMyReports: (_, action: PayloadAction<FacilityReportEntry[]>) => {
+      return action.payload;
     },
     createReport: (state, action: PayloadAction<FacilityReportEntry>) => {
-      state.facilityReports.push(action.payload);
+      state.push(action.payload);
     },
     updateReport: (state, action: PayloadAction<EditReportPayload>) => {
       const { reportId, newTitle, newDescription, updatedAt } = action.payload;
-      const findReportIndex = state.facilityReports.findIndex((report) => report._id === reportId);
-      const reportToUpdate = state.facilityReports[findReportIndex];
-      Object.assign(reportToUpdate, { title: newTitle, description: newDescription, updatedAt });
+      const findReportIndex = state.findIndex((report) => report._id === reportId);
+      const reportToUpdate = state[findReportIndex];
+      Object.assign(reportToUpdate, {
+        title: newTitle,
+        description: newDescription,
+        updatedAt,
+      });
     },
     deleteReport: (state, action: PayloadAction<DeleteOrCloseReportPayload>) => {
       const { reportId } = action.payload;
-      const findReportIndex = state.facilityReports.findIndex((report) => report._id === reportId);
-      state.facilityReports.splice(findReportIndex, 1);
+      const findReportIndex = state.findIndex((report) => report._id === reportId);
+      state.splice(findReportIndex, 1);
     },
     closeReport: (state, action: PayloadAction<DeleteOrCloseReportPayload>) => {
       const { reportId } = action.payload;
-      const findReportIndex = state.facilityReports.findIndex((report) => report._id === reportId);
-      state.facilityReports[findReportIndex].status = 'Closed';
+      const findReportIndex = state.findIndex((report) => report._id === reportId);
+      state[findReportIndex].status = 'Closed';
     },
     addComment: (state, action: PayloadAction<addCommentPayload>) => {
       const { reportId, newComment } = action.payload;
-      const findReportIndex = state.facilityReports.findIndex((report) => report._id === reportId);
-      state.facilityReports[findReportIndex].comments.push(newComment);
+      const findReportIndex = state.findIndex((report) => report._id === reportId);
+      state[findReportIndex].comments.push(newComment);
+      state[findReportIndex].status = 'In Progress';
     },
     updateComment: (state, action: PayloadAction<updateCommentPayload>) => {
       const { reportId, commentId, newDescription, newTimestamp } = action.payload;
-      const findReportIndex = state.facilityReports.findIndex((report) => report._id === reportId);
-      const findCommentIndex = state.facilityReports[findReportIndex].comments.findIndex(
+      const findReportIndex = state.findIndex((report) => report._id === reportId);
+      const findCommentIndex = state[findReportIndex].comments.findIndex(
         (comment) => comment._id === commentId
       );
-      const commentToUpdate = state.facilityReports[findReportIndex].comments[findCommentIndex];
+      const commentToUpdate = state[findReportIndex].comments[findCommentIndex];
       Object.assign(commentToUpdate, { description: newDescription, timestamp: newTimestamp });
     },
     deleteComment: (state, action: PayloadAction<deleteCommentPayload>) => {
       const { reportId, commentId } = action.payload;
-      const findReportIndex = state.facilityReports.findIndex((report) => report._id === reportId);
-      const commentList = state.facilityReports[findReportIndex].comments;
+      const findReportIndex = state.findIndex((report) => report._id === reportId);
+      const commentList = state[findReportIndex].comments;
       const findCommentIndex = commentList.findIndex((comment) => comment._id === commentId);
       commentList.splice(findCommentIndex, 1);
     },

@@ -1,58 +1,81 @@
 import { memo, useState } from 'react';
 
-import { Button, TextField } from '@mui/material';
+import { Box, Button, MenuItem, Modal, Select, TextField } from '@mui/material';
 
-import { Comment, Report } from '../../../pages/Housing';
+import { useAppDispatch } from '../../../store';
+import {
+  FacilityReportEntry,
+  closeReport,
+  deleteReport,
+  updateReport,
+} from '../../../store/slices/facilityReportSlice';
+import { api } from '../../../utils/utils';
 import CommentSection from '../comments/CommentSection';
 
-interface ExistingFacilityReportProps {
-  index: number;
-  title: string;
-  description: string;
-  timeframe: Date;
-  comments: Comment[];
-  setReports: React.Dispatch<React.SetStateAction<Report[]>>;
-}
-
-const ExistingFacilityReport = ({
-  index,
-  title,
-  description,
-  timeframe,
-  comments,
-  setReports,
-}: ExistingFacilityReportProps) => {
-  const [currTitle, setTitle] = useState(title);
-  const [currDescription, setDescription] = useState(description);
+const ExistingFacilityReport = ({ report }: { report: FacilityReportEntry }) => {
+  const [currTitle, setTitle] = useState(report.title);
+  const [currDescription, setDescription] = useState(report.description);
   const [edit, setEdit] = useState(false);
-  const [isEdited, setIsEdited] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  const reportTimestamp = report && report.updatedAt && new Date(report.updatedAt);
+
+  const dispatch = useAppDispatch();
 
   const handleCancel = () => {
     setEdit(() => false);
-    setTitle(() => title);
-    setDescription(() => description);
+    setTitle(() => report.title);
+    setDescription(() => report.description);
   };
 
-  const handleDelete = (index: number) => {
-    setReports((prevReports) => {
-      const splicedReports = [...prevReports];
-      splicedReports.splice(index, 1);
-      console.log(splicedReports);
-      return splicedReports;
+  const handleClose = () => {
+    setOpen(() => false);
+  };
+
+  const handleCloseReport = async () => {
+    api(`/employee/facilityReport/${report._id}/close`);
+    dispatch(closeReport({ reportId: report._id }));
+  };
+
+  const handleDelete = async () => {
+    const res = await api(`/employee/facilityReport/${report._id}/delete`, {
+      method: 'DELETE',
     });
+    if (res.ok) {
+      const {
+        facilityReport: { _id: reportId },
+      } = await res.json();
+      dispatch(deleteReport({ reportId }));
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>, index: number) => {
+  const handleOpen = () => {
+    setOpen(() => true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setReports((prevReports) => {
-      const editedReports = [...prevReports];
-      editedReports[index].title = currTitle;
-      editedReports[index].description = currDescription;
-      editedReports[index].timeframe = new Date();
-      return editedReports;
+    const res = await api(`/employee/facilityReport/${report._id}/update`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        newTitle: currTitle,
+        newDescription: currDescription,
+      }),
     });
+    const {
+      facilityReport: { _id, updatedAt },
+      newTitle,
+      newDescription,
+    } = await res.json();
+    dispatch(
+      updateReport({
+        reportId: _id,
+        newTitle,
+        newDescription,
+        updatedAt,
+      })
+    );
     setEdit(() => false);
-    setIsEdited(() => true);
   };
 
   const handleTurnOnEdit = () => {
@@ -67,20 +90,96 @@ const ExistingFacilityReport = ({
       {!edit ? (
         // UnEdited Mode
         <>
-          {timeframe && (
+          {report && report.createdAt && report.updatedAt && reportTimestamp && (
             <div style={{ fontStyle: 'italic' }}>
-              {!isEdited ? 'Created' : 'Edited'} on {timeframe.toLocaleDateString()},{' '}
-              {timeframe.toLocaleTimeString('en-GB')}
+              {report.createdAt.toString() === report.updatedAt.toString() ? 'Created' : 'Edited'}{' '}
+              on {reportTimestamp.toLocaleDateString()}, {reportTimestamp.toLocaleTimeString()}
             </div>
           )}
-          <h2>{currTitle}</h2>
+          <h2>
+            {currTitle}
+            {report.status !== 'Closed' ? (
+              <>
+                <Select value={report.status} sx={{ marginLeft: '20px' }}>
+                  <MenuItem value={report.status}>{report.status}</MenuItem>
+                  <MenuItem value={'Closed'} onClick={handleOpen}>
+                    Closed
+                  </MenuItem>
+                </Select>
+
+                <Modal open={open} onClose={handleClose}>
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      aspectRatio: 1 / 1,
+                      width: 400,
+                      bgcolor: 'rgb(18, 18, 18)',
+                      color: 'white',
+                      border: '2px solid #000',
+                      borderRadius: 5,
+                      boxShadow: 24,
+                      pt: 2,
+                      px: 4,
+                      pb: 3,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <p>Once you close the report, you can never reopen!</p>
+                    <p>You can never do anything to this report from now on!</p>
+                    <p>Are you sure?</p>
+                    <Box
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                      }}
+                    >
+                      <Button
+                        onClick={handleClose}
+                        sx={{
+                          backgroundColor: 'lightblue',
+                          color: 'white',
+                          ':hover': { backgroundColor: 'blue' },
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={handleCloseReport}
+                        sx={{
+                          backgroundColor: '#FFCCCB',
+                          color: 'white',
+                          ':hover': { backgroundColor: 'red' },
+                          marginLeft: '10px',
+                        }}
+                      >
+                        Close Report
+                      </Button>
+                    </Box>
+                  </Box>
+                </Modal>
+              </>
+            ) : (
+              <span style={{ color: 'red', marginLeft: '10px' }}>({report.status})</span>
+            )}
+          </h2>
           <p>{currDescription}</p>
-          <Button onClick={() => handleDelete(index)}>Delete</Button>
-          <Button onClick={handleTurnOnEdit}>Edit</Button>
+          {report.status !== 'Closed' && (
+            <>
+              <Button onClick={() => handleDelete()}>Delete</Button>
+              <Button onClick={handleTurnOnEdit}>Edit</Button>
+            </>
+          )}
         </>
       ) : (
         // Edited Mode
-        <form onSubmit={(e) => handleSubmit(e, index)}>
+        <form onSubmit={(e) => handleSubmit(e)}>
           <TextField
             label="Title"
             name="title"
@@ -103,7 +202,7 @@ const ExistingFacilityReport = ({
         </form>
       )}
 
-      <CommentSection comments={comments} reportIndex={index} setReports={setReports} />
+      <CommentSection reportId={report._id} comments={report.comments} status={report.status} />
     </>
   );
 };

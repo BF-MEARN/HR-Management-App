@@ -1,6 +1,7 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-interface Employee {
+export interface Employee {
+  _id: string;
   firstName: string;
   lastName: string;
   middleName?: string;
@@ -10,7 +11,7 @@ interface Employee {
   };
 }
 
-interface HousingState {
+export interface HousingState {
   _id: string;
   address: {
     building?: string;
