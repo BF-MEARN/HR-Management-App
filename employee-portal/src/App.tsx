@@ -3,12 +3,12 @@ import { BrowserRouter, Route, Routes } from 'react-router';
 
 import NavBar from './components/NavBar';
 import ErrorMapProvider from './contexts/error-map/ErrorMapProvider';
+import HousingPage from './pages/Housing';
 import LoginPage from './pages/Login';
 import OnboardingApplicationPage from './pages/OnboardingApplication';
 import PersonalInformationPage from './pages/PersonalInfomation';
 import RegisterPage from './pages/Register';
 import VisaStatusManagementPage from './pages/VisaStatusManagement';
-import HousingPage from './pages/housing_without_backend/Housing';
 import { useAppDispatch, useAppSelector } from './store';
 import { updateFormsWithEmployee } from './store/slices/employeeFormSlice';
 import { fetchEmployeeData } from './store/slices/employeeSlice';

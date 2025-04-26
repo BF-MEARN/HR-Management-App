@@ -399,14 +399,14 @@ const seedDatabase = async () => {
           status: faker.helpers.arrayElement(['Open', 'In Progress', 'Closed']),
           comments: [
             {
-              createdBy: reportingEmployee.userId,
+              createdBy: reportingEmployee._id,
               description: faker.lorem.sentence(10),
               timestamp: faker.date.recent({ days: 10 }),
             },
             ...(faker.datatype.boolean(0.5)
               ? [
                   {
-                    createdBy: createdByUser._id,
+                    createdBy: createdByUser.employeeId,
                     description: faker.lorem.sentence(8),
                     timestamp: faker.date.recent({ days: 5 }),
                   },

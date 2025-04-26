@@ -4,6 +4,7 @@ import {
   addCommentOnFacilityReport,
   closeFacilityReport,
   createFacilityReport,
+  deleteCommentFromFacilityReport,
   deleteFacilityReport,
   getCurrentUserFacilityReportsByHouseId,
   updateCommentOnFacilityReport,
@@ -53,5 +54,11 @@ router.post('/:facilityReportId/comments', addCommentOnFacilityReport);
  * @route   PUT /api/employee/facilityReport/:facilityReportId/comments/:commentId
  */
 router.put('/:facilityReportId/comments/:commentId', updateCommentOnFacilityReport);
+
+/**
+ * @desc    Remove comment from facility report
+ * @route   DELETE /api/employee/facilityReport/:facilityReportId/comments/:commentId/delete
+ */
+router.delete('/:facilityReportId/comments/:commentId/delete', deleteCommentFromFacilityReport);
 
 export default router;

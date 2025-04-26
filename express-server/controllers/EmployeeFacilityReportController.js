@@ -1,6 +1,15 @@
 import Employee from '../models/Employee.js';
 import FacilityReport from '../models/FacilityReport.js';
-import Housing from '../models/Housing.js';
+
+/**
+ * Helper Function
+ */
+const thisReportWasNotCreatedByUser = async (req, facilityReport) => {
+  const { id: userId } = req.user;
+  const findEmployeeByUserId = await Employee.findOne({ userId }).select('_id');
+  const { _id: employeeId } = findEmployeeByUserId;
+  return employeeId.toString() !== facilityReport.employeeId.toString();
+};
 
 /**
  * @desc    Find all facility reports submitted by the current user for a specific house
@@ -14,17 +23,22 @@ export const getCurrentUserFacilityReportsByHouseId = async (req, res) => {
 
     const findEmployeeByUserId = await Employee.findOne({
       userId,
-    });
+    }).select('_id');
     const { _id: employeeId } = findEmployeeByUserId;
 
     const facilityReports = await FacilityReport.find({
       houseId,
       employeeId,
-    });
+    })
+      .select('title description status comments createdAt updatedAt')
+      .populate({
+        path: 'comments.createdBy',
+        select: 'preferredName firstName middleName lastName -_id',
+      });
 
     res.status(200).json(facilityReports);
   } catch (error) {
-    res.status(500).json({ message: 'Failed to find the facility reports', error });
+    res.status(500).json({ message: 'Failed to find the facility reports', error: error.message });
   }
 };
 
@@ -41,10 +55,10 @@ export const createFacilityReport = async (req, res) => {
 
     const findEmployeeByUserId = await Employee.findOne({
       userId,
-    });
-    const { _id: employeeId } = findEmployeeByUserId;
-    const findHouseById = await Housing.findById(houseId);
-    if (!findHouseById.residents.includes(employeeId)) {
+    }).select('_id houseId');
+    const { _id: employeeId, houseId: employeeHouseId } = findEmployeeByUserId;
+
+    if (houseId !== employeeHouseId.toString()) {
       return res.status(403).json({
         message:
           'Employee does NOT reside in this house. Hence, they CANNOT write a facility report of this house!',
@@ -65,7 +79,7 @@ export const createFacilityReport = async (req, res) => {
       facility_report: newFacilityReport,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to create a Facility Report!', error });
+    res.status(500).json({ message: 'Failed to create a Facility Report!', error: error.message });
   }
 };
 
@@ -77,38 +91,39 @@ export const createFacilityReport = async (req, res) => {
 export const updateFacilityReport = async (req, res) => {
   try {
     const { facilityReportId } = req.params;
-    const { title, description } = req.body;
-    const { id: userId } = req.user;
+    const { newTitle, newDescription } = req.body;
 
-    const findEmployeeByUserId = await Employee.findOne({
-      userId,
-    });
-    const { _id: employeeId } = findEmployeeByUserId;
-    const originalFacilityReport = await FacilityReport.findById(facilityReportId);
-    if (employeeId.toString() !== originalFacilityReport.employeeId.toString()) {
+    const facilityReport = await FacilityReport.findById(facilityReportId).select(
+      'title description employeeId status createdAt updatedAt'
+    );
+    if (await thisReportWasNotCreatedByUser(req, facilityReport)) {
       return res.status(403).json({
         message: 'This employee did NOT create this facility report! Hence, they CANNOT edit it!',
       });
     }
+    if (facilityReport.status === 'Closed') {
+      return res.status(400).json({
+        message: 'This Facility Report is already closed!',
+      });
+    }
 
-    const updatedFacilityReport = await FacilityReport.findByIdAndUpdate(
-      facilityReportId,
-      {
-        title,
-        description,
-      },
-      {
-        new: true,
-      }
-    );
+    const { title: oldTitle, description: oldDescription } = facilityReport;
+    facilityReport.title = newTitle;
+    facilityReport.description = newDescription;
+    await facilityReport.save();
 
     res.status(200).json({
       message: 'Facility Report successfully updated',
-      originalFacilityReport,
-      updatedFacilityReport,
+      oldTitle,
+      oldDescription,
+      newTitle,
+      newDescription,
+      facilityReport,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to update the Facility Report!', error });
+    res
+      .status(500)
+      .json({ message: 'Failed to update the Facility Report!', error: error.message });
   }
 };
 
@@ -120,26 +135,26 @@ export const updateFacilityReport = async (req, res) => {
 export const closeFacilityReport = async (req, res) => {
   try {
     const { facilityReportId } = req.params;
-    const { id: userId } = req.user;
 
-    const findEmployeeByUserId = await Employee.findOne({
-      userId,
-    });
-    const { _id: employeeId } = findEmployeeByUserId;
-    const facilityReport = await FacilityReport.findById(facilityReportId);
-    if (employeeId.toString() !== facilityReport.employeeId.toString()) {
+    const facilityReport =
+      await FacilityReport.findById(facilityReportId).select('employeeId status');
+    if (await thisReportWasNotCreatedByUser(req, facilityReport)) {
       return res.status(403).json({
         message: 'This employee did NOT create this facility report! Hence, they CANNOT close it!',
       });
     }
+    if (facilityReport.status === 'Closed') {
+      return res.status(400).json({
+        message: 'This Facility Report is already closed!',
+      });
+    }
 
-    await FacilityReport.findByIdAndUpdate(facilityReportId, {
-      status: 'Closed',
-    });
+    facilityReport.status = 'Closed';
+    await facilityReport.save();
 
     res.status(200).json({ message: 'Successfully closed the facility report' });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to close the facility report!', error });
+    res.status(500).json({ message: 'Failed to close the facility report!', error: error.message });
   }
 };
 
@@ -151,24 +166,25 @@ export const closeFacilityReport = async (req, res) => {
 export const deleteFacilityReport = async (req, res) => {
   try {
     const { facilityReportId } = req.params;
-    const { id: userId } = req.user;
-
-    const findEmployeeByUserId = await Employee.findOne({
-      userId,
-    });
-    const { _id: employeeId } = findEmployeeByUserId;
-    const facilityReport = await FacilityReport.findById(facilityReportId);
-    if (employeeId.toString() !== facilityReport.employeeId.toString()) {
+    const facilityReport =
+      await FacilityReport.findById(facilityReportId).select('employeeId status');
+    if (await thisReportWasNotCreatedByUser(req, facilityReport)) {
       return res.status(403).json({
         message: 'This employee did NOT create this facility report! Hence, they CANNOT delete it!',
       });
     }
-
+    if (facilityReport.status === 'Closed') {
+      return res.status(400).json({
+        message: 'This Facility Report is already closed!',
+      });
+    }
     await FacilityReport.findByIdAndDelete(facilityReportId);
 
     res.status(200).json({ message: 'Facility Report successfully deleted', facilityReport });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to delete the Facility Report!', error });
+    res
+      .status(500)
+      .json({ message: 'Failed to delete the Facility Report!', error: error.message });
   }
 };
 
@@ -180,40 +196,47 @@ export const deleteFacilityReport = async (req, res) => {
 export const addCommentOnFacilityReport = async (req, res) => {
   try {
     const { facilityReportId } = req.params;
-    const { id: userId } = req.user;
-
-    const findEmployeeByUserId = await Employee.findOne({
-      userId,
-    });
-    const { _id: employeeId } = findEmployeeByUserId;
-    const facilityReport = await FacilityReport.findById(facilityReportId);
-    if (employeeId.toString() !== facilityReport.employeeId.toString()) {
+    const facilityReport = await FacilityReport.findById(facilityReportId).select(
+      'employeeId status comments'
+    );
+    if (await thisReportWasNotCreatedByUser(req, facilityReport)) {
       return res.status(403).json({
         message:
           'This employee did NOT create this facility report! Hence, they CANNOT view the report and as a result, they should NOT be able to comment on it!',
       });
     }
+    if (facilityReport.status === 'Closed') {
+      return res.status(400).json({
+        message: 'This Facility Report is already closed!',
+      });
+    }
 
+    const { employeeId } = facilityReport;
     const { commentDescription } = req.body;
-    const newComment = {
+    let newComment = {
       createdBy: employeeId,
       description: commentDescription,
       timestamp: new Date(),
     };
-    const newCommentList = [...facilityReport.comments];
-    newCommentList.push(newComment);
-    await FacilityReport.findByIdAndUpdate(facilityReportId, {
-      status: 'In Progress',
-      comments: newCommentList,
-    });
+
+    facilityReport.comments.push(newComment);
+    facilityReport.status = 'In Progress';
+    await facilityReport.save();
+    newComment = facilityReport.comments[facilityReport.comments.length - 1];
+
+    const findCommenter = await Employee.findById(employeeId).select(
+      'preferredName firstName lastName middleName -_id'
+    );
 
     res.status(200).json({
       message: 'Successfully added a comment on the Facility Report!',
-      prevCommentList: facilityReport.comments,
-      newCommentList,
+      newComment,
+      commenter: findCommenter,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to add a comment on the Facility Report!', error });
+    res
+      .status(500)
+      .json({ message: 'Failed to add a comment on the Facility Report!', error: error.message });
   }
 };
 
@@ -225,51 +248,101 @@ export const addCommentOnFacilityReport = async (req, res) => {
 export const updateCommentOnFacilityReport = async (req, res) => {
   try {
     const { facilityReportId } = req.params;
-    const { id: userId } = req.user;
-
-    const findEmployeeByUserId = await Employee.findOne({
-      userId,
-    });
-    const { _id: employeeId } = findEmployeeByUserId;
-    const facilityReport = await FacilityReport.findById(facilityReportId);
-    if (employeeId.toString() !== facilityReport.employeeId.toString()) {
+    const facilityReport = await FacilityReport.findById(facilityReportId).select(
+      'employeeId comments status'
+    );
+    if (await thisReportWasNotCreatedByUser(req, facilityReport)) {
       return res.status(403).json({
         message:
           'This employee did NOT create this facility report! Hence, they CANNOT view the report and as a result, they should NOT be able to update any comments there!',
       });
     }
+    if (facilityReport.status === 'Closed') {
+      return res.status(400).json({
+        message: 'This Facility Report is already closed!',
+      });
+    }
 
-    const newCommentList = [...facilityReport.comments];
     const { commentId } = req.params;
-    const commentToUpdate = newCommentList.find((comment) => {
+    const existingComment = facilityReport.comments.find((comment) => {
       return comment._id.toString() === commentId;
     });
-    const previousCommentDescription = commentToUpdate.description;
-    const { updatedCommentDescription } = req.body;
-    // Check if this comment exists
-    if (commentToUpdate) {
-      // Check if this is the current employee's comment
-      // If so, it will update the comment's description
-      if (employeeId.toString() === commentToUpdate.createdBy.toString()) {
-        commentToUpdate.description = updatedCommentDescription;
-      }
-      // Otherwise, it will throw a forbidden error!
-      else {
-        return res.status(403).json({
-          message: 'This employee did NOT create this comment! Hence, they CANNOT edit it!',
-        });
-      }
+    if (!existingComment) {
+      return res.status(400).json({
+        message: 'Comment NOT found!',
+      });
     }
-    await FacilityReport.findByIdAndUpdate(facilityReportId, {
-      comments: newCommentList,
-    });
+
+    const { employeeId } = facilityReport;
+    if (employeeId.toString() !== existingComment.createdBy.toString()) {
+      return res.status(403).json({
+        message: 'This employee did NOT create this comment! Hence, they CANNOT edit it!',
+      });
+    }
+
+    const { description: oldDescription } = existingComment;
+    const { newDescription } = req.body;
+    existingComment.description = newDescription;
+    existingComment.timestamp = new Date();
+    await facilityReport.save();
 
     res.status(200).json({
       message: 'Successfully updated the comment',
-      prevComment: previousCommentDescription,
-      updatedComment: commentToUpdate.description,
+      oldDescription,
+      newDescription,
+      newTimestamp: existingComment.timestamp,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to update the comment', error });
+    res.status(500).json({ message: 'Failed to update the comment', error: error.message });
+  }
+};
+
+/**
+ * @desc    Remove comment from facility report
+ * @route   DELETE /api/employee/facilityReport/:facilityReportId/comments/:commentId/delete
+ * @access  Employee only
+ */
+export const deleteCommentFromFacilityReport = async (req, res) => {
+  try {
+    const { facilityReportId } = req.params;
+    const facilityReport = await FacilityReport.findById(facilityReportId).select(
+      'employeeId comments status'
+    );
+    if (await thisReportWasNotCreatedByUser(req, facilityReport)) {
+      return res.status(403).json({
+        message:
+          'This employee did NOT create this facility report! Hence, they CANNOT view the report and as a result, they should NOT be able to delete any comments there!',
+      });
+    }
+    if (facilityReport.status === 'Closed') {
+      return res.status(400).json({
+        message: 'This Facility Report is already closed!',
+      });
+    }
+
+    const { commentId } = req.params;
+    const existingComment = facilityReport.comments.find((comment) => {
+      return comment._id.toString() === commentId;
+    });
+    if (!existingComment) {
+      return res.status(400).json({
+        message: 'Comment NOT found!',
+      });
+    }
+
+    const { employeeId } = facilityReport;
+    if (employeeId.toString() !== existingComment.createdBy.toString()) {
+      return res.status(403).json({
+        message: 'This employee did NOT create this comment! Hence, they CANNOT delete it!',
+      });
+    }
+
+    facilityReport.comments = facilityReport.comments.filter(
+      (comment) => comment._id.toString() !== commentId
+    );
+    await facilityReport.save();
+    res.status(200).json({ message: 'Comment successfully deleted!', existingComment });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to delete comment!', error: error.message });
   }
 };

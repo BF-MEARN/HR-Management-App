@@ -8,17 +8,12 @@ import Housing from '../models/Housing.js';
  */
 export const autoAssignHousing = async (req, res, next) => {
   try {
-    const availableHouseToSleepIn = await Housing.findOne({
-      $expr: {
-        $gt: [{ $add: ['$facility.beds', '$facility.mattresses'] }, { $size: '$residents' }],
-      },
-    });
-    if (!availableHouseToSleepIn) {
-      throw new Error('No house is available for the new employee!');
-    }
+    const allHouses = await Housing.find();
+    const randomIndex = Math.floor(Math.random() * allHouses.length);
+    const randomHouse = allHouses[randomIndex];
 
+    const address = randomHouse.address;
     const { employeeId: _id } = req.body;
-    const address = availableHouseToSleepIn.address;
     // This is for the addResidentToHousing in the EmployeeOnboardingController.js
     req.autoAssign = { address, _id };
     next();
@@ -42,7 +37,10 @@ export const getCurrentEmployeeHouse = async (req, res) => {
     });
 
     const { houseId } = findEmployeeByUserId;
-    const findEmployeeHouse = await Housing.findById(houseId);
+    const findEmployeeHouse = await Housing.findById(houseId).populate({
+      path: 'residents',
+      select: 'firstName lastName middleName preferredName contactInfo.cellPhone',
+    });
 
     res.status(200).json({
       message: "Successfully found the user's assigned employee house",
