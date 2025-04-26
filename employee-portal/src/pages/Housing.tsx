@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { Paper } from '@mui/material';
+import { Box, Divider, Paper, Stack, Typography } from '@mui/material';
 
 import HousingDetails from '../components/housing/HousingDetails';
 import ExistingFacilityReport from '../components/housing/reports/ExistingFacilityReport';
@@ -38,14 +38,23 @@ export default function HousingPage() {
   }, [dispatch]);
   return (
     <>
-      <HousingDetails housing={housingSelect} />
-      <FacilityReportForm houseId={housingSelect._id} />
-      {/* List of Existing/Past Facility Reports */}
-      <Paper>
-        <h1>Existing/Past Reports</h1>
-        {facilityReportsSelect.map((report) => (
-          <ExistingFacilityReport key={report._id} report={report} />
-        ))}
+      <Box p={4}>
+        <HousingDetails housing={housingSelect} />
+      </Box>
+      <Paper variant="outlined">
+        <FacilityReportForm houseId={housingSelect._id} />
+        <Divider />
+        <Box px={2} margin={4}>
+          <Stack gap={2}>
+            <Typography variant="h6" component="div">
+              Existing/Past Reports
+            </Typography>
+
+            {facilityReportsSelect.map((report) => (
+              <ExistingFacilityReport key={report._id} report={report} />
+            ))}
+          </Stack>
+        </Box>
       </Paper>
     </>
   );

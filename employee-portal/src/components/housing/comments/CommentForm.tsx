@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 
-import { Button, TextField } from '@mui/material';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+} from '@mui/material';
 
 import { useAppDispatch } from '../../../store';
 import { addComment } from '../../../store/slices/facilityReportSlice';
-// import { v4 as randomId } from 'uuid';
-
-// import { Report } from '../../../pages/Housing';
-
 import { api } from '../../../utils/utils';
 
-export default function CommentForm({ reportId, status }: { reportId: string; status: string }) {
+export default function CommentForm({ reportId }: { reportId: string; status: string }) {
   const [create, setCreate] = useState<boolean>(false);
   const [description, setDescription] = useState<string>('');
 
@@ -41,28 +44,35 @@ export default function CommentForm({ reportId, status }: { reportId: string; st
 
   return (
     <>
-      {status !== 'Closed' && (
-        <>
-          {create ? (
-            <form onSubmit={(e) => handleSubmit(e)}>
-              <TextField
-                label="Description"
-                name="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                fullWidth
-                required
-              />
-              <Button type="button" onClick={handleCancel}>
-                Cancel
-              </Button>
-              <Button type="submit">Submit</Button>
-            </form>
-          ) : (
-            <Button onClick={handleTurnOnCreate}>Reply</Button>
-          )}
-        </>
-      )}
+      <Button onClick={handleTurnOnCreate}>Reply</Button>
+      <Dialog
+        open={create}
+        onClose={handleCancel}
+        slotProps={{
+          paper: {
+            component: 'form',
+            onSubmit: handleSubmit,
+          },
+        }}
+      >
+        <DialogTitle>Add a Comment</DialogTitle>
+        <DialogContent>
+          <TextField
+            sx={{ mt: 1 }}
+            autoFocus
+            label="Description"
+            name="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            fullWidth
+            required
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancel}>Cancel</Button>
+          <Button type="submit">Submit</Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
