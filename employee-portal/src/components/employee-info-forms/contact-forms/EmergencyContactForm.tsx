@@ -31,10 +31,13 @@ export default function EmergencyContactForm(props: EmergencyContactFormProps) {
   }, [formData.emergencyContacts.length, updateErrorMap]);
 
   const updateEmergencyContact = (index: number, patch: Partial<Contact>) => {
-    const newArray = [...formData.emergencyContacts];
-    const patchedContact = { ...newArray[index], ...patch };
-    newArray[index] = patchedContact;
-    dispatch(updateContacts({ emergencyContacts: newArray }));
+    dispatch(
+      updateContacts({
+        emergencyContacts: formData.emergencyContacts.map((c, i) =>
+          i === index ? { ...c, ...patch } : c
+        ),
+      })
+    );
   };
 
   const spliceEmergencyContact = (index: number) => {

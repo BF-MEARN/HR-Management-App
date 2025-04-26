@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { TextFieldProps } from '@mui/material';
 import validator from 'validator';
@@ -31,20 +31,16 @@ function validate(
     case 'email':
       if (!isEmpty && !validator.isEmail(value)) return 'Invalid email address.';
       break;
-
     case 'date':
       if (!isEmpty && !validator.isDate(value)) return 'Invalid date format.';
       break;
-
     case 'phone':
       if (!isEmpty && !validator.isMobilePhone(value, 'en-US')) return 'Invalid phone number.';
       break;
-
     case 'ssn':
       if (!isEmpty && !/^\d{3}-\d{2}-\d{4}$/.test(value))
         return 'SSN must be in ###-##-#### format.';
       break;
-
     default:
       break;
   }
@@ -52,13 +48,11 @@ function validate(
   return extraValidate ? extraValidate(value) : undefined;
 }
 
-type TextFieldPropsGenerator = (overrides?: Partial<TextFieldProps>) => TextFieldProps;
-
 export function useTextFieldProps(
   field: StringFormField,
   forceCheck: boolean = false,
   updateErrorMap?: (key: string, error: string | undefined) => void
-): TextFieldPropsGenerator {
+): TextFieldProps {
   const [error, setError] = useState<string | undefined>();
   const [touched, setTouched] = useState<boolean>(forceCheck);
   const { name, get, set, required, readOnly } = field;
@@ -80,34 +74,29 @@ export function useTextFieldProps(
     };
   }, [field, forceCheck, get, name, updateErrorMap]);
 
-  const props: TextFieldPropsGenerator = useCallback(
-    (overrides) => {
-      const requiredValue = typeof required === 'function' ? required() : required;
-      return {
-        fullWidth: true,
-        name,
-        value: get(),
-        onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-          setTouched(true);
-          set(e.target.value);
-          const error = validate(e.target.value, field);
-          setError(error);
-          if (updateErrorMap) {
-            updateErrorMap(name, error);
-          }
-        },
-        error: touched ? !!error : undefined,
-        helperText: touched ? error : undefined,
-        required: requiredValue,
-        ...overrides,
-        slotProps: {
-          input: { disabled: readOnly, ...overrides?.slotProps?.input },
-          ...overrides?.slotProps,
-        },
-      };
-    },
-    [error, field, get, name, readOnly, required, set, touched, updateErrorMap]
-  );
+  const props = useMemo(() => {
+    const requiredValue = typeof required === 'function' ? required() : required;
+    return {
+      fullWidth: true,
+      name,
+      value: get(),
+      onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+        setTouched(true);
+        set(e.target.value);
+        const error = validate(e.target.value, field);
+        setError(error);
+        if (updateErrorMap) {
+          updateErrorMap(name, error);
+        }
+      },
+      error: touched ? !!error : undefined,
+      helperText: touched ? error : undefined,
+      required: requiredValue,
+      slotProps: {
+        input: { disabled: readOnly },
+      },
+    };
+  }, [error, field, get, name, readOnly, required, set, touched, updateErrorMap]);
 
   return props;
 }

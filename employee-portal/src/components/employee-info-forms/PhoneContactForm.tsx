@@ -55,10 +55,10 @@ function PhoneContactForm({ forceCheck, readOnly }: PhoneContactFormProps) {
       </Typography>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, sm: 6 }}>
-          <TextField label="Cell Phone" {...cellPhoneProps()} />
+          <TextField label="Cell Phone" {...cellPhoneProps} />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
-          <TextField label="Work Phone" {...workPhoneProps()} />
+          <TextField label="Work Phone" {...workPhoneProps} />
         </Grid>
       </Grid>
     </Box>

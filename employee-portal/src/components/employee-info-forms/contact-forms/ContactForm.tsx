@@ -20,12 +20,15 @@ export default function ContactForm({
   forceCheck: boolean;
 }) {
   const { updateErrorMap } = useErrorMap();
+
+  const firstNameValue = contact.firstName ?? ''; // cache value
+
   const firstNameProps = useTextFieldProps(
     {
-      name: `${id}-firstName`,
-      get: () => contact.firstName ?? '',
+      name: 'firstName',
+      get: () => firstNameValue, // getter returns cached value
       set: (v) => updateContact({ firstName: v }),
-      required: used,
+      required: true,
       readOnly,
     },
     forceCheck,
@@ -69,12 +72,14 @@ export default function ContactForm({
     updateErrorMap
   );
 
+  const emailValue = contact.email ?? '';
+
   const emailProps = useTextFieldProps(
     {
-      name: `${id}-email`,
-      get: () => contact.email ?? '',
+      name: 'email',
+      get: () => emailValue,
       set: (v) => updateContact({ email: v }),
-      required: used,
+      required: true,
       type: 'email',
       readOnly,
     },
@@ -97,22 +102,22 @@ export default function ContactForm({
   return (
     <Grid container spacing={2}>
       <Grid size={{ xs: 12, sm: 4 }}>
-        <TextField label="First Name" {...firstNameProps()} />
+        <TextField label="First Name" {...firstNameProps} />
       </Grid>
       <Grid size={{ xs: 12, sm: 4 }}>
-        <TextField label="Last Name" {...lastNameProps()} />
+        <TextField label="Last Name" {...lastNameProps} />
       </Grid>
       <Grid size={{ xs: 12, sm: 4 }}>
-        <TextField label="Middle Name" {...middleNameProps()} />
+        <TextField label="Middle Name" {...middleNameProps} />
       </Grid>
       <Grid size={{ xs: 12, sm: 6 }}>
-        <TextField label="Cell Phone" {...cellPhoneProps()} />
+        <TextField label="Cell Phone" {...cellPhoneProps} />
       </Grid>
       <Grid size={{ xs: 12, sm: 6 }}>
-        <TextField label="Email" {...emailProps()} />
+        <TextField label="Email" {...emailProps} />
       </Grid>
       <Grid size={{ xs: 12 }}>
-        <TextField label="Relationship" {...relationshipProps()} />
+        <TextField label="Relationship" {...relationshipProps} />
       </Grid>
     </Grid>
   );

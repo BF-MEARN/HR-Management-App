@@ -26,7 +26,7 @@ export default function DocumentConfirmation() {
               previewOnly
               width="200px"
               height="200px"
-              previewURL={profilePicture.url}
+              previewURL={profilePicture.previewUrl}
               fileName={profilePicture.name}
               type="image"
             />
@@ -41,7 +41,7 @@ export default function DocumentConfirmation() {
           ) : (
             <FileUploadWithPreview
               previewOnly
-              previewURL={driverLicense.url}
+              previewURL={driverLicense.previewUrl}
               fileName={driverLicense.name}
               type="document"
             />
@@ -56,7 +56,7 @@ export default function DocumentConfirmation() {
           ) : (
             <FileUploadWithPreview
               previewOnly
-              previewURL={authDocument.url}
+              previewURL={authDocument.previewUrl}
               fileName={authDocument.name}
               type="document"
             />

@@ -16,6 +16,7 @@ export class ViewProfileComponent implements OnInit {
   error = '';
   returnTo: string = '';
   houseId: string = '';
+  profilePictureUrl?: string;
 
   constructor(
     private route: ActivatedRoute,
@@ -67,6 +68,21 @@ export class ViewProfileComponent implements OnInit {
   handleGoToVisaStatusPage(employeeId: string): void {
     this.router.navigate(['/visa-status', employeeId]);
   }
+
+  handleProfilePicturePreview(): void {
+    if (this.application?.profilePicture) {
+      this.docService.getPresignedUrl(this.application.profilePicture).subscribe({
+        next: (res) => {
+          this.profilePictureUrl = res.url;
+        },
+        error: (err) => {
+          console.error('Failed to fetch profile picture presigned URL:', err);
+          this.profilePictureUrl = undefined;
+        }
+      });
+    }
+  }
+  
 
   handlePreviewDocument(document: any): void {
     if (document?.file) {

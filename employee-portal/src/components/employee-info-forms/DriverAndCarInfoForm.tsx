@@ -3,6 +3,7 @@ import { Box, Checkbox, FormControlLabel, Grid, TextField, Typography } from '@m
 import useErrorMap from '../../contexts/error-map/useErrorMap';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { updateDriverAndCar } from '../../store/slices/employeeFormSlice';
+import { uploadEmployeeDocument } from '../../utils/utils';
 import FileUploadWithPreview from '../FileUploadWithPreview';
 import { useTextFieldProps } from '../useTextFieldProps';
 import { EmployeeFormProps } from './formProps';
@@ -99,30 +100,47 @@ function DriverAndCarInfoForm({
       {formData.hasDriverLicense && (
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField label="License Number" {...licenseNumberProps()} />
+            <TextField label="License Number" {...licenseNumberProps} />
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
               label="Expiration Date"
               type="date"
-              {...licenseExpirationProps({ slotProps: { inputLabel: { shrink: true } } })}
+              InputLabelProps={{ shrink: true }}
+              {...licenseExpirationProps}
             />
           </Grid>
           <Grid size={{ xs: 12 }}>
             <FileUploadWithPreview
-              previewURL={formData.driverLicense.license.url}
+              previewURL={formData.driverLicense.license.previewUrl}
               type="document"
               fileName={formData.driverLicense.license.name}
               buttonText="Upload Driver's License"
               previewOnly={readOnly}
-              onFileSelect={(f) => {
+              onFileSelect={async (f) => {
+                const previewUrl = URL.createObjectURL(f);
+
                 dispatch(
                   updateDriverAndCar({
                     driverLicense: {
-                      license: { name: f.name, url: URL.createObjectURL(f) },
+                      license: { name: f.name, previewUrl },
                     },
                   })
                 );
+
+                try {
+                  const s3Key = await uploadEmployeeDocument(f, 'driverLicenseFile');
+                  dispatch(
+                    updateDriverAndCar({
+                      driverLicense: {
+                        license: { name: f.name, previewUrl, s3Key },
+                      },
+                    })
+                  );
+                } catch (error) {
+                  console.error('Failed to upload driver’s license:', error);
+                }
+
                 onDriverLicenseFileChange(f);
               }}
             />
@@ -145,13 +163,13 @@ function DriverAndCarInfoForm({
       {formData.hasCar && (
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 4 }}>
-            <TextField label="Car Make" {...carMakeProps()} />
+            <TextField label="Car Make" {...carMakeProps} />
           </Grid>
           <Grid size={{ xs: 12, sm: 4 }}>
-            <TextField label="Car Model" {...carModelProps()} />
+            <TextField label="Car Model" {...carModelProps} />
           </Grid>
           <Grid size={{ xs: 12, sm: 4 }}>
-            <TextField label="Car Color" {...carColorProps()} />
+            <TextField label="Car Color" {...carColorProps} />
           </Grid>
         </Grid>
       )}
