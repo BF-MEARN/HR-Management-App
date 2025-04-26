@@ -139,7 +139,7 @@ export const emptyContactFormData = {
   emergencyContacts: [],
 };
 
-export interface OnboardingApplicationPayload {
+export interface EmployeeFormPayload {
   firstName: string;
   lastName: string;
   middleName?: string;

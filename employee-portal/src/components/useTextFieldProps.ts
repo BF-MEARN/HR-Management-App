@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { TextFieldProps } from '@mui/material';
 import validator from 'validator';
@@ -110,17 +110,4 @@ export function useTextFieldProps(
   );
 
   return props;
-}
-
-export function useErrorMap(statusCallBack: (value: boolean) => void) {
-  const errorMap = useRef<Record<string, string | undefined>>({});
-
-  const validateAll = () => Object.values(errorMap.current).every((error) => error === undefined);
-
-  const updateErrorMap = (key: string, error: string | undefined) => {
-    errorMap.current[key] = error;
-    statusCallBack(validateAll());
-  };
-
-  return updateErrorMap;
 }

@@ -11,6 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 
+import useErrorMap from '../../contexts/error-map/useErrorMap';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { updateWorkAuth } from '../../store/slices/employeeFormSlice';
 import {
@@ -18,7 +19,7 @@ import {
   workAuthorizationCategories,
 } from '../../store/slices/employeeFormTypes';
 import FileUploadWithPreview from '../FileUploadWithPreview';
-import { useErrorMap, useTextFieldProps } from '../useTextFieldProps';
+import { useTextFieldProps } from '../useTextFieldProps';
 import { EmployeeFormProps } from './formProps';
 
 export type WorkAuthorizationFormProps = {
@@ -27,14 +28,13 @@ export type WorkAuthorizationFormProps = {
 
 export default function WorkAuthorizationForm({
   onF1OptDocumentChange,
-  onFormStatusChange,
   forceCheck,
   readOnly,
 }: WorkAuthorizationFormProps) {
   const formData = useAppSelector((state) => state.employeeForm.workAuth);
   const dispatch = useAppDispatch();
 
-  const updateErrorMap = useErrorMap(onFormStatusChange);
+  const { updateErrorMap } = useErrorMap();
 
   const selectableTypes = formData.isCitizenOrPermanentResident
     ? workAuthorizationCategories.citizenOrPermanentResidentTypes
@@ -104,55 +104,63 @@ export default function WorkAuthorizationForm({
   );
 
   return (
-    <Box sx={{ px: 2 }}>
+    <Box component="form" noValidate sx={{ px: 2 }}>
       <Typography variant="h6" mb={1}>
         Work Authorization
       </Typography>
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={formData.isCitizenOrPermanentResident}
-            disabled={readOnly}
-            onChange={(e) => {
-              const types = e.target.checked
-                ? workAuthorizationCategories.citizenOrPermanentResidentTypes
-                : workAuthorizationCategories.foreignerTypes;
-              dispatch(
-                updateWorkAuth({
-                  isCitizenOrPermanentResident: e.target.checked,
-                  authorizationType: Object.keys(types)[0] as WorkAuthorizationType,
-                })
-              );
-            }}
-          />
-        }
-        label="I am a US citizen or a permanent US resident"
-      />
-      <FormControl fullWidth>
-        <InputLabel id="citizen-label">Authorization Type</InputLabel>
-        <Select
-          labelId="citizen-label"
-          value={formData.authorizationType}
-          disabled={readOnly}
-          label="Authorization Type"
-          onChange={(e) =>
-            dispatch(
-              updateWorkAuth({
-                authorizationType: e.target.value as WorkAuthorizationType,
-              })
-            )
-          }
-        >
-          {Object.entries(selectableTypes).map(([k, v]) => (
-            <MenuItem key={k} value={k}>
-              {v}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      <Grid container spacing={2}>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <FormControl fullWidth>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={formData.isCitizenOrPermanentResident}
+                  disabled={readOnly}
+                  onChange={(e) => {
+                    const types = e.target.checked
+                      ? workAuthorizationCategories.citizenOrPermanentResidentTypes
+                      : workAuthorizationCategories.foreignerTypes;
+                    dispatch(
+                      updateWorkAuth({
+                        isCitizenOrPermanentResident: e.target.checked,
+                        authorizationType: Object.keys(types)[0] as WorkAuthorizationType,
+                      })
+                    );
+                  }}
+                />
+              }
+              label="I am a US citizen or a permanent US resident"
+            />
+          </FormControl>
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <FormControl fullWidth>
+            <InputLabel id="citizen-label">Authorization Type</InputLabel>
+            <Select
+              labelId="citizen-label"
+              value={formData.authorizationType}
+              disabled={readOnly}
+              label="Authorization Type"
+              onChange={(e) =>
+                dispatch(
+                  updateWorkAuth({
+                    authorizationType: e.target.value as WorkAuthorizationType,
+                  })
+                )
+              }
+            >
+              {Object.entries(selectableTypes).map(([k, v]) => (
+                <MenuItem key={k} value={k}>
+                  {v}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+      </Grid>
       {!formData.isCitizenOrPermanentResident && (
         <>
-          <Typography variant="subtitle1" sx={{ marginBlock: '1rem' }}>
+          <Typography variant="subtitle1" mt={4} sx={{ marginBlock: '1rem' }}>
             Additional Info
           </Typography>
           <Grid container spacing={2}>
