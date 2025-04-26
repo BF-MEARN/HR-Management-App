@@ -36,6 +36,29 @@ const VisaStatusManagementPage = () => {
     };
   }
 
+  const fakeData = {
+    optReceipt: {
+      status: "Not Uploaded",
+      feedback: "string;"
+    },
+    optEAD: {
+      status: "Not Uploaded",
+      feedback: "string;",
+    },
+    i983: {
+      status: "Not Uploaded",
+      feedback: "string;",
+    },
+    i20: {
+      status: "Not Uploaded",
+      feedback: "string;",
+    },
+    employeeId: "Not Uploaded",
+    workAuthorization: {
+      type: "string;"
+    }
+  }
+
   const fetchUserData = async () => {
     try {
       const res = await axios.get('http://localhost:3000/api/personal-info', {
@@ -101,15 +124,16 @@ const VisaStatusManagementPage = () => {
   };
 
   useEffect(() => {
-    fetchUserData();
-  }, [userData]);
+    // fetchUserData();
+    setUserVisaStatus(fakeData)
+  }, []);
 
-  useEffect(() => {
-    if (userData?._id) {
-      fetchVisaStatus();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userData]);
+  // useEffect(() => {
+  //   if (userData?._id) {
+  //     fetchVisaStatus();
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [userData]);
 
   return (
     <>
@@ -122,7 +146,7 @@ const VisaStatusManagementPage = () => {
           padding: '25px',
           display: 'flex',
           flexDirection: 'column',
-          height: '20vh',
+          minHeight: '20vh',
           justifyContent: 'space-evenly',
         }}
       >
@@ -146,12 +170,12 @@ const VisaStatusManagementPage = () => {
                     </Button>
                   </label>
                   {file && (
-                    <>
+                    <div>
                       <p>File selected: {file.name}</p>
                       <Button variant="contained" onClick={() => handleUpload('optReceiptFile')}>
                         Submit
                       </Button>
-                    </>
+                    </div>
                   )}
                 </div>
               );
