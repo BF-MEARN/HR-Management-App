@@ -14,6 +14,7 @@ import {
 import { useAppDispatch, useAppSelector } from '../../store';
 import { updatePersonalInfo } from '../../store/slices/employeeFormSlice';
 import { Gender } from '../../store/slices/employeeFormTypes';
+import { uploadEmployeeDocument } from '../../utils/utils';
 import FileUploadWithPreview from '../FileUploadWithPreview';
 import { useErrorMap, useTextFieldProps } from '../useTextFieldProps';
 import { EmployeeFormProps } from './formProps';
@@ -228,13 +229,25 @@ function PersonalInfoForm({
         fileName={formData.profilePicture?.name ?? ''}
         width="200px"
         height="200px"
-        onFileSelect={(f) => {
-          onProfilePictureFileChange(f);
-          dispatch(
-            updatePersonalInfo({
-              profilePicture: { name: f.name, url: URL.createObjectURL(f) },
-            })
-          );
+        // onFileSelect={(f) => {
+        //   onProfilePictureFileChange(f);
+        //   dispatch(
+        //     updatePersonalInfo({
+        //       profilePicture: { name: f.name, url: URL.createObjectURL(f) },
+        //     })
+        //   );
+        // }}
+        onFileSelect={async (f) => {
+          try {
+            const s3Key = await uploadEmployeeDocument(f, 'profilePictureFile'); // Uploads to backend and S3
+            dispatch(
+              updatePersonalInfo({
+                profilePicture: { name: f.name, url: s3Key }, // Save real S3 key in Redux
+              })
+            );
+          } catch (error) {
+            console.error('Failed to upload profile picture:', error);
+          }
         }}
         previewOnly={readOnly}
         buttonText="Upload Picture..."

@@ -2,6 +2,7 @@ import { Box, Checkbox, FormControlLabel, Grid, TextField, Typography } from '@m
 
 import { useAppDispatch, useAppSelector } from '../../store';
 import { updateDriverAndCar } from '../../store/slices/employeeFormSlice';
+import { uploadEmployeeDocument } from '../../utils/utils';
 import FileUploadWithPreview from '../FileUploadWithPreview';
 import { useErrorMap, useTextFieldProps } from '../useTextFieldProps';
 import { EmployeeFormProps } from './formProps';
@@ -115,15 +116,29 @@ function DriverAndCarInfoForm({
               fileName={formData.driverLicense.license.name}
               buttonText="Upload Driver's License"
               previewOnly={readOnly}
-              onFileSelect={(f) => {
-                dispatch(
-                  updateDriverAndCar({
-                    driverLicense: {
-                      license: { name: f.name, url: URL.createObjectURL(f) },
-                    },
-                  })
-                );
-                onDriverLicenseFileChange(f);
+              // onFileSelect={(f) => {
+              //   dispatch(
+              //     updateDriverAndCar({
+              //       driverLicense: {
+              //         license: { name: f.name, url: URL.createObjectURL(f) },
+              //       },
+              //     })
+              //   );
+              //   onDriverLicenseFileChange(f);
+              // }}
+              onFileSelect={async (f) => {
+                try {
+                  const s3Key = await uploadEmployeeDocument(f, 'driverLicenseFile');
+                  dispatch(
+                    updateDriverAndCar({
+                      driverLicense: {
+                        license: { name: f.name, url: s3Key },
+                      },
+                    })
+                  );
+                } catch (error) {
+                  console.error('Failed to upload driver license:', error);
+                }
               }}
             />
           </Grid>

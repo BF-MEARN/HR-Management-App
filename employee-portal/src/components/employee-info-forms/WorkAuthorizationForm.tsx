@@ -17,6 +17,7 @@ import {
   WorkAuthorizationType,
   workAuthorizationCategories,
 } from '../../store/slices/employeeFormTypes';
+import { uploadEmployeeDocument } from '../../utils/utils';
 import FileUploadWithPreview from '../FileUploadWithPreview';
 import { useErrorMap, useTextFieldProps } from '../useTextFieldProps';
 import { EmployeeFormProps } from './formProps';
@@ -164,15 +165,29 @@ export default function WorkAuthorizationForm({
                   previewOnly={readOnly}
                   type="document"
                   buttonText="Upload OPT Receipt"
-                  onFileSelect={(f) => {
-                    onF1OptDocumentChange(f);
-                    dispatch(
-                      updateWorkAuth({
-                        extraAuthInfo: {
-                          optReceipt: { name: f.name, url: URL.createObjectURL(f) },
-                        },
-                      })
-                    );
+                  // onFileSelect={(f) => {
+                  //   onF1OptDocumentChange(f);
+                  //   dispatch(
+                  //     updateWorkAuth({
+                  //       extraAuthInfo: {
+                  //         optReceipt: { name: f.name, url: URL.createObjectURL(f) },
+                  //       },
+                  //     })
+                  //   );
+                  // }}
+                  onFileSelect={async (f) => {
+                    try {
+                      const s3Key = await uploadEmployeeDocument(f, 'optReceiptFile');
+                      dispatch(
+                        updateWorkAuth({
+                          extraAuthInfo: {
+                            optReceipt: { name: f.name, url: s3Key },
+                          },
+                        })
+                      );
+                    } catch (error) {
+                      console.error('Failed to upload OPT receipt:', error);
+                    }
                   }}
                 />
               </Grid>

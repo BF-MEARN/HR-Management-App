@@ -12,6 +12,7 @@ import {
   userAuth,
 } from './middlewares/AuthMiddlewares.js';
 import errorHandler from './middlewares/ErrorHandler.js';
+import employeeDocumentRouter from './routers/EmployeeDocumentRouter.js';
 import employeeFacilityReportRouter from './routers/EmployeeFacilityReportRouter.js';
 import employeeHousingRouter from './routers/EmployeeHousingRouter.js';
 import employeeOnboardingRouter from './routers/EmployeeOnboardingRouter.js';
@@ -58,6 +59,7 @@ app.use('/api/hr/housing', hrAuth, requireHR, hrHousingRouter);
 app.use('/api/hr/visa', hrAuth, requireHR, hrVisaRouter);
 
 // Employee specific routes
+app.use('/api/employee/docs', employeeAuth, requireEmployee, employeeDocumentRouter);
 app.use('/api/employee/onboarding', employeeAuth, requireEmployee, employeeOnboardingRouter);
 app.use('/api/employee/personal-info', employeeAuth, requireEmployee, personalInfoRouter);
 app.use(
