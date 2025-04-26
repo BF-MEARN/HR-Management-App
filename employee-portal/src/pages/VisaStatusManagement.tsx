@@ -102,7 +102,7 @@ const VisaStatusManagementPage = () => {
 
   useEffect(() => {
     fetchUserData();
-  }, [userData]);
+  }, []);
 
   useEffect(() => {
     if (userData?._id) {
@@ -122,7 +122,7 @@ const VisaStatusManagementPage = () => {
           padding: '25px',
           display: 'flex',
           flexDirection: 'column',
-          height: '20vh',
+          minHeight: '20vh',
           justifyContent: 'space-evenly',
         }}
       >
@@ -146,12 +146,12 @@ const VisaStatusManagementPage = () => {
                     </Button>
                   </label>
                   {file && (
-                    <>
+                    <div>
                       <p>File selected: {file.name}</p>
                       <Button variant="contained" onClick={() => handleUpload('optReceiptFile')}>
                         Submit
                       </Button>
-                    </>
+                    </div>
                   )}
                 </div>
               );
@@ -212,7 +212,7 @@ const VisaStatusManagementPage = () => {
           padding: '25px',
           display: 'flex',
           flexDirection: 'column',
-          height: '20vh',
+          minHeight: '20vh',
           justifyContent: 'space-evenly',
         }}
       >
@@ -321,7 +321,7 @@ const VisaStatusManagementPage = () => {
           padding: '25px',
           display: 'flex',
           flexDirection: 'column',
-          height: '20vh',
+          minHeight: '20vh',
           justifyContent: 'space-evenly',
         }}
       >
@@ -431,7 +431,7 @@ const VisaStatusManagementPage = () => {
           padding: '25px',
           display: 'flex',
           flexDirection: 'column',
-          height: '20vh',
+          minHeight: '20vh',
           justifyContent: 'space-evenly',
         }}
       >
