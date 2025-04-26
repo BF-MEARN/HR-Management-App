@@ -35,7 +35,7 @@ export default function HousingPage() {
       }
     }
     fetching();
-  }, []);
+  }, [dispatch]);
   return (
     <>
       <HousingDetails housing={housingSelect} />

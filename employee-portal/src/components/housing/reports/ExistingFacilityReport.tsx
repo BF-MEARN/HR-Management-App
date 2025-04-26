@@ -33,7 +33,9 @@ const ExistingFacilityReport = ({ report }: { report: FacilityReportEntry }) => 
   };
 
   const handleCloseReport = async () => {
-    api(`/employee/facilityReport/${report._id}/close`);
+    api(`/employee/facilityReport/${report._id}/close`, {
+      method: 'PATCH',
+    });
     dispatch(closeReport({ reportId: report._id }));
   };
 
