@@ -11,8 +11,14 @@
   <mat-card class="section-card profile-card">
     <div class="profile-header">
       <div class="avatar-icon">
-        <mat-icon>person</mat-icon>
+        <ng-container *ngIf="profilePictureUrl; else fallbackIcon">
+          <img [src]="profilePictureUrl" alt="Profile Picture" class="profile-pic" />
+        </ng-container>
+        <ng-template #fallbackIcon>
+          <mat-icon>person</mat-icon>
+        </ng-template>
       </div>
+
       <div class="profile-info">
         <div class="name-status-wrapper">
           <h2>
