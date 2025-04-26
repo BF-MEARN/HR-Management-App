@@ -46,3 +46,8 @@ export const api = (path: string, options: RequestInit = {}) => {
     ...options,
   });
 };
+
+export const formatDateString = (dateString: string | undefined) => {
+  if (!dateString) return '';
+  return new Date(dateString).toISOString().substring(0, 10);
+};

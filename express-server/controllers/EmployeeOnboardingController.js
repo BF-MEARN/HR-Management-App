@@ -2,73 +2,96 @@ import mongoose from 'mongoose';
 
 import Employee from '../models/Employee.js';
 import Housing from '../models/Housing.js';
-import RegistrationToken from '../models/RegistrationToken.js';
+import User from '../models/User.js';
 import VisaStatus from '../models/VisaStatus.js';
 
-export const validateRegistrationToken = async (req, res) => {
-  try {
-    const { tokenUUID } = req.params;
-
-    // not expired, not used
-    const token = await RegistrationToken.findOne({
-      token: tokenUUID,
-      expiresAt: { $gt: new Date() },
-      used: false,
+function updateVisaInfo(employee, inputVisaInfo) {
+  let visaInfo = employee.visaInfo;
+  if (!visaInfo) {
+    visaInfo = new VisaStatus({
+      employeeId: employee._id,
     });
-    if (!token) {
-      return res.status(404).json({ message: 'Registration token not found or invalid.' });
-    }
-    return res.status(200).json({ token });
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to validate employee registration token ', error });
+    employee.visaInfo = visaInfo._id;
   }
-};
 
-export const createNewEmployee = async (req, res) => {
+  visaInfo.set({
+    workAuthorization: inputVisaInfo?.workAuthorization,
+  });
+
+  if (inputVisaInfo?.optReceipt) {
+    visaInfo.set({
+      optReceipt: {
+        file: inputVisaInfo?.optReceipt.file,
+        status: 'Pending Approval',
+      },
+    });
+  }
+  return visaInfo;
+}
+
+export const acceptEmployeeOnboardingSubmission = async (req, res) => {
   try {
     const {
-      userId,
-      houseId,
-      visaInfo,
       firstName,
       lastName,
       middleName,
+      preferredName,
       profilePicture,
       ssn,
       dob,
-      gender,
-      isCitizenOrPR,
-      emergencyContacts,
-      contactInfo,
       address,
+      gender,
+      contactInfo,
+      isCitizenOrPR,
+      visaInfo,
+      driverLicense,
+      carInfo,
+      reference,
+      emergencyContacts,
     } = req.body;
 
-    const existingEmployee = await Employee.findOne({ ssn });
+    const user = await User.findById(req.user.id).populate({
+      path: 'employeeId',
+      populate: {
+        path: 'visaInfo',
+      },
+    });
+    let employee = user.employeeId;
 
-    if (existingEmployee) {
-      return res.status(400).json({ message: 'SSN already registered.' });
+    if (employee) {
+      if (employee.onboardingStatus != 'Rejected') {
+        return res.status(400).json({ message: 'You cannot make new submission yet.' });
+      }
+    } else {
+      employee = new Employee({
+        userId: user._id,
+      });
+      user.employeeId = employee._id;
     }
-
-    const newEmployee = new Employee({
-      userId,
-      houseId,
-      visaInfo,
+    employee.set({
       firstName,
       lastName,
       middleName,
+      preferredName,
       profilePicture,
       dob,
       ssn,
       gender,
       isCitizenOrPR,
-      emergencyContacts,
       contactInfo,
       address,
+      driverLicense,
+      carInfo,
+      reference,
+      emergencyContacts,
+      onboardingStatus: 'Pending',
     });
 
-    await newEmployee.save();
+    const updatedVisaInfo = await updateVisaInfo(employee, visaInfo);
+    user.isOnboardingSubmitted = true;
+    await Promise.all([employee.save(), updatedVisaInfo.save(), user.save()]);
 
-    res.status(201).json({ message: `Employee registration successful!` });
+    res.status(201).json({ message: `Onboard application submitted successfully!` });
   } catch (error) {
     console.error('Error creating new employee:', error);
     res.status(500).json({ message: 'Failed to post new employee information in system: ', error });
@@ -153,10 +176,8 @@ export const addResidentToHousing = async (req, res) => {
 
 export const getEmployeeData = async (req, res) => {
   try {
-    const { _id } = req.params;
-
+    const _id = req.user.employeeId;
     const employee = await Employee.findOne({ _id });
-
     if (!employee) {
       res.status(400).json({ message: 'employee could not be found with given _id' });
     }
@@ -169,7 +190,7 @@ export const getEmployeeData = async (req, res) => {
 
 export const getVisaStatus = async (req, res) => {
   try {
-    const { _id } = req.params;
+    const { _id } = req.query;
 
     const visaStatus = await VisaStatus.findOne({ employeeId: _id });
 
@@ -183,17 +204,19 @@ export const getVisaStatus = async (req, res) => {
   }
 };
 
-export const updateOptReceipt = async (req, res) => {
+export const updateVisaStatus = async (req, res) => {
   try {
-    const { _id, optReceipt } = req.body;
+    const { _id, documentUpdate } = req.body;
+
+    const employeeId = new mongoose.Types.ObjectId(_id);
 
     const updatedEmployee = await VisaStatus.findOneAndUpdate(
-      { employeeId: _id },
+      { employeeId },
       {
         $set: {
-          'optReceipt.file': optReceipt.file,
-          'optReceipt.status': optReceipt.status,
-          'optReceipt.feedback': optReceipt.feedback,
+          [`${documentUpdate.type}.file`]: documentUpdate.file,
+          [`${documentUpdate.type}.status`]: documentUpdate.status,
+          [`${documentUpdate.type}.feedback`]: documentUpdate.feedback,
         },
       },
       { new: true } // returns the updated document
@@ -203,86 +226,9 @@ export const updateOptReceipt = async (req, res) => {
       return res.status(404).json({ message: 'Employee not found' });
     }
 
-    res.status(200).json({ message: 'OPT Receipt updated successfully', data: updatedEmployee });
+    res.status(200).json({ message: 'Visa status updated successfully', data: updatedEmployee });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to update OPT receipt', error });
-  }
-};
-
-export const updateOptEAD = async (req, res) => {
-  try {
-    const { _id, optEAD } = req.body;
-
-    const updatedEmployee = await VisaStatus.findOneAndUpdate(
-      { employeeId: _id },
-      {
-        $set: {
-          'optEAD.file': optEAD.file,
-          'optEAD.status': optEAD.status,
-          'optEAD.feedback': optEAD.feedback,
-        },
-      },
-      { new: true } // returns the updated document
-    );
-
-    if (!updatedEmployee) {
-      return res.status(404).json({ message: 'Employee not found' });
-    }
-
-    res.status(200).json({ message: 'OPT EAD updated successfully', data: updatedEmployee });
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to update OPT EAD', error });
-  }
-};
-
-export const updateI983 = async (req, res) => {
-  try {
-    const { _id, i983 } = req.body;
-
-    const updatedEmployee = await VisaStatus.findOneAndUpdate(
-      { employeeId: _id },
-      {
-        $set: {
-          'i983.file': i983.file,
-          'i983.status': i983.status,
-          'i983.feedback': i983.feedback,
-        },
-      },
-      { new: true } // returns the updated document
-    );
-
-    if (!updatedEmployee) {
-      return res.status(404).json({ message: 'Employee not found' });
-    }
-
-    res.status(200).json({ message: 'I-983 updated successfully', data: updatedEmployee });
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to update I-983', error });
-  }
-};
-
-export const updateI20 = async (req, res) => {
-  try {
-    const { _id, i20 } = req.body;
-
-    const updatedEmployee = await VisaStatus.findOneAndUpdate(
-      { employeeId: _id },
-      {
-        $set: {
-          'i20.file': i20.file,
-          'i20.status': i20.status,
-          'i20.feedback': i20.feedback,
-        },
-      },
-      { new: true } // returns the updated document
-    );
-
-    if (!updatedEmployee) {
-      return res.status(404).json({ message: 'Employee not found' });
-    }
-
-    res.status(200).json({ message: 'I-20 updated successfully', data: updatedEmployee });
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to update I-20', error });
+    console.log(error);
+    res.status(500).json({ message: 'Failed to update user visa status', error });
   }
 };

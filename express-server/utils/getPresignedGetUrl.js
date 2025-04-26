@@ -9,7 +9,7 @@ import { s3Client } from './s3-credentials.js';
  * @param {number} expiresIn The duration in seconds the URL should be valid for in seconds.
  * @returns The presigned URL.
  */
-export const getPresignedGetUrl = async (key, expiresIn = 300) => {
+export const getPresignedGetUrl = async (key, expiresIn = 300, options = {}) => {
   if (!key) {
     console.error('getPresignedGetUrl: No key provided.');
     return null;
@@ -25,10 +25,22 @@ export const getPresignedGetUrl = async (key, expiresIn = 300) => {
       Key: key,
     };
 
+    // If asAttachment is true, add parameters to force download
+    if (options.asAttachment) {
+      // Extract filename from key (last part after the last slash)
+      const filename = key.split('/').pop() || 'document.pdf';
+      params.ResponseContentDisposition = `attachment; filename="${filename}"`;
+
+      // For PDF and other files, this ensures they download instead of opening in browser
+      params.ResponseContentType = 'application/octet-stream';
+    }
+
     const command = new GetObjectCommand(params);
     const url = await getSignedUrl(s3Client, command, { expiresIn });
 
-    console.log(`Generated presigned GET URL for key "${key}"`);
+    console.log(
+      `Generated presigned GET URL for key "${key}"${options.asAttachment ? ' as download' : ''}`
+    );
     return url;
   } catch (error) {
     console.error(`Error generating presigned GET URL for key "${key}":`, error);

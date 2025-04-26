@@ -24,8 +24,8 @@ export default function FileUploadWithPreview({
   onFileSelect = () => {},
   previewOnly = false,
   type = 'any',
-  width = '200px',
-  height = '200px',
+  width = 'auto',
+  height = '2.5rem',
 }: FileUploadWithPreviewProps) {
   const accept = AcceptedTypes[type];
   const renderContent = () => {
@@ -80,6 +80,7 @@ export default function FileUploadWithPreview({
         sx={{
           width,
           height,
+          padding: type == 'image' ? 0 : '0.3rem',
           border: '1px dashed #ccc',
           borderRadius: 2,
           display: 'flex',

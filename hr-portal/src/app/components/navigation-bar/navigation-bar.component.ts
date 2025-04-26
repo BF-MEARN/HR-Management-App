@@ -13,11 +13,16 @@ export class NavigationBarComponent implements OnInit {
   menuItems = [
     { path: '/home', label: 'Home', icon: 'home' },
     { path: '/employee-profiles', label: 'Employee Profiles', icon: 'people' },
-    { path: '/visa', label: 'Visa Status Management', icon: 'article' },
+    {
+      path: '/visa-status',
+      label: 'Visa Status Management',
+      icon: 'article',
+      queryParams: { tab: 'in-progress' }
+    },
     {
       label: 'Hiring Management',
       path: ['/hiring'],
-      queryParams: { subTab: 'pending' },
+      queryParams: { tab: 'pending' },
       icon: 'work'
     },
     { path: '/housing', label: 'Housing Management', icon: 'house' },

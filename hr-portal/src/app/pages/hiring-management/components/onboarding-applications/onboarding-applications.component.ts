@@ -18,6 +18,8 @@ export class OnboardingApplicationsComponent implements OnInit {
   @Input() selectedTab: number = 0;
   @Output() tabChange = new EventEmitter<number>();
   
+  displayedColumns: string[] = ['name', 'email', 'status', 'action'];
+  
   constructor(private onboardingService: OnboardingApplicationService, private router: Router, private store: Store) { }
   
   pending$: Observable<Employee[]> = this.store.select(selectPendingApplications);

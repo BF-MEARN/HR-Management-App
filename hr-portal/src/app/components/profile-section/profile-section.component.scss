@@ -74,15 +74,6 @@ $section-spacing: 20px;
   }
 }
 
-.feedback-card {
-  background-color: #fff8f7;
-
-  &.approved-feedback {
-    border-left: 5px solid #4caf50;
-    background-color: #f1f8e9;
-  }
-}
-
 .profile-card {
   .profile-header {
     background-color: #fcfcfc;
@@ -134,28 +125,87 @@ $section-spacing: 20px;
         color: #666;
       }
     }
+  }
+}
 
-    mat-chip {
-      font-size: 12px;
-      padding: 4px 12px;
-      height: auto;
-      border-radius: 16px;
-      margin-left: auto; // pushes chip to the far right
+.status-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 16px;
 
-      &.pending {
-        background-color: #ff9800 !important;
-        color: #fcfcfc !important;
-      }
+  &.pending {
+    background-color: #fff3e0;
+    color: #f57c00;
 
-      &.approved {
-        background-color: #4caf50 !important;
-        color: #fcfcfc !important;
-      }
+    mat-icon {
+      color: #f57c00;
+    }
+  }
 
-      &.rejected {
-        background-color: #f44336 !important;
-        color: #fcfcfc !important;
-      }
+  &.approved {
+    background-color: #e5f3e6;
+    color: #2e7d32;
+
+    mat-icon {
+      color: #2e7d32;
+    }
+  }
+
+  &.rejected {
+    background-color: #ffe7eb;
+    color: #c62828;
+
+    mat-icon {
+      color: #c62828;
+    }
+  }
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .status-content {
+    flex: 1;
+
+    .status-title {
+      font-weight: 600;
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .status-message {
+      font-size: 14px;
+    }
+  }
+}
+
+.feedback-section {
+  margin-top: 20px;
+
+  mat-divider {
+    margin-bottom: 20px;
+  }
+
+  .feedback-content {
+    padding: 0 20px;
+
+    h3 {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: #555;
+    }
+
+    p {
+      font-size: 14px;
+      line-height: 1.5;
+      color: #333;
+      white-space: pre-line;
     }
   }
 }
@@ -257,29 +307,116 @@ $section-spacing: 20px;
   }
 }
 
-.visa-details {
-  margin-top: 16px;
+.visa-documents-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
 
-  .info-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 0;
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 16px;
+    background-color: #1976d2;
+    margin-right: 8px;
+    border-radius: 2px;
+  }
+}
 
-    .label {
-      color: #666;
-      font-size: 14px;
-    }
+.document-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
 
-    .value {
-      font-weight: 500;
-      color: #333;
+.document-item {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  &:has(.document-actions) {
+    border-left: 3px solid #1976d2;
+  }
+}
+
+.document-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.document-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  mat-icon {
+    color: #555;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  span {
+    font-weight: 500;
+    color: #333;
+  }
+}
+
+.document-status {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 12px;
+
+  &.status-not-uploaded {
+    background-color: #f1f1f1;
+    color: #888;
+  }
+
+  &.status-pending {
+    background-color: #fff3e0;
+    color: #f57c00;
+  }
+
+  &.status-approved {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+  }
+
+  &.status-rejected {
+    background-color: #ffebee;
+    color: #c62828;
+  }
+}
+
+.document-actions {
+  display: flex;
+  gap: 12px;
+
+  button {
+    flex: 1;
+    height: 36px;
+
+    mat-icon {
+      margin-right: 4px;
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
     }
   }
 }
 
+// Enhance the existing F1 visa info box
 .f1-visa-info-box {
-  margin-top: 16px;
+  margin-top: 24px;
   padding: 16px;
   background-color: #e8f4fd;
   border-left: 4px solid #1976d2;
@@ -308,18 +445,6 @@ $section-spacing: 20px;
   button {
     margin-left: auto;
     white-space: nowrap;
-  }
-}
-
-.document-button {
-  width: 100%;
-  margin-top: 16px;
-  height: 48px;
-  font-size: 15px;
-  border-width: 2px;
-
-  mat-icon {
-    margin-right: 8px;
   }
 }
 

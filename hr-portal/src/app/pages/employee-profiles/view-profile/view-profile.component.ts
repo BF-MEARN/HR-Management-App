@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ActivatedRoute, Router } from '@angular/router';
 import { OnboardingApplicationService } from 'src/app/services/onboarding-application.service';
+import { S3DocumentService } from 'src/app/services/s3-document.service';
 
 @Component({
   selector: 'app-view-profile',
@@ -20,7 +21,8 @@ export class ViewProfileComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private onboardingService: OnboardingApplicationService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private docService: S3DocumentService,
   ) { }
 
   ngOnInit(): void {
@@ -66,15 +68,64 @@ export class ViewProfileComponent implements OnInit {
     this.router.navigate(['/visa-status', employeeId]);
   }
 
-  // TODO: Implement S3
-  handleDownloadDocument(document: any): void {
+  handlePreviewDocument(document: any): void {
     if (document?.file) {
-      window.open(document.file, '_blank');
+      this.docService.getPresignedUrl(document.file).subscribe({
+        next: (res) => {
+          window.open(res.url, '_blank');
+        },
+        error: (err) => {
+          console.error('Failed to fetch presigned URL:', err);
+          this.snackBar.open('Failed to open document preview', 'Close', { 
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          });
+        }
+      });
     } else {
-      this.snackBar.open('Document not available', 'Close', {
+      this.snackBar.open('Document not available for preview', 'Close', {
         duration: 3000,
         panelClass: ['error-snackbar']
       });
     }
   }
+
+
+  handleDownloadDocument(documentObj: any): void {
+    if (!documentObj?.file) {
+      this.snackBar.open('Document not available', 'Close', {
+        duration: 3000,
+        panelClass: ['error-snackbar']
+      });
+      return;
+    }
+    
+    const fileKey = documentObj.file;
+    
+    this.docService.getDownloadUrl(fileKey).subscribe({
+      next: (res) => {
+        // Create a link and trigger the download
+        const link = window.document.createElement('a');
+        link.href = res.url;
+        link.style.display = 'none';
+        window.document.body.appendChild(link);
+        link.click();
+        
+        // Small delay before removal to ensure click is processed
+        setTimeout(() => {
+          window.document.body.removeChild(link);
+        }, 100);
+        
+        this.snackBar.open('Downloading document...', 'Close', { duration: 3000 });
+      },
+      error: (err) => {
+        console.error('Download failed:', err);
+        this.snackBar.open('Failed to download document', 'Close', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
+      }
+    });
+  }
+  
 }

@@ -1,71 +1,125 @@
 import { Box, Checkbox, FormControlLabel, Grid, TextField, Typography } from '@mui/material';
 
+import useErrorMap from '../../contexts/error-map/useErrorMap';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { updateDriverAndCar } from '../../store/slices/employeeFormSlice';
 import FileUploadWithPreview from '../FileUploadWithPreview';
+import { useTextFieldProps } from '../useTextFieldProps';
+import { EmployeeFormProps } from './formProps';
 
-export interface DriverAndCarInfoFormProps {
+export type DriverAndCarInfoFormProps = {
   onDriverLicenseFileChange: (f: File) => void;
-}
+} & EmployeeFormProps;
 
-export default function DriverAndCarInfoForm({
+function DriverAndCarInfoForm({
   onDriverLicenseFileChange,
+  readOnly,
+  forceCheck,
 }: DriverAndCarInfoFormProps) {
   const formData = useAppSelector((state) => state.employeeForm.driverAndCar);
   const dispatch = useAppDispatch();
+  const { updateErrorMap } = useErrorMap();
+
+  const licenseNumberProps = useTextFieldProps(
+    {
+      name: 'licenseNumber',
+      get: () => formData.driverLicense.number ?? '',
+      set: (v) => dispatch(updateDriverAndCar({ driverLicense: { number: v } })),
+      required: () => formData.hasDriverLicense,
+      readOnly,
+    },
+    forceCheck,
+    updateErrorMap
+  );
+
+  const licenseExpirationProps = useTextFieldProps(
+    {
+      name: 'expirationDate',
+      get: () => formData.driverLicense.expirationDate ?? '',
+      set: (v) => dispatch(updateDriverAndCar({ driverLicense: { expirationDate: v } })),
+      required: () => formData.hasDriverLicense,
+      type: 'date',
+      readOnly,
+    },
+    forceCheck,
+    updateErrorMap
+  );
+
+  const carMakeProps = useTextFieldProps(
+    {
+      name: 'make',
+      get: () => formData.carInfo.make ?? '',
+      set: (v) => dispatch(updateDriverAndCar({ carInfo: { make: v } })),
+      required: () => formData.hasCar,
+      readOnly,
+    },
+    forceCheck,
+    updateErrorMap
+  );
+
+  const carModelProps = useTextFieldProps(
+    {
+      name: 'model',
+      get: () => formData.carInfo.model ?? '',
+      set: (v) => dispatch(updateDriverAndCar({ carInfo: { model: v } })),
+      required: () => formData.hasCar,
+      readOnly,
+    },
+    forceCheck,
+    updateErrorMap
+  );
+
+  const carColorProps = useTextFieldProps(
+    {
+      name: 'color',
+      get: () => formData.carInfo.color ?? '',
+      set: (v) => dispatch(updateDriverAndCar({ carInfo: { color: v } })),
+      required: () => formData.hasCar,
+      readOnly,
+    },
+    forceCheck,
+    updateErrorMap
+  );
+
   return (
-    <Box sx={{ px: 2 }}>
+    <Box component="form" noValidate sx={{ px: 2 }}>
       <Typography variant="h6" mb={1}>
         Driver&apos;s License
       </Typography>
       <FormControlLabel
         control={
           <Checkbox
+            disabled={readOnly}
             checked={formData.hasDriverLicense}
-            slotProps={{ input: { 'aria-label': 'controlled' } }}
             onChange={(e) => dispatch(updateDriverAndCar({ hasDriverLicense: e.target.checked }))}
           />
         }
         label="I have a driver's license"
       />
-
       {formData.hasDriverLicense && (
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField
-              label="License Number"
-              fullWidth
-              value={formData.driverLicense.number}
-              onChange={(e) =>
-                dispatch(updateDriverAndCar({ driverLicense: { number: e.target.value } }))
-              }
-            />
+            <TextField label="License Number" {...licenseNumberProps()} />
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              type="date"
               label="Expiration Date"
-              slotProps={{ inputLabel: { shrink: true } }}
-              fullWidth
-              value={formData.driverLicense.expirationDate}
-              onChange={(e) =>
-                dispatch(updateDriverAndCar({ driverLicense: { expirationDate: e.target.value } }))
-              }
+              type="date"
+              {...licenseExpirationProps({ slotProps: { inputLabel: { shrink: true } } })}
             />
           </Grid>
           <Grid size={{ xs: 12 }}>
             <FileUploadWithPreview
-              previewURL={formData.driverLicense.licensePreview}
+              previewURL={formData.driverLicense.license.url}
               type="document"
-              height="2rem"
-              fileName={formData.driverLicense.licenseFileName}
+              fileName={formData.driverLicense.license.name}
               buttonText="Upload Driver's License"
+              previewOnly={readOnly}
               onFileSelect={(f) => {
                 dispatch(
                   updateDriverAndCar({
                     driverLicense: {
-                      licenseFileName: f.name,
-                      licensePreview: URL.createObjectURL(f),
+                      license: { name: f.name, url: URL.createObjectURL(f) },
                     },
                   })
                 );
@@ -75,12 +129,13 @@ export default function DriverAndCarInfoForm({
           </Grid>
         </Grid>
       )}
-      <Typography variant="h6" mb={1}>
+      <Typography variant="h6" mt={4} mb={1}>
         Car
       </Typography>
       <FormControlLabel
         control={
           <Checkbox
+            disabled={readOnly}
             checked={formData.hasCar}
             onChange={(e) => dispatch(updateDriverAndCar({ hasCar: e.target.checked }))}
           />
@@ -90,31 +145,18 @@ export default function DriverAndCarInfoForm({
       {formData.hasCar && (
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 4 }}>
-            <TextField
-              label="Car Make"
-              fullWidth
-              value={formData.carInfo.make}
-              onChange={(e) => dispatch(updateDriverAndCar({ carInfo: { make: e.target.value } }))}
-            />
+            <TextField label="Car Make" {...carMakeProps()} />
           </Grid>
           <Grid size={{ xs: 12, sm: 4 }}>
-            <TextField
-              label="Car Model"
-              fullWidth
-              value={formData.carInfo.model}
-              onChange={(e) => dispatch(updateDriverAndCar({ carInfo: { model: e.target.value } }))}
-            />
+            <TextField label="Car Model" {...carModelProps()} />
           </Grid>
           <Grid size={{ xs: 12, sm: 4 }}>
-            <TextField
-              label="Car Color"
-              fullWidth
-              value={formData.carInfo.color}
-              onChange={(e) => dispatch(updateDriverAndCar({ carInfo: { color: e.target.value } }))}
-            />
+            <TextField label="Car Color" {...carColorProps()} />
           </Grid>
         </Grid>
       )}
     </Box>
   );
 }
+
+export default DriverAndCarInfoForm;

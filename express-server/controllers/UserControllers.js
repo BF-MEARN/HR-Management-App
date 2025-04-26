@@ -52,6 +52,30 @@ export const logout = async (req, res) => {
 };
 
 /**
+ * @desc    Validate if the given registration token is valid
+ * @route   get /api/user/registration-token/:tokenUUID
+ * @access  Authenticated users
+ */
+export const validateRegistrationToken = async (req, res) => {
+  try {
+    const { tokenUUID } = req.params;
+
+    // not expired, not used
+    const token = await RegistrationToken.findOne({
+      token: tokenUUID,
+      expiresAt: { $gt: new Date() },
+      used: false,
+    });
+    if (!token) {
+      return res.status(404).json({ message: 'Registration token not found or invalid.' });
+    }
+    return res.status(200).json({ token });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to validate employee registration token ', error });
+  }
+};
+
+/**
  * @desc    Register a new user (defaults to employee role)
  * @route   POST /api/user/register
  * @access  Public

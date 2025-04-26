@@ -3,6 +3,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import employeeFormReducer from './slices/employeeFormSlice';
 import facilityReportReducer from './slices/facilityReportSlice';
 import housingReducer from './slices/housingSlice';
+import employeeReducer from './slices/employeeSlice';
 import userReducer from './slices/userSlice';
 
 export const store = configureStore({
@@ -11,6 +12,7 @@ export const store = configureStore({
     user: userReducer,
     housing: housingReducer,
     facilityReports: facilityReportReducer,
+    employee: employeeReducer,
   },
 });
 
