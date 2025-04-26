@@ -23,7 +23,7 @@ export class AuthService {
   }
 
   logout(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true });
+    return this.http.post(`${this.apiUrl}/hrLogout`, {}, { withCredentials: true });
   }
   
   getCurrentUser(): Observable<{ user: any }> {

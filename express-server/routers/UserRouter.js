@@ -1,6 +1,7 @@
 import { Router } from 'express';
 
 import {
+  hrLogout,
   login,
   logout,
   register,
@@ -13,6 +14,7 @@ const router = Router();
 
 router.post('/login', login);
 router.post('/logout', logout);
+router.post('/hrLogout', hrAuth, hrLogout);
 router.post('/register', register);
 router.get('/register/:tokenUUID', validateRegistrationToken);
 

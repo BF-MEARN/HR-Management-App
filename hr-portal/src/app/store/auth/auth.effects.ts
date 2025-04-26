@@ -24,7 +24,7 @@ export class AuthEffects {
               throw new Error('Unauthorized: not an HR user');
             }
 
-            localStorage.setItem('user', JSON.stringify(response.user));
+            localStorage.setItem('hrUser', JSON.stringify(response.user));
             return AuthActions.loginSuccess({ user: response.user });
           }),
           catchError((err) =>

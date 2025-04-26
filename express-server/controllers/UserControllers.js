@@ -53,18 +53,36 @@ export const login = async (req, res) => {
 };
 
 /**
- * @desc    Clear authToken cookie and log out
+ * @desc    Clear authToken cookie and log out (Employee portal only)
  * @route   POST /api/user/logout
  * @access  Authenticated users
  */
 export const logout = async (req, res, next) => {
   try {
-    if (req.user?.role === 'hr') {
-      res.clearCookie('hrAuthToken');
-    } else {
-      res.clearCookie('authToken');
-    }
+    res.clearCookie('authToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Lax',
+    });
     res.json({ message: 'Logged out successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Clear hrAuthToken cookie and log out (HR)
+ * @route   POST /api/user/hr/logout
+ * @access  Authenticated HR users
+ */
+export const hrLogout = async (req, res, next) => {
+  try {
+    res.clearCookie('hrAuthToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Lax',
+    });
+    res.json({ message: 'HR logged out successfully' });
   } catch (error) {
     next(error);
   }

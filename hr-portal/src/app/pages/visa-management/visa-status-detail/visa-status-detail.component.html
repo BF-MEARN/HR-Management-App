@@ -31,6 +31,69 @@
       </div>
     </mat-card>
 
+    <!-- Application Status -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>Application Status</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="status-container" [ngClass]="statusClass">
+          <mat-icon>{{ getStatusIcon() }}</mat-icon>
+          <div class="status-content">
+            <div class="status-title">
+              {{ visaStatus?.employeeId?.onboardingStatus }}
+            </div>
+
+            <div
+              class="status-message"
+              *ngIf="visaStatus?.employeeId?.onboardingStatus === 'Pending'"
+            >
+              Please review the employee's onboarding application first before proceeding with the
+              visa documents.
+            </div>
+
+            <div
+              class="status-message"
+              *ngIf="visaStatus?.employeeId?.onboardingStatus === 'Approved'"
+            >
+              This application has been approved. The employee has completed the onboarding process.
+            </div>
+
+            <div
+              class="status-message"
+              *ngIf="visaStatus?.employeeId?.onboardingStatus === 'Rejected'"
+            >
+              This application has been rejected.
+            </div>
+          </div>
+        </div>
+
+        <!-- Display rejection feedback inside the status card -->
+        <!-- <div
+          class="feedback-section"
+          *ngIf="application?.onboardingStatus === 'Rejected' && application?.onboardingFeedback"
+        >
+          <mat-divider></mat-divider>
+          <div class="feedback-content">
+            <h3>Rejection Feedback:</h3>
+            <p>{{ application?.onboardingFeedback }}</p>
+          </div>
+        </div> -->
+
+        <!-- Display approval feedback inside the status card if exists -->
+        <!-- <div
+          class="feedback-section"
+          *ngIf="application?.onboardingStatus === 'Approved' && application?.onboardingFeedback"
+        >
+          <mat-divider></mat-divider>
+          <div class="feedback-content">
+            <h3>Approval Comments:</h3>
+            <p>{{ application?.onboardingFeedback }}</p>
+          </div>
+        </div> -->
+      </mat-card-content>
+    </mat-card>
+
     <!-- Visa Information -->
     <mat-card class="section-card">
       <mat-card-header>
@@ -131,11 +194,21 @@
               <h3 class="admin-section-title">Admin Actions</h3>
 
               <div *ngIf="visaStatus[doc].status === 'Pending Approval'" class="action-buttons">
-                <button mat-raised-button color="warn" (click)="openRejectDialog(doc)">
+                <button
+                  mat-raised-button
+                  color="warn"
+                  (click)="openRejectDialog(doc)"
+                  [disabled]="isOnboardingPending()"
+                >
                   <mat-icon>cancel</mat-icon>
                   Reject
                 </button>
-                <button mat-raised-button color="primary" (click)="approveDocument(doc)">
+                <button
+                  mat-raised-button
+                  color="primary"
+                  (click)="approveDocument(doc)"
+                  [disabled]="isOnboardingPending()"
+                >
                   <mat-icon>check_circle</mat-icon>
                   Approve
                 </button>

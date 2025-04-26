@@ -49,8 +49,10 @@ export class NavigationBarComponent implements OnInit {
 
   logout(): void {
     this.authService.logout().subscribe(() => {
-      localStorage.clear();
-      sessionStorage.clear();
+      // localStorage.clear();
+      // sessionStorage.clear();
+      localStorage.removeItem('hrUser');
+      sessionStorage.removeItem('hrAuthToken'); 
       this.store.dispatch(AuthActions.logout());
       this.router.navigate(['/login']);
     });

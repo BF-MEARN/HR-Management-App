@@ -24,7 +24,7 @@ export class VisaStatusDetailComponent implements OnInit {
   readonly visaDocKeys = visaDocKeys;
 
   constructor(
-    private route: ActivatedRoute,
+    private route: ActivatedRoute, 
     private router: Router,
     private visaService: VisaManagementService,
     private docService: S3DocumentService,
@@ -35,6 +35,28 @@ export class VisaStatusDetailComponent implements OnInit {
   ngOnInit(): void {
     this.loadVisaStatusData();
   }
+
+  get statusClass() {
+    return {
+      pending: this.visaStatus?.employeeId?.onboardingStatus === 'Pending',
+      approved: this.visaStatus?.employeeId?.onboardingStatus === 'Approved',
+      rejected: this.visaStatus?.employeeId?.onboardingStatus === 'Rejected',
+    };
+  }
+  
+  getStatusIcon(): string {
+    switch (this.visaStatus?.employeeId?.onboardingStatus) {
+      case 'Pending':
+        return 'hourglass_empty';
+      case 'Approved':
+        return 'check_circle';
+      case 'Rejected':
+        return 'cancel';
+      default:
+        return 'help';
+    }
+  }
+  
 
   loadVisaStatusData(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -70,6 +92,11 @@ export class VisaStatusDetailComponent implements OnInit {
   goBack(): void {
     this.router.navigate(['../'], { relativeTo: this.route });
   }
+
+  isOnboardingPending(): boolean {
+    return this.visaStatus?.employeeId?.onboardingStatus === 'Pending';
+  }
+  
 
   getCurrentPendingDoc(): VisaDocKey | null {
     if (!this.visaStatus) return null;

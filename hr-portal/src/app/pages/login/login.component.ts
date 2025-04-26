@@ -40,7 +40,7 @@ export class LoginComponent {
             return;
           }
 
-          localStorage.setItem('user', JSON.stringify(response.user));
+          localStorage.setItem('hrUser', JSON.stringify(response.user));
           this.store.dispatch(AuthActions.loginSuccess({ user }));
           this.router.navigate(['/home']);
         },

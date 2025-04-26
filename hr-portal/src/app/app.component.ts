@@ -16,7 +16,7 @@ export class AppComponent implements OnInit {
   constructor(private store: Store, private router: Router) {}
 
   ngOnInit(): void {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = localStorage.getItem('hrUser');
     if (storedUser) {
       const user = JSON.parse(storedUser);
       // this.store.dispatch(AuthActions.loginSuccess({ user }));
