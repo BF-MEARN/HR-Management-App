@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Button, Paper, TextField } from '@mui/material';
+import { Box, Button, Stack, TextField, Typography } from '@mui/material';
 
 import { useAppDispatch } from '../../../store';
 import { createReport } from '../../../store/slices/facilityReportSlice';
@@ -30,9 +30,11 @@ export default function FacilityReportForm({ houseId }: { houseId: string }) {
   };
 
   return (
-    <Paper>
-      <h1>Make A Facility Report</h1>
-      <form onSubmit={(e) => handleSubmit(e)}>
+    <Box component="form" onSubmit={(e) => handleSubmit(e)} px={2} margin={4}>
+      <Stack gap={2}>
+        <Typography variant="h6" component="div">
+          Make A Facility Report
+        </Typography>
         <TextField
           label="Title"
           name="title"
@@ -40,7 +42,6 @@ export default function FacilityReportForm({ houseId }: { houseId: string }) {
           onChange={(e) => setFormTitle(e.target.value)}
           required
         />
-        <br />
         <TextField
           label="Description"
           name="description"
@@ -50,7 +51,7 @@ export default function FacilityReportForm({ houseId }: { houseId: string }) {
           required
         />
         <Button type="submit">Submit</Button>
-      </form>
-    </Paper>
+      </Stack>
+    </Box>
   );
 }

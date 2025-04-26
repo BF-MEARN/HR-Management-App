@@ -1,6 +1,19 @@
 import { FormEvent, useState } from 'react';
 
-import { Button, TextField } from '@mui/material';
+import {
+  Avatar,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  Typography,
+} from '@mui/material';
 
 import { useAppDispatch } from '../../../store';
 import { Comment, deleteComment, updateComment } from '../../../store/slices/facilityReportSlice';
@@ -58,46 +71,53 @@ export default function ExistingComment({
 
   return (
     <>
-      {commentTimestamp && (
-        <div style={{ fontStyle: 'italic', marginTop: '40px' }}>
-          {commentTimestamp.toLocaleDateString()}, {commentTimestamp.toLocaleTimeString()}
-        </div>
-      )}
-
-      {comment && comment.createdBy && (
-        <h4>
-          {comment.createdBy.firstName} {comment.createdBy.lastName} commented:
-        </h4>
-      )}
-
-      {status !== 'Closed' ? (
-        <>
-          {!edit ? (
-            <>
-              <p style={{ marginLeft: '20px' }}>{currDescription}</p>
-              <Button onClick={handleDelete}>Delete</Button>
-              <Button onClick={handleTurnOnEdit}>Edit</Button>
-            </>
-          ) : (
-            <form onSubmit={(e) => handleSubmit(e)}>
-              <TextField
-                label="Description"
-                name="description"
-                value={currDescription}
-                onChange={(e) => setCurrDescription(e.target.value)}
-                fullWidth
-                required
-              />
-              <Button type="button" onClick={handleCancel}>
-                Cancel
-              </Button>
-              <Button type="submit">Submit</Button>
-            </form>
-          )}
-        </>
-      ) : (
-        <p style={{ marginLeft: '20px' }}>{currDescription}</p>
-      )}
+      <Card>
+        <CardHeader
+          avatar={<Avatar />}
+          title={
+            comment.createdBy &&
+            `${comment.createdBy.firstName} ${comment.createdBy.lastName} commented:`
+          }
+          subheader={commentTimestamp.toLocaleDateString()}
+        />
+        <CardContent>
+          <Typography variant="body1">{currDescription}</Typography>
+        </CardContent>
+        {status !== 'Closed' && (
+          <CardActions>
+            <Button onClick={handleDelete}>Delete</Button>
+            <Button onClick={handleTurnOnEdit}>Edit</Button>
+          </CardActions>
+        )}
+      </Card>
+      <Dialog
+        open={edit}
+        onClose={handleCancel}
+        slotProps={{
+          paper: {
+            component: 'form',
+            onSubmit: handleSubmit,
+          },
+        }}
+      >
+        <DialogTitle>Edit Comment</DialogTitle>
+        <DialogContent>
+          <TextField
+            sx={{ mt: 1 }}
+            autoFocus
+            label="Description"
+            name="description"
+            value={currDescription}
+            onChange={(e) => setCurrDescription(e.target.value)}
+            fullWidth
+            required
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancel}>Cancel</Button>
+          <Button type="submit">Submit</Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
