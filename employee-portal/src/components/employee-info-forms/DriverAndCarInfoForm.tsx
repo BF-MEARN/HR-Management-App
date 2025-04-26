@@ -1,9 +1,10 @@
 import { Box, Checkbox, FormControlLabel, Grid, TextField, Typography } from '@mui/material';
 
+import useErrorMap from '../../contexts/error-map/useErrorMap';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { updateDriverAndCar } from '../../store/slices/employeeFormSlice';
 import FileUploadWithPreview from '../FileUploadWithPreview';
-import { useErrorMap, useTextFieldProps } from '../useTextFieldProps';
+import { useTextFieldProps } from '../useTextFieldProps';
 import { EmployeeFormProps } from './formProps';
 
 export type DriverAndCarInfoFormProps = {
@@ -12,13 +13,12 @@ export type DriverAndCarInfoFormProps = {
 
 function DriverAndCarInfoForm({
   onDriverLicenseFileChange,
-  onFormStatusChange,
   readOnly,
   forceCheck,
 }: DriverAndCarInfoFormProps) {
   const formData = useAppSelector((state) => state.employeeForm.driverAndCar);
   const dispatch = useAppDispatch();
-  const updateErrorMap = useErrorMap(onFormStatusChange);
+  const { updateErrorMap } = useErrorMap();
 
   const licenseNumberProps = useTextFieldProps(
     {
@@ -82,7 +82,7 @@ function DriverAndCarInfoForm({
   );
 
   return (
-    <Box sx={{ px: 2 }}>
+    <Box component="form" noValidate sx={{ px: 2 }}>
       <Typography variant="h6" mb={1}>
         Driver&apos;s License
       </Typography>
@@ -129,7 +129,7 @@ function DriverAndCarInfoForm({
           </Grid>
         </Grid>
       )}
-      <Typography variant="h6" mb={1}>
+      <Typography variant="h6" mt={4} mb={1}>
         Car
       </Typography>
       <FormControlLabel

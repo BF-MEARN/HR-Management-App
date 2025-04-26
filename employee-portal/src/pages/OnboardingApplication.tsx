@@ -1,22 +1,19 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { Alert, Box, Button, Paper, Snackbar, Step, StepLabel, Stepper } from '@mui/material';
 
+import AddressForm from '../components/employee-info-forms/AddressForm';
+import BasicInfoForm from '../components/employee-info-forms/BasicInfoForm';
 import DocumentConfirmation from '../components/employee-info-forms/DocumentConfirmation';
 import DriverAndCarInfoForm from '../components/employee-info-forms/DriverAndCarInfoForm';
-import PersonalInfoForm from '../components/employee-info-forms/PersonalInfoForm';
-import ReferenceAndEmergencyContactForm from '../components/employee-info-forms/ReferenceAndEmergencyContactForm';
+import PhoneContactForm from '../components/employee-info-forms/PhoneContactForm';
 import WorkAuthorizationForm from '../components/employee-info-forms/WorkAuthorizationForm';
+import EmergencyContactForm from '../components/employee-info-forms/contact-forms/EmergencyContactForm';
+import ReferenceContactForm from '../components/employee-info-forms/contact-forms/ReferenceContactForm';
+import useErrorMap from '../contexts/error-map/useErrorMap';
 import { useAppDispatch, useAppSelector } from '../store';
 import { postOnboardingSubmission } from '../store/slices/employeeFormSlice';
-
-interface OnboardingStep<T> {
-  id: string;
-  name: string;
-  component?: FunctionComponent<T>;
-  props?: T;
-}
 
 function FinishedStep() {
   return (
@@ -46,14 +43,39 @@ function StepperFooter(props: {
     </Box>
   );
 }
+
+const steps = [
+  {
+    id: 'basicInfo',
+    name: 'Personal Information',
+  },
+  {
+    id: 'driverAndCarInfo',
+    name: "Driver's License and Cars",
+  },
+  {
+    id: 'workAuth',
+    name: 'Work Authorization',
+  },
+  {
+    id: 'contacts',
+    name: 'Reference & Emergency Contacts',
+  },
+  { id: 'documents', name: 'Document Confirmation' },
+];
+
 export default function OnBoardingApplicationPage() {
-  const profilePictureRef = React.useRef<File | null>(null);
-  const driverLicenseDocRef = React.useRef<File | null>(null);
-  const f1OptDocRef = React.useRef<File | null>(null);
+  const profilePictureRef = useRef<File | null>(null);
+  const driverLicenseDocRef = useRef<File | null>(null);
+  const f1OptDocRef = useRef<File | null>(null);
 
-  const [forceCheckEnabled, setForceCheckEnabled] = React.useState(false);
+  const [forceCheckEnabled, setForceCheckEnabled] = useState(false);
+  const [proceeding, setProceeding] = useState(false);
+  const [showErrorSnackBar, setShowErrorSnackBar] = useState(false);
 
-  const [proceeding, setProceeding] = React.useState(false);
+  const { validateAll } = useErrorMap();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const employeeOnboardingStatus = useAppSelector(
     (state) => state.employee.employee?.onboardingStatus
@@ -63,12 +85,10 @@ export default function OnBoardingApplicationPage() {
     (state) => state.employee.employee?.onboardingFeedback
   );
 
-  const [formStatus, setFormStatus] = React.useState(true);
-
-  const navigate = useNavigate();
   const [showStatusAlter, setShowStatusAlter] = useState(
     employeeOnboardingStatus === 'Pending' || employeeOnboardingStatus === 'Rejected'
   );
+
   const statusAlterText =
     employeeOnboardingStatus === 'Pending'
       ? 'Your application is pending. You can view the current application.'
@@ -82,78 +102,31 @@ export default function OnBoardingApplicationPage() {
 
   const readOnly = employeeOnboardingStatus === 'Pending';
 
-  const dispatch = useAppDispatch();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const steps: OnboardingStep<any>[] = [
-    {
-      id: 'basicInfo',
-      name: 'Personal Information',
-      component: PersonalInfoForm,
-      props: {
-        onProfilePictureFileChange: (f: File) => (profilePictureRef.current = f),
-        forceCheck: forceCheckEnabled,
-        onFormStatusChange: setFormStatus,
-        readOnly,
-      },
-    },
-    {
-      id: 'driverAndCarInfo',
-      name: "Driver's License and Cars",
-      component: DriverAndCarInfoForm,
-      props: {
-        onDriverLicenseFileChange: (f: File) => (driverLicenseDocRef.current = f),
-        forceCheck: forceCheckEnabled,
-        onFormStatusChange: setFormStatus,
-        readOnly,
-      },
-    },
-    {
-      id: 'workAuth',
-      name: 'Work Authorization',
-      props: {
-        onF1OptDocumentChange: (f: File) => (f1OptDocRef.current = f),
-        forceCheck: forceCheckEnabled,
-        onFormStatusChange: setFormStatus,
-        readOnly,
-      },
-      component: WorkAuthorizationForm,
-    },
-    {
-      id: 'contacts',
-      name: 'Reference & Emergency Contacts',
-      component: ReferenceAndEmergencyContactForm,
-      props: {
-        forceCheck: forceCheckEnabled,
-        onFormStatusChange: setFormStatus,
-        readOnly,
-      },
-    },
-    { id: 'documents', name: 'Document Confirmation', component: DocumentConfirmation },
-  ];
-
-  const [activeStepIndex, setActiveStepIndex] = React.useState(0);
+  const [activeStepIndex, setActiveStepIndex] = useState(0);
   const finished = activeStepIndex == steps.length;
-
-  const { component: StepComponent, props } = finished ? {} : steps[activeStepIndex];
-
   const nextDisabled = readOnly && activeStepIndex === steps.length - 1;
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (forceCheckEnabled && proceeding) {
-      if (formStatus) {
+      if (validateAll()) {
         setActiveStepIndex((prev) => prev + 1);
         setForceCheckEnabled(false);
-        setFormStatus(true);
       }
       setProceeding(false);
     }
-  }, [forceCheckEnabled, formStatus, proceeding]);
+  }, [forceCheckEnabled, proceeding, validateAll]);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    if (forceCheckEnabled && !validateAll()) {
+      setShowErrorSnackBar(true);
+    }
+  }, [forceCheckEnabled, proceeding, validateAll]);
+
+  useEffect(() => {
     if (finished) {
       dispatch(postOnboardingSubmission());
     }
-  }, [activeStepIndex, dispatch, finished, steps.length]);
+  }, [activeStepIndex, dispatch, finished]);
 
   const handleNext = () => {
     setForceCheckEnabled(true);
@@ -165,11 +138,59 @@ export default function OnBoardingApplicationPage() {
     setActiveStepIndex((prevActiveStep) => prevActiveStep - 1);
   };
 
+  const getStepComponent = () => {
+    switch (activeStepIndex) {
+      case 0:
+        return (
+          <>
+            <BasicInfoForm
+              onProfilePictureFileChange={(f: File) => (profilePictureRef.current = f)}
+              readOnly={readOnly}
+              forceCheck={forceCheckEnabled}
+            />
+            <AddressForm readOnly={readOnly} forceCheck={forceCheckEnabled} />
+            <PhoneContactForm readOnly={readOnly} forceCheck={forceCheckEnabled} />
+          </>
+        );
+      case 1:
+        return (
+          <DriverAndCarInfoForm
+            onDriverLicenseFileChange={(f: File) => (driverLicenseDocRef.current = f)}
+            readOnly={readOnly}
+            forceCheck={forceCheckEnabled}
+          />
+        );
+      case 2:
+        return (
+          <WorkAuthorizationForm
+            onF1OptDocumentChange={(f: File) => (f1OptDocRef.current = f)}
+            readOnly={!readOnly}
+            forceCheck={forceCheckEnabled}
+          />
+        );
+      case 3:
+        return (
+          <>
+            <ReferenceContactForm readOnly={readOnly} forceCheck={forceCheckEnabled} />
+            <EmergencyContactForm readOnly={readOnly} forceCheck={forceCheckEnabled} />
+          </>
+        );
+      case 4:
+        return <DocumentConfirmation />;
+      case 5:
+        return <FinishedStep />;
+      default:
+        return 'Nothing to show!';
+    }
+  };
+
   return (
     <>
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        open={forceCheckEnabled && !formStatus}
+        open={showErrorSnackBar}
+        autoHideDuration={5000}
+        onClose={() => setShowErrorSnackBar(false)}
         message="One or more fields are not filled correctly."
       />
 
@@ -196,13 +217,7 @@ export default function OnBoardingApplicationPage() {
                 );
               })}
             </Stepper>
-            {activeStepIndex === steps.length ? (
-              <FinishedStep />
-            ) : StepComponent ? (
-              <StepComponent {...props} />
-            ) : (
-              <>Nothing to show yet!</>
-            )}
+            {getStepComponent()}
             <StepperFooter
               isFirst={activeStepIndex == 0}
               isLast={activeStepIndex == steps.length - 1}

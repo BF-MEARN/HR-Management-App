@@ -5,7 +5,7 @@ import { RootState } from '../store';
 import {
   ContactFormData,
   DriverAndCarFormData,
-  OnboardingApplicationPayload,
+  EmployeeFormPayload,
   PersonalInfoFormData,
   WorkAuthorizationFormData,
   WorkAuthorizationType,
@@ -18,6 +18,13 @@ import {
   emptyWorkAuthorizationFormData,
 } from './employeeFormTypes';
 import { Employee } from './employeeTypes';
+import {
+  updateEmployeeAddress,
+  updateEmployeeContactInfo,
+  updateEmployeeEmergencyContact,
+  updateEmployeeEmploymentInfo,
+  updateEmployeeName,
+} from './employeeUpdateThunks';
 
 export interface EmployeeFormState {
   personalInfo: PersonalInfoFormData;
@@ -26,6 +33,7 @@ export interface EmployeeFormState {
   contacts: ContactFormData;
   requestStatus: 'idle' | 'pending' | 'succeeded' | 'failed';
   requestError?: string;
+  updateCounter: number;
 }
 
 const initialState: EmployeeFormState = {
@@ -34,13 +42,14 @@ const initialState: EmployeeFormState = {
   workAuth: emptyWorkAuthorizationFormData,
   contacts: emptyContactFormData,
   requestStatus: 'idle',
+  updateCounter: 0,
 };
 
 export const postOnboardingSubmission = createAsyncThunk(
   'employee/onboarding/',
   async (_, { getState, rejectWithValue }) => {
     const { employeeForm: forms } = getState() as RootState;
-    const payload: OnboardingApplicationPayload = {
+    const payload: EmployeeFormPayload = {
       firstName: forms.personalInfo.firstName,
       lastName: forms.personalInfo.lastName,
       middleName: forms.personalInfo.middleName,
@@ -194,13 +203,26 @@ const employeeFormSlice = createSlice({
       .addCase(postOnboardingSubmission.pending, (state) => {
         state.requestStatus = 'pending';
       })
-      .addCase(postOnboardingSubmission.fulfilled, (state, action) => {
+      .addCase(postOnboardingSubmission.fulfilled, (state) => {
         state.requestStatus = 'succeeded';
-        console.log(action.payload);
       })
-      .addCase(postOnboardingSubmission.rejected, (state, action) => {
+      .addCase(postOnboardingSubmission.rejected, (state) => {
         state.requestStatus = 'failed';
-        console.log(action.payload);
+      })
+      .addCase(updateEmployeeName.fulfilled, (state) => {
+        state.updateCounter += 1;
+      })
+      .addCase(updateEmployeeAddress.fulfilled, (state) => {
+        state.updateCounter += 1;
+      })
+      .addCase(updateEmployeeContactInfo.fulfilled, (state) => {
+        state.updateCounter += 1;
+      })
+      .addCase(updateEmployeeEmploymentInfo.fulfilled, (state) => {
+        state.updateCounter += 1;
+      })
+      .addCase(updateEmployeeEmergencyContact.fulfilled, (state) => {
+        state.updateCounter += 1;
       });
   },
 });
