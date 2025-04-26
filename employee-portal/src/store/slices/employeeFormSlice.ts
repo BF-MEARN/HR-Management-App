@@ -54,7 +54,7 @@ export const postOnboardingSubmission = createAsyncThunk(
       lastName: forms.personalInfo.lastName,
       middleName: forms.personalInfo.middleName,
       preferredName: forms.personalInfo.preferredName,
-      profilePicture: forms.personalInfo.profilePicture?.url, // TODO: replace with s3
+      profilePicture: forms.personalInfo.profilePicture?.s3Key, // TODO: replace with s3
       ssn: forms.personalInfo.ssn,
       dob: forms.personalInfo.dob,
       address: forms.personalInfo.address,
@@ -65,10 +65,12 @@ export const postOnboardingSubmission = createAsyncThunk(
       },
       driverLicense: forms.driverAndCar.hasDriverLicense
         ? {
-            ...forms.driverAndCar.driverLicense,
-            file: forms.driverAndCar.driverLicense.license.url, // TODO: replace with s3
+            number: forms.driverAndCar.driverLicense.number,
+            expirationDate: forms.driverAndCar.driverLicense.expirationDate,
+            file: forms.driverAndCar.driverLicense.license.s3Key || '',
           }
         : undefined,
+
       carInfo: forms.driverAndCar.hasCar ? forms.driverAndCar.carInfo : undefined,
       isCitizenOrPR: forms.workAuth.isCitizenOrPermanentResident,
       visaInfo: {
@@ -81,7 +83,7 @@ export const postOnboardingSubmission = createAsyncThunk(
         optReceipt:
           forms.workAuth.authorizationType === 'F1'
             ? {
-                file: forms.workAuth.extraAuthInfo.optReceipt?.url, // TODO: replace with s3
+                file: forms.workAuth.extraAuthInfo.optReceipt?.s3Key, // TODO: replace with s3
               }
             : undefined,
       },
@@ -144,7 +146,8 @@ const employeeFormSlice = createSlice({
         profilePicture: profilePicture
           ? {
               name: profilePicture,
-              url: profilePicture,
+              previewUrl: '',
+              s3Key: profilePicture,
             }
           : undefined,
       };
@@ -156,7 +159,8 @@ const employeeFormSlice = createSlice({
               expirationDate: formatDateString(driverLicense.expirationDate),
               license: {
                 name: driverLicense.file,
-                url: driverLicense.file,
+                previewUrl: '',
+                s3Key: driverLicense.file,
               },
             }
           : emptyLicenseEntry,
@@ -173,7 +177,8 @@ const employeeFormSlice = createSlice({
           optReceipt: visaInfo.optReceipt?.file
             ? {
                 name: visaInfo.optReceipt?.file,
-                url: visaInfo.optReceipt?.file,
+                previewUrl: '',
+                s3Key: visaInfo.optReceipt?.file,
               }
             : undefined,
         },

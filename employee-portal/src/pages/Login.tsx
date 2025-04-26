@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { Card, Typography } from '@mui/material';
+import { Alert, Box, Card, Typography } from '@mui/material';
 
 import AuthForm, { AuthFormData } from '../components/AuthForm';
 import { useAppDispatch, useAppSelector } from '../store';
@@ -16,6 +16,9 @@ export default function LoginPage() {
     (state) => state.employee.employee?.onboardingStatus
   );
 
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+
   useEffect(() => {
     if (user) {
       if (employeeOnboardingStatus === 'Approved') {
@@ -26,37 +29,83 @@ export default function LoginPage() {
     }
   }, [employeeOnboardingStatus, navigate, user]);
 
+  useEffect(() => {
+    if (toastOpen) {
+      const timer = setTimeout(() => {
+        setToastOpen(false);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [toastOpen]);
+
   const handleSubmit = async (form: AuthFormData) => {
     const res = await api('/user/login', {
       method: 'post',
       body: JSON.stringify({ username: form.username, password: form.password }),
     });
+
     if (res.ok) {
       const { user } = await res.json();
+
+      if (user.role !== 'employee') {
+        setToastMessage('Access Denied: Only employees can login.');
+        setToastOpen(true);
+        return;
+      }
+
       dispatch(setUser(user));
       navigate('/onboard');
+    } else {
+      setToastMessage('Login failed. Please check your credentials.');
+      setToastOpen(true);
     }
   };
 
   return (
-    <Card
-      variant="outlined"
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignSelf: 'center',
-        width: '100%',
-        padding: '2rem',
-        gap: '1rem',
-        marginBlock: '10rem',
-        marginInline: 'auto',
-        maxWidth: '450px',
-      }}
+    <Box
+      minHeight="100vh"
+      width="100%"
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
+      position="relative"
     >
-      <Typography component="h1" variant="h4" fontWeight={'bold'}>
-        Log in
-      </Typography>
-      <AuthForm type="login" onSubmit={handleSubmit} />
-    </Card>
+      {/* Floating Toast */}
+      {toastOpen && (
+        <Box
+          position="absolute"
+          top="32px"
+          left="50%"
+          sx={{
+            transform: 'translateX(-50%)',
+            zIndex: 9999,
+          }}
+        >
+          <Alert severity="error" onClose={() => setToastOpen(false)}>
+            {toastMessage}
+          </Alert>
+        </Box>
+      )}
+
+      {/* Login Card */}
+      <Card
+        variant="outlined"
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+          padding: '2rem',
+          gap: '1rem',
+          maxWidth: '450px',
+        }}
+      >
+        <Typography component="h1" variant="h4" fontWeight="bold">
+          Log in
+        </Typography>
+        <AuthForm type="login" onSubmit={handleSubmit} />
+      </Card>
+    </Box>
   );
 }

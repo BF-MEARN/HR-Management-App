@@ -2,7 +2,8 @@ import { Contact } from './employeeTypes';
 
 export type UploadedFile = {
   name: string;
-  url: string;
+  previewUrl: string;
+  s3Key?: string;
 };
 
 export type Gender = 'male' | 'female' | 'prefer_not_to_say';
@@ -72,7 +73,15 @@ export interface DriverAndCarFormData {
   };
 }
 
-export const emptyLicenseEntry = { number: '', expirationDate: '', license: { url: '', name: '' } };
+export const emptyLicenseEntry = {
+  number: '',
+  expirationDate: '',
+  license: {
+    name: '',
+    previewUrl: '',
+    s3Key: '',
+  },
+};
 
 export const emptyCarEntry = {
   make: '',

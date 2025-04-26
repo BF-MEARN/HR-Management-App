@@ -15,6 +15,7 @@ import useErrorMap from '../../contexts/error-map/useErrorMap';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { updatePersonalInfo } from '../../store/slices/employeeFormSlice';
 import { Gender } from '../../store/slices/employeeFormTypes';
+import { uploadEmployeeDocument } from '../../utils/utils';
 import FileUploadWithPreview from '../FileUploadWithPreview';
 import { useTextFieldProps } from '../useTextFieldProps';
 import { EmployeeFormProps } from './formProps';
@@ -118,16 +119,16 @@ function BasicInfoForm({ onProfilePictureFileChange, forceCheck, readOnly }: Bas
           </Typography>
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField label="First Name" {...firstNameProps()} />
+              <TextField label="First Name" {...firstNameProps} />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField label="Last Name" {...lastNameProps()} />
+              <TextField label="Last Name" {...lastNameProps} />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField label="Middle Name" {...middleNameProps()} />
+              <TextField label="Middle Name" {...middleNameProps} />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField label="Preferred Name" {...preferredNameProps()} />
+              <TextField label="Preferred Name" {...preferredNameProps} />
             </Grid>
           </Grid>
         </Grid>
@@ -136,17 +137,31 @@ function BasicInfoForm({ onProfilePictureFileChange, forceCheck, readOnly }: Bas
             Profile Picture
           </Typography>
           <FileUploadWithPreview
-            previewURL={formData.profilePicture?.url ?? ''}
+            previewURL={formData.profilePicture?.previewUrl ?? ''}
             fileName={formData.profilePicture?.name ?? ''}
             width="160px"
             height="160px"
-            onFileSelect={(f) => {
+            onFileSelect={async (f) => {
               onProfilePictureFileChange(f);
+
+              const previewUrl = URL.createObjectURL(f); // <== Save it here first
+
               dispatch(
                 updatePersonalInfo({
-                  profilePicture: { name: f.name, url: URL.createObjectURL(f) },
+                  profilePicture: { name: f.name, previewUrl },
                 })
               );
+
+              try {
+                const s3Key = await uploadEmployeeDocument(f, 'profilePictureFile'); // Uploads to backend and S3
+                dispatch(
+                  updatePersonalInfo({
+                    profilePicture: { name: f.name, previewUrl, s3Key },
+                  })
+                );
+              } catch (error) {
+                console.error('Failed to upload profile picture:', error);
+              }
             }}
             previewOnly={readOnly}
             buttonText="Upload Picture..."
@@ -174,15 +189,14 @@ function BasicInfoForm({ onProfilePictureFileChange, forceCheck, readOnly }: Bas
       </Typography>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12 }}>
-          <TextField label="SSN (###-##-####)" placeholder="123-45-6789" {...ssnProps()} />
+          <TextField label="SSN (###-##-####)" placeholder="123-45-6789" {...ssnProps} />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
           <TextField
             label="Date of Birth"
             type="date"
-            {...dobProps({
-              slotProps: { inputLabel: { shrink: true } },
-            })}
+            InputLabelProps={{ shrink: true }}
+            {...dobProps}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>

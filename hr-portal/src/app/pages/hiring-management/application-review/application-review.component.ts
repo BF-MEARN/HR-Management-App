@@ -19,6 +19,7 @@ export class ApplicationReviewComponent implements OnInit {
   feedback = '';
   isLoading = false;
   fromTab: string = 'pending';
+  profilePictureUrl?: string;
 
   constructor(
     private route: ActivatedRoute,
@@ -146,6 +147,22 @@ export class ApplicationReviewComponent implements OnInit {
   handleFeedbackChange(value: string): void {
     this.feedback = value;
   }
+
+  handleProfilePicturePreview(): void {
+    if (this.application?.profilePicture) {
+      this.docService.getPresignedUrl(this.application.profilePicture).subscribe({
+        next: (res) => {
+          this.profilePictureUrl = res.url;
+        },
+        error: (err) => {
+          console.error('Failed to fetch profile picture presigned URL:', err);
+          this.profilePictureUrl = undefined;
+        }
+      });
+    }
+  }
+  
+
 
   handlePreviewDocument(document: any): void {
     if (document?.file) {

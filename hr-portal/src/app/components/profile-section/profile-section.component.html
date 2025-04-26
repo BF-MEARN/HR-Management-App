@@ -11,8 +11,14 @@
   <mat-card class="section-card profile-card">
     <div class="profile-header">
       <div class="avatar-icon">
-        <mat-icon>person</mat-icon>
+        <ng-container *ngIf="profilePictureUrl; else fallbackIcon">
+          <img [src]="profilePictureUrl" alt="Profile Picture" class="profile-pic" />
+        </ng-container>
+        <ng-template #fallbackIcon>
+          <mat-icon>person</mat-icon>
+        </ng-template>
       </div>
+
       <div class="profile-info">
         <div class="name-status-wrapper">
           <h2>
@@ -292,7 +298,7 @@
                 class="document-actions"
                 *ngIf="
                   application?.visaInfo?.optReceipt?.file &&
-                  application?.visaInfo?.optReceipt?.status === 'Approved'
+                  application?.visaInfo?.optReceipt?.status !== 'Not Uploaded'
                 "
               >
                 <button mat-stroked-button color="primary" (click)="previewDocument('optReceipt')">
@@ -324,7 +330,7 @@
                 class="document-actions"
                 *ngIf="
                   application?.visaInfo?.optEAD?.file &&
-                  application?.visaInfo?.optEAD?.status === 'Approved'
+                  application?.visaInfo?.optEAD?.status !== 'Not Uploaded'
                 "
               >
                 <button mat-stroked-button color="primary" (click)="previewDocument('optEAD')">
@@ -356,7 +362,7 @@
                 class="document-actions"
                 *ngIf="
                   application?.visaInfo?.i983?.file &&
-                  application?.visaInfo?.i983?.status === 'Approved'
+                  application?.visaInfo?.i983?.status !== 'Not Uploaded'
                 "
               >
                 <button mat-stroked-button color="primary" (click)="previewDocument('i983')">
@@ -388,7 +394,7 @@
                 class="document-actions"
                 *ngIf="
                   application?.visaInfo?.i20?.file &&
-                  application?.visaInfo?.i20?.status === 'Approved'
+                  application?.visaInfo?.i20?.status !== 'Not Uploaded'
                 "
               >
                 <button mat-stroked-button color="primary" (click)="previewDocument('i20')">

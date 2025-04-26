@@ -51,3 +51,24 @@ export const formatDateString = (dateString: string | undefined) => {
   if (!dateString) return '';
   return new Date(dateString).toISOString().substring(0, 10);
 };
+
+export const uploadEmployeeDocument = async (
+  file: File,
+  field: 'profilePictureFile' | 'driverLicenseFile' | 'optReceiptFile'
+) => {
+  const formData = new FormData();
+  formData.append(field, file);
+
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/employee/docs/upload`, {
+    method: 'PUT',
+    credentials: 'include',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to upload document');
+  }
+
+  const result = await response.json();
+  return result.s3Key; // the uploaded S3 key
+};

@@ -14,7 +14,7 @@ export const updateEmployeeName = createAsyncThunk(
       lastName: forms.personalInfo.lastName,
       middleName: forms.personalInfo.middleName,
       preferredName: forms.personalInfo.preferredName,
-      profilePicture: forms.personalInfo.profilePicture?.url, // TODO: replace with s3
+      profilePicture: forms.personalInfo.profilePicture?.s3Key, // TODO: replace with s3
       ssn: forms.personalInfo.ssn,
       dob: forms.personalInfo.dob,
       gender: forms.personalInfo.gender,

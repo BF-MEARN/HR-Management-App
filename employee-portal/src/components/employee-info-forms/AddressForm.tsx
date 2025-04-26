@@ -89,19 +89,19 @@ function AddressForm({ forceCheck, readOnly }: AddressFormProps) {
       </Typography>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, sm: 6 }}>
-          <TextField label="Street" {...streetProps()} />
+          <TextField label="Street" {...streetProps} />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
-          <TextField label="Building / Apt #" {...buildingProps()} />
+          <TextField label="Building / Apt #" {...buildingProps} />
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
-          <TextField label="City" {...cityProps()} />
+          <TextField label="City" {...cityProps} />
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
-          <TextField label="State" {...stateProps()} />
+          <TextField label="State" {...stateProps} />
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
-          <TextField label="ZIP Code" {...zipProps()} />
+          <TextField label="ZIP Code" {...zipProps} />
         </Grid>
       </Grid>
     </Box>

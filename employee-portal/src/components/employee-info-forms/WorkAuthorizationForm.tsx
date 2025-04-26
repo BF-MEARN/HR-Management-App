@@ -18,6 +18,7 @@ import {
   WorkAuthorizationType,
   workAuthorizationCategories,
 } from '../../store/slices/employeeFormTypes';
+import { uploadEmployeeDocument } from '../../utils/utils';
 import FileUploadWithPreview from '../FileUploadWithPreview';
 import { useTextFieldProps } from '../useTextFieldProps';
 import { EmployeeFormProps } from './formProps';
@@ -167,42 +168,59 @@ export default function WorkAuthorizationForm({
             {formData.authorizationType == 'F1' && (
               <Grid size={{ xs: 12 }}>
                 <FileUploadWithPreview
-                  previewURL={formData.extraAuthInfo.optReceipt?.url}
+                  previewURL={formData.extraAuthInfo.optReceipt?.previewUrl}
                   fileName={formData.extraAuthInfo.optReceipt?.name}
                   previewOnly={readOnly}
                   type="document"
                   buttonText="Upload OPT Receipt"
-                  onFileSelect={(f) => {
-                    onF1OptDocumentChange(f);
+                  onFileSelect={async (f) => {
+                    const previewUrl = URL.createObjectURL(f); // ✅ Save preview URL first
+
                     dispatch(
                       updateWorkAuth({
                         extraAuthInfo: {
-                          optReceipt: { name: f.name, url: URL.createObjectURL(f) },
+                          optReceipt: { name: f.name, previewUrl },
                         },
                       })
                     );
+
+                    try {
+                      const s3Key = await uploadEmployeeDocument(f, 'optReceiptFile');
+                      dispatch(
+                        updateWorkAuth({
+                          extraAuthInfo: {
+                            optReceipt: { name: f.name, previewUrl, s3Key },
+                          },
+                        })
+                      );
+                    } catch (error) {
+                      console.error('Failed to upload OPT receipt:', error);
+                    }
+
+                    onF1OptDocumentChange(f); // If you still need this callback
                   }}
                 />
               </Grid>
             )}
             {formData.authorizationType == 'other' && (
               <Grid size={{ xs: 12 }}>
-                <TextField label="Visa Title" {...visaTitleProps()} />
+                <TextField label="Visa Title" {...visaTitleProps} />
               </Grid>
             )}
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 type="date"
                 label="Start Date"
-                {...startDateProps({ slotProps: { inputLabel: { shrink: true } } })}
+                InputLabelProps={{ shrink: true }}
+                {...startDateProps}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 type="date"
                 label="End Date"
-                slotProps={{ inputLabel: { shrink: true } }}
-                {...endDateProps({ slotProps: { inputLabel: { shrink: true } } })}
+                InputLabelProps={{ shrink: true }}
+                {...endDateProps}
               />
             </Grid>
           </Grid>

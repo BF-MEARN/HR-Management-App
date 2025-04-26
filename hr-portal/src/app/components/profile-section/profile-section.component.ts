@@ -1,16 +1,19 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { S3DocumentService } from 'src/app/services/s3-document.service';
 
 @Component({
   selector: 'app-profile-section',
   templateUrl: './profile-section.component.html',
   styleUrls: ['./profile-section.component.scss']
 })
-export class ProfileSectionComponent {
+export class ProfileSectionComponent implements OnInit {
   @Input() application: any;
   @Input() showFeedbackSection = false;
   @Input() showActionButtons = false;
   @Input() feedback = '';
   @Input() pageTitle = 'Profile Details';
+  @Input() profilePictureUrl?: string;
+
 
   @Output() goBackEvent = new EventEmitter<void>();
   @Output() approveEvent = new EventEmitter<void>();
@@ -20,7 +23,29 @@ export class ProfileSectionComponent {
   @Output() feedbackChange = new EventEmitter<string>();
   @Output() previewDocumentEvent = new EventEmitter<any>();
 
+
   showFullSSN = false;
+
+  constructor(private s3Service: S3DocumentService) {}
+  ngOnInit(): void {
+    if (this.application?.profilePicture) {
+      // If it's a URL (already uploaded directly), just use it
+      if (this.application.profilePicture.startsWith('http')) {
+        this.profilePictureUrl = this.application.profilePicture;
+      } 
+      else {
+        // Otherwise assume it's a file key and fetch signed URL
+        this.s3Service.getPresignedUrl(this.application.profilePicture).subscribe({
+          next: (res) => {
+            this.profilePictureUrl = res.url;
+          },
+          error: (err) => {
+            console.error('Failed to load profile picture:', err);
+          }
+        });
+      }
+    }
+  }
 
   get statusClass(): any {
     return {

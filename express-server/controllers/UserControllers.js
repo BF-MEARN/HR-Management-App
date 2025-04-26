@@ -29,26 +29,63 @@ export const login = async (req, res) => {
 
     const authToken = generateToken(user._id);
 
-    res.cookie('authToken', authToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Lax',
-      maxAge: 3 * 60 * 60 * 1000,
-    });
+    if (user.role === 'hr') {
+      res.cookie('hrAuthToken', authToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'Lax',
+        maxAge: 3 * 60 * 60 * 1000,
+      });
+    } else {
+      res.cookie('authToken', authToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'Lax',
+        maxAge: 3 * 60 * 60 * 1000,
+      });
+    }
 
     res.status(200).json({ message: 'login successful', user });
   } catch (error) {
-    res.status(500).json({ message: 'server error', error });
+    console.error(error);
+    res.status(500).json({ message: 'server error', error: error.message });
   }
 };
 
 /**
- * @desc    Clear authToken cookie and log out
+ * @desc    Clear authToken cookie and log out (Employee portal only)
  * @route   POST /api/user/logout
  * @access  Authenticated users
  */
-export const logout = async (req, res) => {
-  res.clearCookie('authToken').json({ message: 'Logged out successfully' });
+export const logout = async (req, res, next) => {
+  try {
+    res.clearCookie('authToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Lax',
+    });
+    res.json({ message: 'Logged out successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Clear hrAuthToken cookie and log out (HR)
+ * @route   POST /api/user/hr/logout
+ * @access  Authenticated HR users
+ */
+export const hrLogout = async (req, res, next) => {
+  try {
+    res.clearCookie('hrAuthToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Lax',
+    });
+    res.json({ message: 'HR logged out successfully' });
+  } catch (error) {
+    next(error);
+  }
 };
 
 /**

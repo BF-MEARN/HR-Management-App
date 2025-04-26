@@ -4,8 +4,9 @@ import dotenv from 'dotenv';
 import express from 'express';
 import fileUpload from 'express-fileupload';
 
-import { requireEmployee, requireHR, userAuth } from './middlewares/AuthMiddlewares.js';
+import { employeeAuth, hrAuth, requireEmployee, requireHR } from './middlewares/AuthMiddlewares.js';
 import errorHandler from './middlewares/ErrorHandler.js';
+import employeeDocumentRouter from './routers/EmployeeDocumentRouter.js';
 import employeeFacilityReportRouter from './routers/EmployeeFacilityReportRouter.js';
 import employeeHousingRouter from './routers/EmployeeHousingRouter.js';
 import employeeOnboardingRouter from './routers/EmployeeOnboardingRouter.js';
@@ -44,18 +45,23 @@ app.use(
 app.use('/api/user', userRouter);
 
 // HR specific routes
-app.use('/api/hr/documents', userAuth, requireHR, hrDocumentRouter);
-app.use('/api/hr/token', userAuth, requireHR, hrTokenRouter);
-app.use('/api/hr/onboarding', userAuth, requireHR, hrOnboardingRouter);
-app.use('/api/hr/profiles', userAuth, requireHR, hrProfileRouter);
-app.use('/api/hr/housing', userAuth, requireHR, hrHousingRouter);
-app.use('/api/hr/visa', userAuth, requireHR, hrVisaRouter);
+app.use('/api/hr/documents', hrAuth, requireHR, hrDocumentRouter);
+app.use('/api/hr/token', hrAuth, requireHR, hrTokenRouter);
+app.use('/api/hr/onboarding', hrAuth, requireHR, hrOnboardingRouter);
+app.use('/api/hr/profiles', hrAuth, requireHR, hrProfileRouter);
+app.use('/api/hr/housing', hrAuth, requireHR, hrHousingRouter);
+app.use('/api/hr/visa', hrAuth, requireHR, hrVisaRouter);
 
 // Employee specific routes
-app.use('/api/employee/onboarding', userAuth, requireEmployee, employeeOnboardingRouter);
-app.use('/api/employee/personal-info', userAuth, requireEmployee, personalInfoRouter);
-
-app.use('/api/employee/facilityReport', userAuth, requireEmployee, employeeFacilityReportRouter);
+app.use('/api/employee/docs', employeeAuth, requireEmployee, employeeDocumentRouter);
+app.use('/api/employee/onboarding', employeeAuth, requireEmployee, employeeOnboardingRouter);
+app.use('/api/employee/personal-info', employeeAuth, requireEmployee, personalInfoRouter);
+app.use(
+  '/api/employee/facilityReport',
+  employeeAuth,
+  requireEmployee,
+  employeeFacilityReportRouter
+);
 app.use('/api/employee/housing', employeeHousingRouter);
 
 // Fallback route

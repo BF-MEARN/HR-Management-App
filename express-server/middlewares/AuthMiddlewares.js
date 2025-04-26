@@ -3,10 +3,8 @@ import validator from 'validator';
 
 import User from '../models/User.js';
 
-// ⬅️ make sure this is imported
-
 export const userAuth = async (req, res, next) => {
-  const token = req.cookies.authToken;
+  const token = req.cookies.hrAuthToken || req.cookies.authToken;
   if (!token) {
     return res.status(401).json({ message: 'Unauthorized (No Token)' });
   }
@@ -41,6 +39,48 @@ export const requireRole = (role) => {
   };
 };
 
-// ✅ Shortcuts for specific roles
+// Shortcuts for specific roles
 export const requireHR = requireRole('hr');
 export const requireEmployee = requireRole('employee');
+
+export const employeeAuth = async (req, res, next) => {
+  const token = req.cookies.authToken;
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized (No Employee Token)' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (typeof decoded !== 'object' || !decoded.id || !validator.isMongoId(decoded.id)) {
+      return res.status(401).json({ message: 'Unauthorized (Invalid Employee Token)' });
+    }
+
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res
+      .status(401)
+      .json({ message: 'Unauthorized (Employee Token Error)', error: error.message });
+  }
+};
+
+export const hrAuth = async (req, res, next) => {
+  const token = req.cookies.hrAuthToken;
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized (No HR Token)' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (typeof decoded !== 'object' || !decoded.id || !validator.isMongoId(decoded.id)) {
+      return res.status(401).json({ message: 'Unauthorized (Invalid HR Token)' });
+    }
+
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: 'Unauthorized (HR Token Error)', error: error.message });
+  }
+};

@@ -147,6 +147,62 @@ $pending-color: #ff9800;
   }
 }
 
+.status-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+
+  &.pending {
+    background-color: #fff3e0;
+    color: #f57c00;
+
+    mat-icon {
+      color: #f57c00;
+    }
+  }
+
+  &.approved {
+    background-color: #e5f3e6;
+    color: #2e7d32;
+
+    mat-icon {
+      color: #2e7d32;
+    }
+  }
+
+  &.rejected {
+    background-color: #ffe7eb;
+    color: #c62828;
+
+    mat-icon {
+      color: #c62828;
+    }
+  }
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .status-content {
+    flex: 1;
+
+    .status-title {
+      font-weight: 600;
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .status-message {
+      font-size: 14px;
+    }
+  }
+}
+
 .info-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

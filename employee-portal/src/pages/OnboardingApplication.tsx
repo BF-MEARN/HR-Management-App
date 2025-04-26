@@ -164,7 +164,7 @@ export default function OnBoardingApplicationPage() {
         return (
           <WorkAuthorizationForm
             onF1OptDocumentChange={(f: File) => (f1OptDocRef.current = f)}
-            readOnly={!readOnly}
+            readOnly={readOnly}
             forceCheck={forceCheckEnabled}
           />
         );
