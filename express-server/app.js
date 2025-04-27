@@ -4,13 +4,7 @@ import dotenv from 'dotenv';
 import express from 'express';
 import fileUpload from 'express-fileupload';
 
-import {
-  employeeAuth,
-  hrAuth,
-  requireEmployee,
-  requireHR,
-  userAuth,
-} from './middlewares/AuthMiddlewares.js';
+import { employeeAuth, hrAuth, requireEmployee, requireHR } from './middlewares/AuthMiddlewares.js';
 import errorHandler from './middlewares/ErrorHandler.js';
 import employeeDocumentRouter from './routers/EmployeeDocumentRouter.js';
 import employeeFacilityReportRouter from './routers/EmployeeFacilityReportRouter.js';
