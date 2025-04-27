@@ -15,7 +15,7 @@ import {
   Typography,
 } from '@mui/material';
 
-import { useAppDispatch } from '../../../store';
+import { useAppDispatch, useAppSelector } from '../../../store';
 import { Comment, deleteComment, updateComment } from '../../../store/slices/facilityReportSlice';
 import { api } from '../../../utils/utils';
 
@@ -30,6 +30,8 @@ export default function ExistingComment({
 }) {
   const [currDescription, setCurrDescription] = useState<string>(comment.description);
   const [edit, setEdit] = useState<boolean>(false);
+
+  const userSelect = useAppSelector((state) => state.user.user);
 
   const commentTimestamp = comment && comment.timestamp && new Date(comment.timestamp);
 
@@ -83,7 +85,7 @@ export default function ExistingComment({
         <CardContent>
           <Typography variant="body1">{currDescription}</Typography>
         </CardContent>
-        {status !== 'Closed' && (
+        {status !== 'Closed' && userSelect && userSelect.employeeId === comment.createdBy._id && (
           <CardActions>
             <Button onClick={handleDelete}>Delete</Button>
             <Button onClick={handleTurnOnEdit}>Edit</Button>

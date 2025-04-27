@@ -5,6 +5,7 @@ export interface Comment {
   timestamp: Date;
   description: string;
   createdBy: {
+    _id: string;
     firstName: string;
     lastName: string;
     middleName?: string;

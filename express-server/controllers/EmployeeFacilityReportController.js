@@ -33,7 +33,7 @@ export const getCurrentUserFacilityReportsByHouseId = async (req, res) => {
       .select('title description status comments createdAt updatedAt')
       .populate({
         path: 'comments.createdBy',
-        select: 'preferredName firstName middleName lastName -_id',
+        select: 'preferredName firstName middleName lastName',
       });
 
     res.status(200).json(facilityReports);
@@ -225,7 +225,7 @@ export const addCommentOnFacilityReport = async (req, res) => {
     newComment = facilityReport.comments[facilityReport.comments.length - 1];
 
     const findCommenter = await Employee.findById(employeeId).select(
-      'preferredName firstName lastName middleName -_id'
+      'preferredName firstName lastName middleName'
     );
 
     res.status(200).json({
