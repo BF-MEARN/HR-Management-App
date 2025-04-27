@@ -62,7 +62,7 @@ const seedDatabase = async () => {
         },
         landlord: {
           fullName: faker.person.fullName(),
-          phone: faker.phone.number(),
+          phone: faker.string.numeric(10),
           email: faker.internet.email(),
         },
         facility: {
@@ -101,7 +101,7 @@ const seedDatabase = async () => {
       gender: 'prefer_not_to_say',
       isCitizenOrPR: true,
       contactInfo: {
-        cellPhone: '000-000-0000',
+        cellPhone: '0000000000',
       },
       address: {
         street: 'HR Department',
@@ -164,7 +164,7 @@ const seedDatabase = async () => {
           ? {
               firstName: faker.person.firstName(),
               lastName: faker.person.lastName(),
-              phone: faker.phone.number(),
+              phone: faker.string.numeric(10),
               email: faker.internet.email(),
               relationship: faker.helpers.arrayElement([
                 'Former Manager',
@@ -177,7 +177,7 @@ const seedDatabase = async () => {
           {
             firstName: faker.person.firstName(),
             lastName: faker.person.lastName(),
-            phone: faker.phone.number(),
+            phone: faker.string.numeric(10),
             email: faker.internet.email(),
             relationship: faker.helpers.arrayElement(['Parent', 'Sibling', 'Friend', 'Spouse']),
           },
@@ -187,7 +187,7 @@ const seedDatabase = async () => {
                 {
                   firstName: faker.person.firstName(),
                   lastName: faker.person.lastName(),
-                  phone: faker.phone.number(),
+                  phone: faker.string.numeric(10),
                   email: faker.internet.email(),
                   relationship: faker.helpers.arrayElement([
                     'Parent',
@@ -200,8 +200,8 @@ const seedDatabase = async () => {
             : []),
         ],
         contactInfo: {
-          cellPhone: faker.phone.number(),
-          workPhone: faker.datatype.boolean(0.2) ? faker.phone.number() : undefined,
+          cellPhone: faker.string.numeric(10),
+          workPhone: faker.datatype.boolean(0.2) ? faker.string.numeric(10) : undefined,
         },
         address: {
           building: faker.helpers.arrayElement([
