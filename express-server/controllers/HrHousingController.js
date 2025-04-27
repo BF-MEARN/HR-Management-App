@@ -1,6 +1,7 @@
 import Employee from '../models/Employee.js';
 import FacilityReport from '../models/FacilityReport.js';
 import Housing from '../models/Housing.js';
+import User from '../models/User.js';
 
 /**
  * @desc    Get all houses
@@ -95,17 +96,23 @@ export const getResidentsByHouseId = async (req, res) => {
  * @route   GET /api/hr/housing/:id/reports
  * @access  HR only
  */
+
 export const getReportsByHouseId = async (req, res) => {
   try {
     const reports = await FacilityReport.find({ houseId: req.params.id })
       .sort({ createdAt: -1 })
       .populate({
-        path: 'comments.createdBy',
-        select: 'employeeId',
+        path: 'employeeId',
+        select: 'firstName lastName preferredName userId',
         populate: {
-          path: 'employeeId',
-          select: 'preferredName firstName lastName',
+          path: 'userId',
+          select: 'username email',
         },
+      })
+      .populate({
+        path: 'comments.createdBy',
+        model: 'Employee',
+        select: 'firstName lastName preferredName',
       })
       .lean();
 
@@ -131,23 +138,34 @@ export const addComment = async (req, res) => {
       return res.status(404).json({ message: 'Report not found' });
     }
 
-    // Check for first comment + 'Open' status
-    const isFirstComment = report.comments.length === 0;
-    const isOpen = report.status === 'Open';
+    // Check if the report is closed
+    if (report.status === 'Closed') {
+      return res.status(403).json({ message: 'Cannot add comments to a closed report' });
+    }
+
+    // Get the employee associated with this user
+    const user = await User.findById(req.user.id);
+    if (!user || !user.employeeId) {
+      return res.status(400).json({ message: 'User has no associated employee record' });
+    }
 
     report.comments.push({
-      createdBy: req.user.id,
+      createdBy: user.employeeId,
       description,
       timestamp: new Date(),
     });
 
-    // Auto-update status to 'In Progress' if needed
-    if (isOpen && isFirstComment) {
+    //  If status is 'Open', update to 'In Progress' regardless of comment count
+    //  (This covers both the first comment case and the edge case mentioned)
+    if (report.status === 'Open') {
       report.status = 'In Progress';
     }
 
     await report.save();
-    res.status(201).json({ message: 'Comment added', updatedStatus: report.status });
+    res.status(201).json({
+      message: 'Comment added',
+      updatedStatus: report.status,
+    });
   } catch (err) {
     res.status(500).json({ message: 'Failed to add comment', error: err.message });
   }
@@ -158,6 +176,7 @@ export const addComment = async (req, res) => {
  * @route   PUT /api/hr/housing/report/:reportId/comments/:commentId
  * @access  HR only
  */
+
 export const updateComment = async (req, res) => {
   try {
     const { reportId, commentId } = req.params;
@@ -173,8 +192,15 @@ export const updateComment = async (req, res) => {
       return res.status(404).json({ message: 'Comment not found' });
     }
 
-    // 🔐 Check if the logged-in user is the one who created the comment
-    if (String(comment.createdBy) !== req.user.id) {
+    // Get the employee associated with this user
+    const user = await User.findById(req.user.id);
+    if (!user || !user.employeeId) {
+      return res.status(400).json({ message: 'User has no associated employee record' });
+    }
+
+    // Check if the logged-in user is the one who created the comment
+    // Compare the employeeId strings
+    if (String(comment.createdBy) !== String(user.employeeId)) {
       return res.status(403).json({ message: 'You are not allowed to edit this comment' });
     }
 

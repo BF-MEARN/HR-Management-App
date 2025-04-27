@@ -38,7 +38,7 @@ const VisaStatusManagementPage = () => {
 
   const fetchUserData = async () => {
     try {
-      const res = await axios.get('http://localhost:3000/api/personal-info', {
+      const res = await axios.get('http://localhost:3000/api/employee/personal-info', {
         withCredentials: true,
       });
 
@@ -51,7 +51,10 @@ const VisaStatusManagementPage = () => {
   const fetchVisaStatus = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:3000/api/onboarding/visa-status?_id=${userData?._id}`
+        `http://localhost:3000/api/employee/onboarding/visa-status?_id=${userData?._id}`,
+        {
+          withCredentials: true,
+        }
       );
 
       setUserVisaStatus(res.data.visaStatus);
@@ -76,9 +79,13 @@ const VisaStatusManagementPage = () => {
     formData.append(fileType, file); // make sure 'file' matches your backend key
 
     try {
-      const res = await axios.put('http://localhost:3000/api/personal-info/documents', formData, {
-        withCredentials: true,
-      });
+      const res = await axios.put(
+        'http://localhost:3000/api/employee/personal-info/documents',
+        formData,
+        {
+          withCredentials: true,
+        }
+      );
 
       if (res.status === 200) {
         const updateData = {
@@ -89,7 +96,13 @@ const VisaStatusManagementPage = () => {
         };
 
         try {
-          await axios.patch('http://localhost:3000/api/onboarding/update-visa', updateData);
+          await axios.patch(
+            'http://localhost:3000/api/employee/onboarding/update-visa',
+            updateData,
+            {
+              withCredentials: true,
+            }
+          );
           fetchUserData();
         } catch (error) {
           console.log(error);

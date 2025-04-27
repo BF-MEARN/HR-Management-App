@@ -181,8 +181,15 @@
           <p class="report-description">{{ report.description }}</p>
 
           <p class="report-meta">
-            Reported by {{ report.createdBy?.username || 'Unknown' }} on
-            {{ report.createdAt | date: 'medium' }}
+            Reported by
+            {{
+              report.employeeId.preferredName || report.employeeId.firstName
+                ? (report.employeeId.preferredName || report.employeeId.firstName) +
+                  ' ' +
+                  (report.employeeId.lastName || '')
+                : report.employeeId.userId?.username || 'Unknown'
+            }}
+            on {{ report.createdAt | date: 'medium' }}
           </p>
 
           <!-- Comments Section -->
@@ -195,10 +202,9 @@
                   <p class="meta">
                     By
                     {{
-                      comment.createdBy.employeeId?.preferredName ||
-                        comment.createdBy.employeeId?.firstName
+                      comment.createdBy.preferredName || comment.createdBy.firstName || 'Unknown'
                     }}
-                    {{ comment.createdBy.employeeId?.lastName || 'Unknown' }}
+                    {{ comment.createdBy.lastName || '' }}
                     on {{ comment.timestamp | date: 'short' }}
                   </p>
 
@@ -249,7 +255,7 @@
           </div>
 
           <!-- Add Comment -->
-          <div class="add-comment">
+          <div class="add-comment" *ngIf="report.status !== 'Closed'">
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Add a comment</mat-label>
               <textarea
@@ -269,6 +275,11 @@
               <mat-icon>send</mat-icon>
               Post Comment
             </button>
+          </div>
+
+          <div class="closed-report-message" *ngIf="report.status === 'Closed'">
+            <mat-icon>lock</mat-icon>
+            <span>This report is closed. New comments cannot be added.</span>
           </div>
         </div>
 

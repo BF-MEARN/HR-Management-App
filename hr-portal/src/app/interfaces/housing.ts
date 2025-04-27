@@ -49,14 +49,19 @@ export interface Resident {
 export interface FacilityReport {
   _id: string;
   houseId: string;
-  employeeId: string;
+  employeeId: {
+    _id: string;
+    firstName?: string;
+    lastName?: string;
+    preferredName?: string;
+    userId?: {
+      username?: string;
+      email?: string;
+    };
+  };
   title: string;
   description: string;
   status: 'Open' | 'In Progress' | 'Closed';
-  createdBy?: {
-    _id: string;
-    username: string;
-  };
   comments: Comment[];
   createdAt: string;
   updatedAt: string;
@@ -68,10 +73,8 @@ export interface Comment {
   timestamp: string;
   createdBy: {
     _id: string;
-    employeeId?: {
-      preferredName?: string;
-      firstName?: string;
-      lastName?: string;
-    };
+    firstName?: string;
+    lastName?: string;
+    preferredName?: string;
   };
 }

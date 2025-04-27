@@ -65,18 +65,18 @@ export class ApplicationReviewComponent implements OnInit {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       data: {
         title: 'Approve Application',
-        message: 'Are you sure you want to approve this application?'
+        message: 'Are you sure you want to approve and assign housing to this employee?'
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.isLoading = true;
-        this.onboardingService.approveApplication(this.employeeId).subscribe({
+        this.onboardingService.approveAndAssignHousing(this.employeeId).subscribe({
           next: () => {
             this.application.onboardingStatus = 'Approved';
             this.isLoading = false;
-            this.snackBar.open('Application approved successfully', 'Close', {
+            this.snackBar.open('Application approved and housing assigned successfully', 'Close', {
               duration: 3000,
               panelClass: ['success-snackbar']
             });
@@ -85,8 +85,9 @@ export class ApplicationReviewComponent implements OnInit {
             });
           },
           error: (error) => {
+            console.error('Failed to approve and assign housing:', error);
             this.isLoading = false;
-            this.snackBar.open('Failed to approve application', 'Close', {
+            this.snackBar.open('Failed to approve and assign housing', 'Close', {
               duration: 3000,
               panelClass: ['error-snackbar']
             });
@@ -95,6 +96,7 @@ export class ApplicationReviewComponent implements OnInit {
       }
     });
   }
+
 
   handleReject(): void {
     if (!this.feedback || this.feedback.trim().length < 10) {

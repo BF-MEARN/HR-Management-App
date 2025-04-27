@@ -41,7 +41,7 @@
           <mat-icon>{{ getStatusIcon() }}</mat-icon>
           <div class="status-content">
             <div class="status-title">
-              {{ visaStatus?.employeeId?.onboardingStatus }}
+              {{ visaStatus.employeeId.onboardingStatus }}
             </div>
 
             <div
@@ -67,30 +67,6 @@
             </div>
           </div>
         </div>
-
-        <!-- Display rejection feedback inside the status card -->
-        <!-- <div
-          class="feedback-section"
-          *ngIf="application?.onboardingStatus === 'Rejected' && application?.onboardingFeedback"
-        >
-          <mat-divider></mat-divider>
-          <div class="feedback-content">
-            <h3>Rejection Feedback:</h3>
-            <p>{{ application?.onboardingFeedback }}</p>
-          </div>
-        </div> -->
-
-        <!-- Display approval feedback inside the status card if exists -->
-        <!-- <div
-          class="feedback-section"
-          *ngIf="application?.onboardingStatus === 'Approved' && application?.onboardingFeedback"
-        >
-          <mat-divider></mat-divider>
-          <div class="feedback-content">
-            <h3>Approval Comments:</h3>
-            <p>{{ application?.onboardingFeedback }}</p>
-          </div>
-        </div> -->
       </mat-card-content>
     </mat-card>
 
@@ -170,10 +146,7 @@
               </div>
             </div>
 
-            <div
-              class="document-actions"
-              *ngIf="visaStatus[doc].status !== 'Not Uploaded' && visaStatus[doc].file"
-            >
+            <div class="document-actions" *ngIf="visaStatus[doc].status !== 'Not Uploaded'">
               <button mat-stroked-button color="primary" (click)="openFile(visaStatus[doc].file)">
                 <mat-icon>visibility</mat-icon>
                 Preview Document

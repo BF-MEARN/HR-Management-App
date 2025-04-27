@@ -1,7 +1,10 @@
 /* eslint-disable no-unused-vars */
 import Employee from '../models/Employee.js';
+import Housing from '../models/Housing.js';
 import User from '../models/User.js';
 import VisaStatus from '../models/VisaStatus.js';
+import { autoAssignHousing } from './EmployeeHousingController.js';
+import { addResidentToHousing } from './EmployeeOnboardingController.js';
 
 /**
  * @desc    Get all pending onboarding applications
@@ -144,5 +147,83 @@ export const rejectApplication = async (req, res) => {
     res.status(200).json({ message: 'Application rejected', employee });
   } catch (error) {
     res.status(500).json({ message: 'Failed to reject application', error });
+  }
+};
+
+/**
+ * @desc    Approve application and assign housing to employee
+ * @route   PATCH /api/hr/onboarding/approve-and-assign/:id
+ * @access  HR only
+ */
+export const approveAndAssignHousing = async (req, res) => {
+  try {
+    const { id } = req.params; // Employee ID
+
+    // 1. Update onboarding status to 'Approved'
+    const employee = await Employee.findById(id);
+
+    if (!employee) {
+      return res.status(404).json({ message: 'Employee not found' });
+    }
+
+    if (employee.onboardingStatus === 'Approved') {
+      return res.status(400).json({ message: 'Employee is already approved' });
+    }
+
+    // 2. Update the employee status
+    employee.onboardingStatus = 'Approved';
+
+    // 3. If feedback is provided in the request
+    if (req.body.feedback) {
+      employee.onboardingFeedback = req.body.feedback;
+    }
+
+    // Save employee first to update status
+    await employee.save();
+
+    // 4. Auto-assign to a house with fewest residents
+    const houses = await Housing.find().populate('residents');
+
+    if (houses.length === 0) {
+      return res.status(404).json({ message: 'No housing available for assignment' });
+    }
+
+    // Find house with fewest residents
+    let leastPopulatedHouse = houses.reduce((prev, current) =>
+      prev.residents.length <= current.residents.length ? prev : current
+    );
+
+    // 5. Add employee to house using existing logic from addResidentToHousing
+    const address = leastPopulatedHouse.address;
+
+    // Update employee with house information
+    employee.houseId = leastPopulatedHouse._id;
+    employee.address = {
+      ...employee.address,
+      building: leastPopulatedHouse.address.building,
+      street: leastPopulatedHouse.address.street,
+      city: leastPopulatedHouse.address.city,
+      state: leastPopulatedHouse.address.state,
+      zip: leastPopulatedHouse.address.zip,
+    };
+
+    await employee.save();
+
+    // Update house residents array
+    if (!leastPopulatedHouse.residents.includes(id)) {
+      leastPopulatedHouse.residents.push(id);
+      await leastPopulatedHouse.save();
+    }
+
+    return res.status(200).json({
+      message: 'Application approved and housing assigned successfully',
+      houseId: leastPopulatedHouse._id,
+    });
+  } catch (error) {
+    console.error('Error approving application:', error);
+    return res.status(500).json({
+      message: 'Failed to approve application and assign housing',
+      error: error.message,
+    });
   }
 };

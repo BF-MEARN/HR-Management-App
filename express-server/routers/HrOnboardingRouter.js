@@ -1,6 +1,7 @@
 import express from 'express';
 
 import {
+  approveAndAssignHousing,
   approveApplication,
   getApplicationById,
   getApprovedApplications,
@@ -47,4 +48,5 @@ router.post('/:id/approve', approveApplication);
  */
 router.post('/:id/reject', rejectApplication);
 
+router.patch('/approve-and-assign/:id', approveAndAssignHousing);
 export default router;
