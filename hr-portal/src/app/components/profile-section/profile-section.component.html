@@ -195,8 +195,8 @@
           <div class="info-content">
             <div class="label">Address</div>
             <div class="value" *ngIf="application?.address?.street; else noAddress">
-              {{ application?.address?.building ? application?.address.building + ', ' : '' }}
-              {{ application?.address?.street }}<br />
+              {{ application?.address?.building ? application?.address.street + ', ' : '' }}
+              {{ application?.address?.building }}<br />
               {{ application?.address?.city }}, {{ application?.address?.state }}
               {{ application?.address?.zip }}
             </div>

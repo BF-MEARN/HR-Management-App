@@ -170,8 +170,13 @@ export class VisaStatusDetailComponent implements OnInit {
   }
 
 
-  openFile(key: string): void {
-    this.docService.getPresignedUrl(key).subscribe({
+  openFile(fileKey: string): void {
+    if (!fileKey) {
+      this.snackBar.open('Document not available', 'Close', { duration: 3000 });
+      return;
+    }
+  
+    this.docService.getPresignedUrl(fileKey).subscribe({
       next: (res) => {
         window.open(res.url, '_blank');
       },
@@ -182,26 +187,25 @@ export class VisaStatusDetailComponent implements OnInit {
     });
   }
   
+  
 
-  downloadFile(key: string): void {
-    this.docService.getDownloadUrl(key).subscribe({
+  downloadFile(fileKey: string): void {
+    if (!fileKey) {
+      this.snackBar.open('Document not available', 'Close', { duration: 3000 });
+      return;
+    }
+  
+    this.docService.getDownloadUrl(fileKey).subscribe({
       next: (res) => {
-        // Create a link and trigger the download
         const link = document.createElement('a');
         link.href = res.url;
-        // No need to set download attribute as the URL already has Content-Disposition: attachment
+        link.download = fileKey.split('/').pop() || 'document'; // Suggest filename
         link.style.display = 'none';
         document.body.appendChild(link);
         link.click();
-        
-        // Small delay before removal to ensure click is processed
         setTimeout(() => {
           document.body.removeChild(link);
         }, 100);
-        
-        // Extract document type for better message
-        const docType = this.getDocumentTypeFromKey(key);
-        this.snackBar.open(`Downloading ${docType}...`, 'Close', { duration: 3000 });
       },
       error: (err) => {
         console.error('Download failed:', err);
@@ -209,6 +213,7 @@ export class VisaStatusDetailComponent implements OnInit {
       }
     });
   }
+  
   
   // Helper method to get document type from S3 key
   private getDocumentTypeFromKey(key: string): string {

@@ -20,6 +20,7 @@ export interface VisaStatus {
     preferredName?: string;
     onboardingStatus?: 'Pending' | 'Approved' | 'Rejected';
     userId?: {
+      _id: string;
       email?: string;
     };
   };

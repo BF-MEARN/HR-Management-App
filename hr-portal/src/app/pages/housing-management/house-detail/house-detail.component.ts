@@ -31,22 +31,41 @@ export class HouseDetailComponent implements OnInit {
     private authService: AuthService
   ) { }
 
+  // ngOnInit(): void {
+  //   this.houseId = this.route.snapshot.paramMap.get('id') || '';
+  //   this.loadHouseData();
+  
+  //   this.authService.getCurrentUser().subscribe({
+  //     next: (res) => {
+  //       this.currentUserId = res.user._id;
+  //     },
+  //     error: () => {
+  //       this.currentUserId = '';
+  //       console.warn('Failed to fetch current user');
+  //     },
+  //   });
+    
+  // }
+  
   ngOnInit(): void {
     this.houseId = this.route.snapshot.paramMap.get('id') || '';
     this.loadHouseData();
   
     this.authService.getCurrentUser().subscribe({
       next: (res) => {
-        this.currentUserId = res.user._id;
+        // Store the employee ID instead of user ID if available
+        if (res.user && res.user.employeeId) {
+          this.currentUserId = res.user.employeeId;
+        } else {
+          this.currentUserId = res.user._id;
+        }
       },
       error: () => {
         this.currentUserId = '';
         console.warn('Failed to fetch current user');
       },
     });
-    
   }
-  
 
   loadHouseData(): void {
     // Load house details

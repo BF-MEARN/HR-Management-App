@@ -19,6 +19,6 @@ router.post('/autoAssignHousing', autoAssignHousing, addResidentToHousing);
  * @desc    Get the house that the current user is living in as an employee
  * @route   GET /api/employee/housing/getHouse
  */
-router.get('/getHouse', userAuth, requireEmployee, getCurrentEmployeeHouse);
+router.get('/getHouse', getCurrentEmployeeHouse);
 
 export default router;

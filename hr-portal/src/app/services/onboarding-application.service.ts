@@ -49,4 +49,13 @@ export class OnboardingApplicationService {
       { withCredentials: true }
     );
   }
+
+  approveAndAssignHousing(employeeId: string) {
+    return this.http.patch(
+      `${this.baseUrl}/approve-and-assign/${employeeId}`,
+      {},
+      { withCredentials: true }
+    );
+  }
+  
 }
