@@ -53,7 +53,7 @@ export default function HousingDetails({ housing }: { housing: HousingState }) {
                     </ListItemAvatar>
                     <ListItemText
                       primary={
-                        'preferredName' in person
+                        person.preferredName
                           ? `${person.preferredName}, `
                           : `${person.firstName} ${person.middleName || ''} ${person.lastName}`
                       }
