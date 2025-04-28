@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 
 import { useAppDispatch, useAppSelector } from '../store';
@@ -8,20 +8,12 @@ import { resetUser } from '../store/slices/userSlice';
 import { api } from '../utils/utils';
 
 export default function NavDrawer() {
-  const userStatus = useAppSelector((state) => state.user.status);
   const user = useAppSelector((state) => state.user.user);
   const employee = useAppSelector((state) => state.employee.employee);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const currentRoute = location.pathname;
-    if (userStatus == 'failed' && currentRoute !== '/') {
-      navigate('/');
-    }
-  }, [user, location.pathname, navigate, userStatus]);
 
   const handleLogout = async () => {
     await api('/user/logout', {

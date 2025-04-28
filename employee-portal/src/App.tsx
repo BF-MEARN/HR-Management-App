@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router';
 
-import { Backdrop, CircularProgress } from '@mui/material';
-
 import NavBar from './components/NavBar';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import ErrorMapProvider from './hooks/error-map/ErrorMapProvider';
 import HousingPage from './pages/Housing';
 import LoginPage from './pages/Login';
@@ -14,7 +13,7 @@ import RegisterPage from './pages/Register';
 import VisaStatusManagementPage from './pages/VisaStatusManagement';
 import { useAppDispatch, useAppSelector } from './store';
 import { updateFormsWithEmployee } from './store/slices/employeeFormSlice';
-import { fetchEmployeeData } from './store/slices/employeeSlice';
+import { fetchEmployeeData, setEmployeeStatus } from './store/slices/employeeSlice';
 import { fetchMe } from './store/slices/userSlice';
 
 function App() {
@@ -23,19 +22,17 @@ function App() {
   const employeeStatus = useAppSelector((state) => state.employee.status);
   const employee = useAppSelector((state) => state.employee.employee);
 
-  const [backdropOpen, setBackdropOpen] = useState(true);
-
-  useEffect(() => {
-    if (userStatus === 'pending' || employeeStatus === 'pending') {
-      setBackdropOpen(true);
-    } else {
-      setBackdropOpen(false);
-    }
-  }, [userStatus, dispatch, employeeStatus]);
-
   useEffect(() => {
     if (userStatus === 'idle') {
       dispatch(fetchMe());
+    }
+  }, [userStatus, dispatch]);
+
+  useEffect(() => {
+    if (userStatus === 'failed') {
+      dispatch(setEmployeeStatus('no-user'));
+    } else if (userStatus === 'succeeded') {
+      dispatch(setEmployeeStatus('idle'));
     }
   }, [userStatus, dispatch]);
 
@@ -53,10 +50,6 @@ function App() {
 
   return (
     <>
-      <Backdrop open={backdropOpen}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
-
       <BrowserRouter>
         <Routes>
           <Route element={<NavBar />}>
@@ -64,21 +57,39 @@ function App() {
             <Route
               path="onboard"
               element={
-                <ErrorMapProvider>
-                  <OnboardingApplicationPage />
-                </ErrorMapProvider>
+                <ProtectedRoute requiredStatus={'onboarding'}>
+                  <ErrorMapProvider>
+                    <OnboardingApplicationPage />
+                  </ErrorMapProvider>
+                </ProtectedRoute>
               }
             />
             <Route
               path="personal-info"
               element={
-                <ErrorMapProvider>
-                  <PersonalInformationPage />
-                </ErrorMapProvider>
+                <ProtectedRoute requiredStatus={'onboarded'}>
+                  <ErrorMapProvider>
+                    <PersonalInformationPage />
+                  </ErrorMapProvider>
+                </ProtectedRoute>
               }
             />
-            <Route path="visa" element={<VisaStatusManagementPage />} />
-            <Route path="housing" element={<HousingPage />} />
+            <Route
+              path="visa"
+              element={
+                <ProtectedRoute requiredStatus={'onboarded'}>
+                  <VisaStatusManagementPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="housing"
+              element={
+                <ProtectedRoute requiredStatus={'onboarded'}>
+                  <HousingPage />
+                </ProtectedRoute>
+              }
+            />
           </Route>
           <Route path="register/:token" element={<RegisterPage />} />
           <Route path="*" element={<NotFound />} />
