@@ -23,33 +23,9 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 
-interface UserData {
-  _id: string;
-  [key: string]: unknown;
-}
-
-interface VisaStatus {
-  optReceipt: {
-    status: string;
-    feedback?: string;
-  };
-  optEAD: {
-    status: string;
-    feedback?: string;
-  };
-  i983: {
-    status: string;
-    feedback?: string;
-  };
-  i20: {
-    status: string;
-    feedback?: string;
-  };
-  employeeId: string;
-  workAuthorization: {
-    type: string;
-  };
-}
+import FileUploadWithPreview from '../components/FileUploadWithPreview';
+import { useAppDispatch, useAppSelector } from '../store';
+import { fetchEmployeeData } from '../store/slices/employeeSlice';
 
 interface UploadComponentProps {
   fileType: string;
@@ -67,52 +43,31 @@ interface DocumentStepProps {
 }
 
 const VisaStatusManagementPage = () => {
-  const [userData, setUserData] = useState<UserData | null>(null);
+  const userData = useAppSelector((state) => state.employee.employee);
+  const dispatch = useAppDispatch();
   const [file, setFile] = useState<File | null>(null);
-  const [userVisaStatus, setUserVisaStatus] = useState<VisaStatus | null>(null);
+  const userVisaStatus = userData?.visaInfo;
   const [activeStep, setActiveStep] = useState(0);
 
-  const fetchUserData = async () => {
-    try {
-      const res = await axios.get('http://localhost:3000/api/employee/personal-info', {
-        withCredentials: true,
-      });
-
-      setUserData(res.data.employee);
-    } catch (error) {
-      console.log(error);
-    }
+  const fetchUserData = () => {
+    dispatch(fetchEmployeeData());
   };
 
-  const fetchVisaStatus = async () => {
-    try {
-      const res = await axios.get(
-        `http://localhost:3000/api/employee/onboarding/visa-status?_id=${userData?._id}`,
-        {
-          withCredentials: true,
-        }
-      );
-
-      setUserVisaStatus(res.data.visaStatus);
-
-      // Set active step based on status
-      if (res.data.visaStatus) {
-        if (res.data.visaStatus.i20.status === 'Approved') {
-          setActiveStep(4); // All complete
-        } else if (res.data.visaStatus.i983.status === 'Approved') {
-          setActiveStep(3); // I-20 is next
-        } else if (res.data.visaStatus.optEAD.status === 'Approved') {
-          setActiveStep(2); // I-983 is next
-        } else if (res.data.visaStatus.optReceipt.status === 'Approved') {
-          setActiveStep(1); // OPT EAD is next
-        } else {
-          setActiveStep(0); // OPT Receipt is next
-        }
+  useEffect(() => {
+    if (userVisaStatus) {
+      if (userVisaStatus.i20.status === 'Approved') {
+        setActiveStep(4); // All complete
+      } else if (userVisaStatus.i983.status === 'Approved') {
+        setActiveStep(3); // I-20 is next
+      } else if (userVisaStatus.optEAD.status === 'Approved') {
+        setActiveStep(2); // I-983 is next
+      } else if (userVisaStatus.optReceipt.status === 'Approved') {
+        setActiveStep(1); // OPT EAD is next
+      } else {
+        setActiveStep(0); // OPT Receipt is next
       }
-    } catch (error) {
-      console.log(error);
     }
-  };
+  }, [userVisaStatus]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     if (e.target.files) {
@@ -308,26 +263,31 @@ const VisaStatusManagementPage = () => {
         </div>
 
         {(status === 'Not Uploaded' || status === 'Rejected') && (
-          <UploadComponent
-            fileType={fileType}
-            isDisabled={isDisabled}
-            disabledMessage={disabledMessage}
-          />
+          <>
+            <Box sx={{ display: 'none' }}>
+              <UploadComponent
+                fileType={fileType}
+                isDisabled={isDisabled}
+                disabledMessage={disabledMessage}
+              />
+            </Box>
+            <FileUploadWithPreview
+              type="document"
+              previewOnly={isDisabled}
+              fileName={file?.name}
+              previewURL={file ? URL.createObjectURL(file) : undefined}
+              onFileSelect={(f) => {
+                setFile(f);
+              }}
+            />
+            <Button variant="contained" onClick={() => handleUpload(fileType)} color="primary">
+              Submit
+            </Button>
+          </>
         )}
       </Box>
     );
   };
-
-  useEffect(() => {
-    fetchUserData();
-  }, []);
-
-  useEffect(() => {
-    if (userData?._id) {
-      fetchVisaStatus();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userData]);
 
   return (
     <div className="max-w-[1000px] mx-auto px-2 py-4">

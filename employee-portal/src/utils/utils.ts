@@ -39,10 +39,10 @@ export type DeepPartial<T> = {
   [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K];
 };
 
-export const api = (path: string, options: RequestInit = {}) => {
+export const api = (path: string, options: RequestInit = {}, jsonBody = true) => {
   return fetch(`${import.meta.env.VITE_API_URL}${path}`, {
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
+    headers: jsonBody ? { 'Content-Type': 'application/json' } : {},
     ...options,
   });
 };
@@ -59,11 +59,14 @@ export const uploadEmployeeDocument = async (
   const formData = new FormData();
   formData.append(field, file);
 
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/employee/docs/upload`, {
-    method: 'PUT',
-    credentials: 'include',
-    body: formData,
-  });
+  const response = await api(
+    `/employee/docs/upload`,
+    {
+      method: 'PUT',
+      body: formData,
+    },
+    false
+  );
 
   if (!response.ok) {
     throw new Error('Failed to upload document');
@@ -72,3 +75,11 @@ export const uploadEmployeeDocument = async (
   const result = await response.json();
   return result.s3Key; // the uploaded S3 key
 };
+
+export async function getDocumentUrl(s3Key: string) {
+  const params = new URLSearchParams();
+  params.append('key', s3Key);
+  const response = await api(`/employee/docs/file?${params}`, {}, false);
+  const { url } = await response.json();
+  return url;
+}

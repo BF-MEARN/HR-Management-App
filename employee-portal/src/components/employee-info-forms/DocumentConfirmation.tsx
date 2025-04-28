@@ -28,6 +28,7 @@ export default function DocumentConfirmation() {
               height="200px"
               previewURL={profilePicture.previewUrl}
               fileName={profilePicture.name}
+              s3Key={profilePicture.s3Key}
               type="image"
             />
           )}
@@ -43,6 +44,7 @@ export default function DocumentConfirmation() {
               previewOnly
               previewURL={driverLicense.previewUrl}
               fileName={driverLicense.name}
+              s3Key={driverLicense.s3Key}
               type="document"
             />
           )}
@@ -58,6 +60,7 @@ export default function DocumentConfirmation() {
               previewOnly
               previewURL={authDocument.previewUrl}
               fileName={authDocument.name}
+              s3Key={authDocument.s3Key}
               type="document"
             />
           )}

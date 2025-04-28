@@ -2,10 +2,10 @@ import { useEffect } from 'react';
 
 import { Box, Grid, TextField, Typography } from '@mui/material';
 
-import useErrorMap from '../../contexts/error-map/useErrorMap';
+import useErrorMap from '../../hooks/error-map/useErrorMap';
+import { useTextFieldProps } from '../../hooks/useTextFieldProps';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { updatePersonalInfo } from '../../store/slices/employeeFormSlice';
-import { useTextFieldProps } from '../useTextFieldProps';
 import { EmployeeFormProps } from './formProps';
 
 export type AddressFormProps = EmployeeFormProps;

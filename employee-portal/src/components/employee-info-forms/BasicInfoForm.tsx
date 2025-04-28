@@ -11,13 +11,13 @@ import {
   Typography,
 } from '@mui/material';
 
-import useErrorMap from '../../contexts/error-map/useErrorMap';
+import useErrorMap from '../../hooks/error-map/useErrorMap';
+import { useTextFieldProps } from '../../hooks/useTextFieldProps';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { updatePersonalInfo } from '../../store/slices/employeeFormSlice';
 import { Gender } from '../../store/slices/employeeFormTypes';
 import { uploadEmployeeDocument } from '../../utils/utils';
 import FileUploadWithPreview from '../FileUploadWithPreview';
-import { useTextFieldProps } from '../useTextFieldProps';
 import { EmployeeFormProps } from './formProps';
 
 export type BasicInfoFormProps = EmployeeFormProps & {
@@ -137,8 +137,9 @@ function BasicInfoForm({ onProfilePictureFileChange, forceCheck, readOnly }: Bas
             Profile Picture
           </Typography>
           <FileUploadWithPreview
-            previewURL={formData.profilePicture?.previewUrl ?? ''}
-            fileName={formData.profilePicture?.name ?? ''}
+            previewURL={formData.profilePicture?.previewUrl}
+            fileName={formData.profilePicture?.name}
+            s3Key={formData.profilePicture?.s3Key}
             width="160px"
             height="160px"
             onFileSelect={async (f) => {

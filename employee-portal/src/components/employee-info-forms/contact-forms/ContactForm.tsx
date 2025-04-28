@@ -1,8 +1,8 @@
 import { Grid, TextField } from '@mui/material';
 
-import useErrorMap from '../../../contexts/error-map/useErrorMap';
+import useErrorMap from '../../../hooks/error-map/useErrorMap';
+import { useTextFieldProps } from '../../../hooks/useTextFieldProps';
 import { Contact } from '../../../store/slices/employeeTypes';
-import { useTextFieldProps } from '../../useTextFieldProps';
 
 export default function ContactForm({
   id,

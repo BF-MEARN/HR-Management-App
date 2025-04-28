@@ -8,7 +8,7 @@ import DocumentConfirmation from '../components/employee-info-forms/DocumentConf
 import PhoneContactForm from '../components/employee-info-forms/PhoneContactForm';
 import WorkAuthorizationForm from '../components/employee-info-forms/WorkAuthorizationForm';
 import EmergencyContactForm from '../components/employee-info-forms/contact-forms/EmergencyContactForm';
-import useErrorMap from '../contexts/error-map/useErrorMap';
+import useErrorMap from '../hooks/error-map/useErrorMap';
 import { useAppDispatch, useAppSelector } from '../store';
 import { updateFormsWithEmployee } from '../store/slices/employeeFormSlice';
 import { fetchEmployeeData } from '../store/slices/employeeSlice';
@@ -159,6 +159,7 @@ export default function OnBoardingApplicationPage() {
           onF1OptDocumentChange={(f: File) => (f1OptDocRef.current = f)}
           readOnly={!editingEmployment}
           forceCheck={forceCheckEnabled}
+          enableDocumentUpload={false}
         />
         <EditBar
           editing={editingEmployment}
