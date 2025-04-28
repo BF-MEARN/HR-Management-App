@@ -11,7 +11,7 @@ import EmergencyContactForm from '../components/employee-info-forms/contact-form
 import useErrorMap from '../hooks/error-map/useErrorMap';
 import { useAppDispatch, useAppSelector } from '../store';
 import { updateFormsWithEmployee } from '../store/slices/employeeFormSlice';
-import { fetchEmployeeData } from '../store/slices/employeeSlice';
+import { setEmployeeStatus } from '../store/slices/employeeSlice';
 import { Employee } from '../store/slices/employeeTypes';
 import {
   updateEmployeeAddress,
@@ -83,19 +83,23 @@ export default function OnBoardingApplicationPage() {
   const profilePictureRef = React.useRef<File | null>(null);
   const f1OptDocRef = React.useRef<File | null>(null);
 
-  const employee = useAppSelector((state) => state.employee.employee) as Employee;
+  const employeeStore = useAppSelector((state) => state.employee);
+  const employee = employeeStore.employee as Employee;
+  const status = employeeStore.status;
   const forceCheckEnabled = true;
   const dispatch = useAppDispatch();
 
   const updateCounter = useAppSelector((state) => state.employeeForm.updateCounter);
+  const [currentCounter, setCurrentCounter] = React.useState(0);
   const [requestSentSnackBarOpen, setRequestSentSnackBarOpen] = React.useState(false);
 
   React.useEffect(() => {
-    if (updateCounter > 0) {
-      dispatch(fetchEmployeeData());
+    if (updateCounter != currentCounter && status == 'succeeded') {
+      dispatch(setEmployeeStatus('idle'));
       setRequestSentSnackBarOpen(true);
     }
-  }, [updateCounter, dispatch]);
+    setCurrentCounter(updateCounter);
+  }, [updateCounter, dispatch, currentCounter, status]);
 
   const handleReset = () => {
     dispatch(updateFormsWithEmployee(employee));
