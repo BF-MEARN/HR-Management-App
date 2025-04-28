@@ -55,7 +55,7 @@ export default function LoginPage() {
       }
 
       dispatch(setUser(user));
-      navigate('/onboard');
+      navigate('/');
     } else {
       setToastMessage('Login failed. Please check your credentials.');
       setToastOpen(true);

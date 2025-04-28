@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router';
 
 import { Alert, Box, Button, Paper, Snackbar, Step, StepLabel, Stepper } from '@mui/material';
 
@@ -74,7 +73,6 @@ export default function OnBoardingApplicationPage() {
   const [showErrorSnackBar, setShowErrorSnackBar] = useState(false);
 
   const { validateAll } = useErrorMap();
-  const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   const employeeOnboardingStatus = useAppSelector(
@@ -93,12 +91,6 @@ export default function OnBoardingApplicationPage() {
     employeeOnboardingStatus === 'Pending'
       ? 'Your application is pending. You can view the current application.'
       : `Your application is rejected: ${employeeOnboardingFeedback}. You can make a new submission.`;
-
-  useEffect(() => {
-    if (employeeOnboardingStatus === 'Approved') {
-      navigate('/personal-info');
-    }
-  }, [employeeOnboardingStatus, navigate]);
 
   const readOnly = employeeOnboardingStatus === 'Pending';
 

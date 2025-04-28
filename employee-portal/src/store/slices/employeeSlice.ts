@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { api } from '../../utils/utils';
 import { Employee } from './employeeTypes';
@@ -22,7 +22,7 @@ export const fetchEmployeeData = createAsyncThunk(
 
 export interface EmployeeState {
   employee: Employee | null;
-  status: 'idle' | 'pending' | 'succeeded' | 'failed';
+  status: 'no-user' | 'idle' | 'pending' | 'succeeded' | 'failed';
   error?: string;
 }
 
@@ -36,6 +36,9 @@ const employeeSlice = createSlice({
   initialState,
   reducers: {
     resetEmployee: () => initialState,
+    setEmployeeStatus: (state, action: PayloadAction<'no-user' | 'idle'>) => {
+      state.status = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -53,5 +56,5 @@ const employeeSlice = createSlice({
   },
 });
 
-export const { resetEmployee } = employeeSlice.actions;
+export const { resetEmployee, setEmployeeStatus } = employeeSlice.actions;
 export default employeeSlice.reducer;
