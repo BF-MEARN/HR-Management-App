@@ -14,7 +14,7 @@ import VisaStatus from '../models/VisaStatus.js';
 import { putObject } from './putObject.js';
 
 const SALT_ROUNDS = 10;
-const amountHousing = 5;
+const amountHousing = 6;
 const amountUserEmployee = 20;
 const amountFacilityReports = 15;
 const amountRegTokens = 10;

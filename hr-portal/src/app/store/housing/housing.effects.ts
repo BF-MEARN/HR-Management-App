@@ -24,4 +24,17 @@ export class HousingEffects {
       )
     )
   );
+
+  deleteHouse$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(HousingActions.deleteHouse),
+      mergeMap(({ id }) =>
+        this.housingService.deleteHouse(id).pipe(
+          map(() => HousingActions.deleteHouseSuccess({ id })),
+          catchError((error) => of(HousingActions.deleteHouseFailure({ error })))
+        )
+      )
+    )
+  );
+  
 }

@@ -5,7 +5,6 @@ import {
   getCurrentEmployeeHouse,
 } from '../controllers/EmployeeHousingController.js';
 import { addResidentToHousing } from '../controllers/EmployeeOnboardingController.js';
-import { requireEmployee, userAuth } from '../middlewares/AuthMiddlewares.js';
 
 const router = express.Router();
 

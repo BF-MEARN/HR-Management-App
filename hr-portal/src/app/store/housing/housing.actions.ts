@@ -16,7 +16,12 @@ export const addHouseSuccess = createAction('[Housing] Add House Success');
 export const addHouseFailure = createAction('[Housing] Add House Failure', props<{ error: any }>());
 
 export const deleteHouse = createAction('[Housing] Delete House', props<{ id: string }>());
-export const deleteHouseSuccess = createAction('[Housing] Delete House Success');
+
+export const deleteHouseSuccess = createAction(
+  '[Housing] Delete House Success',
+  props<{ id: string }>()
+);
+
 export const deleteHouseFailure = createAction(
   '[Housing] Delete House Failure',
   props<{ error: any }>()

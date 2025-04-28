@@ -1,16 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Housing } from 'src/app/interfaces/housing';
-import { AddHouseDialogComponent } from './components/add-house-dialog/add-house-dialog.component';
-import { ConfirmationDialogComponent } from 'src/app/components/confirmation-dialog/confirmation-dialog.component';
-import { Store } from '@ngrx/store';
-import { loadHouses } from 'src/app/store/housing/housing.actions';
-import { selectAllHouses } from 'src/app/store/housing/housing.selectors';
-import { HousingManagementService } from 'src/app/services/housing-management.service';
-import { Router } from '@angular/router';
-import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+
+import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+
+import { ConfirmationDialogComponent } from 'src/app/components/confirmation-dialog/confirmation-dialog.component';
+import { Housing } from 'src/app/interfaces/housing';
+import { HousingManagementService } from 'src/app/services/housing-management.service';
+import { deleteHouse, loadHouses } from 'src/app/store/housing/housing.actions';
+import { selectAllHouses } from 'src/app/store/housing/housing.selectors';
+
+import { AddHouseDialogComponent } from './components/add-house-dialog/add-house-dialog.component';
 
 @Component({
   selector: 'app-housing-management',
@@ -104,25 +107,10 @@ export class HousingManagementComponent implements OnInit {
         confirmText: 'Delete'
       }
     });
-
+  
     dialogRef.afterClosed().subscribe((confirmed: boolean) => {
       if (confirmed) {
-        this.housingService.deleteHouse(houseId).subscribe({
-          next: () => {
-            this.store.dispatch(loadHouses());
-            this.snackBar.open('House deleted successfully', 'Close', {
-              duration: 3000,
-              panelClass: ['success-snackbar']
-            });
-          },
-          error: (err) => {
-            console.error('Error deleting house:', err);
-            this.snackBar.open('Failed to delete house. Please try again.', 'Close', {
-              duration: 5000,
-              panelClass: ['error-snackbar']
-            });
-          }
-        });
+        this.store.dispatch(deleteHouse({ id: houseId }));
       }
     });
   }

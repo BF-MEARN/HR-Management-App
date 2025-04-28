@@ -1,3 +1,10 @@
+/**
+ * @desc    Delete a house by ID
+ * @route   DELETE /api/hr/housing/:id
+ * @access  HR only
+ */
+import mongoose from 'mongoose';
+
 import Employee from '../models/Employee.js';
 import FacilityReport from '../models/FacilityReport.js';
 import Housing from '../models/Housing.js';
@@ -42,21 +49,47 @@ export const createHouse = async (req, res) => {
   }
 };
 
-/**
- * @desc    Delete a house by ID
- * @route   DELETE /api/hr/housing/:id
- * @access  HR only
- */
 export const deleteHouse = async (req, res) => {
   try {
     const { id } = req.params;
+
+    // 1. Find all other houses
+    const otherHouses = await Housing.find({ _id: { $ne: id } });
+    if (otherHouses.length === 0) {
+      return res.status(400).json({
+        message: 'Cannot delete house — no other houses available to reassign residents.',
+      });
+    }
+
+    console.log(
+      'Found other houses:',
+      otherHouses.map((h) => h._id)
+    );
+
+    // 2. Find all residents of the house
+    const residents = await Employee.find({ houseId: new mongoose.Types.ObjectId(id) });
+    console.log('Residents to reassign:', residents.length);
+
+    // 3. Reassign each resident randomly
+    for (const resident of residents) {
+      const randomHouse = otherHouses[Math.floor(Math.random() * otherHouses.length)];
+
+      // Update employee's houseId
+      await Employee.updateOne({ _id: resident._id }, { houseId: randomHouse._id });
+
+      // Add employee to the new house's residents array
+      await Housing.updateOne({ _id: randomHouse._id }, { $addToSet: { residents: resident._id } });
+    }
+
+    // 4. Finally delete the old house
     await Housing.findByIdAndDelete(id);
-    res.status(204).end();
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to delete house', error: err.message });
+
+    res.status(200).json({ message: 'House deleted and residents reassigned randomly.' });
+  } catch (error) {
+    console.error('Failed to delete house:', error);
+    res.status(500).json({ message: 'Failed to delete house', error: error.message });
   }
 };
-
 /**
  * @desc    Get a house by ID
  * @route   GET /api/hr/housing/:id
