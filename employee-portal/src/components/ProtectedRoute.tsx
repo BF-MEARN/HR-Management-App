@@ -33,23 +33,28 @@ export function ProtectedRoute({
     }
   }, [user, employee]);
 
-  if (loading)
-    return (
-      <Backdrop open={loading}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
-    );
-
   if (isNotLoggedIn) {
     return <Navigate to={'/'} replace />;
   }
-  if (isOnboarding && requiredStatus != 'onboarding') {
+  if (!loading && isOnboarding && requiredStatus != 'onboarding') {
     return <Navigate to={'/onboard'} replace />;
   }
 
-  if (!isOnboarding && requiredStatus != 'onboarded') {
+  if (!loading && !isOnboarding && requiredStatus != 'onboarded') {
     return <Navigate to={'/personal-info'} replace />;
   }
 
-  return children;
+  return (
+    <>
+      {children}
+      {loading && (
+        <>
+          <Backdrop open={loading}>
+            <CircularProgress color="inherit" />
+          </Backdrop>
+        </>
+      )}
+      ;
+    </>
+  );
 }
