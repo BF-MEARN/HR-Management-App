@@ -54,3 +54,33 @@ export const getDocument = async (req, res) => {
     res.status(500).json({ message: 'Failed to generate presigned URL', error: err.message });
   }
 };
+
+export const getTemplate = async (req, res) => {
+  try {
+    const { template } = req.query;
+
+    if (!template) {
+      return res.status(400).json({ message: 'Template name is required' });
+    }
+
+    // Validate template name to prevent directory traversal
+    const validTemplates = ['Empty_Template.pdf', 'Sample_Template.pdf'];
+    if (!validTemplates.includes(template)) {
+      return res.status(400).json({ message: 'Invalid template requested' });
+    }
+
+    const key = `i983/${template}`;
+
+    // Get a presigned URL with download disposition
+    const url = await getPresignedGetUrl(key, 300, { asAttachment: true });
+
+    if (!url) {
+      return res.status(404).json({ message: 'Template file not found' });
+    }
+
+    res.status(200).json({ url });
+  } catch (error) {
+    console.error('Error generating template download URL:', error);
+    res.status(500).json({ message: 'Failed to generate download URL', error: error.message });
+  }
+};
