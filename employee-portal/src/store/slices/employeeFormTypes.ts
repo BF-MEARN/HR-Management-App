@@ -1,8 +1,8 @@
 import { Contact } from './employeeTypes';
 
 export type UploadedFile = {
-  name: string;
-  previewUrl: string;
+  name?: string;
+  previewUrl?: string;
   s3Key?: string;
 };
 
@@ -97,8 +97,8 @@ export const emptyDriverAndCarFormData: DriverAndCarFormData = {
 };
 
 const citizenOrPermanentResidentTypes = {
-  citizen: 'Citizen',
-  green_card: 'Permanent Resident (Green Card)',
+  Citizen: 'Citizen',
+  'Green Card': 'Permanent Resident (Green Card)',
 };
 const foreignerTypes = { 'H1-B': 'H1-B', L2: 'L2', F1: 'F1 (CPT/OPT)', H4: 'H4', other: 'Other' };
 
@@ -124,7 +124,7 @@ export interface WorkAuthorizationFormData {
 
 export const emptyWorkAuthorizationFormData: WorkAuthorizationFormData = {
   isCitizenOrPermanentResident: true,
-  authorizationType: 'citizen',
+  authorizationType: 'Citizen',
   extraAuthInfo: {},
 };
 

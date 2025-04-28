@@ -64,21 +64,25 @@ export interface Employee {
       endDate?: string;
       otherTitle?: string;
     };
-    optReceipt?: {
+    optReceipt: {
       status: string;
       file?: string;
+      feedback?: string;
     };
-    optEAD?: {
+    optEAD: {
       status: string;
       file?: string;
+      feedback?: string;
     };
-    i983?: {
+    i983: {
       status: string;
       file?: string;
+      feedback?: string;
     };
-    i20?: {
+    i20: {
       status: string;
       file?: string;
+      feedback?: string;
     };
     createdAt: string;
     updatedAt: string;

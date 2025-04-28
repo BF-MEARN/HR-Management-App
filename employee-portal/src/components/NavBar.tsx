@@ -8,6 +8,7 @@ import { resetUser } from '../store/slices/userSlice';
 import { api } from '../utils/utils';
 
 export default function NavDrawer() {
+  const userStatus = useAppSelector((state) => state.user.status);
   const user = useAppSelector((state) => state.user.user);
   const employee = useAppSelector((state) => state.employee.employee);
   const dispatch = useAppDispatch();
@@ -17,10 +18,10 @@ export default function NavDrawer() {
 
   useEffect(() => {
     const currentRoute = location.pathname;
-    if (!user && currentRoute !== '/') {
+    if (userStatus == 'failed' && currentRoute !== '/') {
       navigate('/');
     }
-  }, [user, location.pathname, navigate]);
+  }, [user, location.pathname, navigate, userStatus]);
 
   const handleLogout = async () => {
     await api('/user/logout', {

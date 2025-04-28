@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import { Box, Button, Card, CardActions, CardContent, Typography } from '@mui/material';
 
-import useErrorMap from '../../../contexts/error-map/useErrorMap';
+import useErrorMap from '../../../hooks/error-map/useErrorMap';
 import { useAppDispatch, useAppSelector } from '../../../store';
 import { updateContacts } from '../../../store/slices/employeeFormSlice';
 import { emptyContact } from '../../../store/slices/employeeFormTypes';

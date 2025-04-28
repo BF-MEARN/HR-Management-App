@@ -1,12 +1,15 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router';
 
+import { Backdrop, CircularProgress } from '@mui/material';
+
 import NavBar from './components/NavBar';
-import ErrorMapProvider from './contexts/error-map/ErrorMapProvider';
+import ErrorMapProvider from './hooks/error-map/ErrorMapProvider';
 import HousingPage from './pages/Housing';
 import LoginPage from './pages/Login';
+import NotFound from './pages/NotFound';
 import OnboardingApplicationPage from './pages/OnboardingApplication';
-import PersonalInformationPage from './pages/PersonalInfomation';
+import PersonalInformationPage from './pages/PersonalInformation';
 import RegisterPage from './pages/Register';
 import VisaStatusManagementPage from './pages/VisaStatusManagement';
 import { useAppDispatch, useAppSelector } from './store';
@@ -19,6 +22,16 @@ function App() {
   const userStatus = useAppSelector((state) => state.user.status);
   const employeeStatus = useAppSelector((state) => state.employee.status);
   const employee = useAppSelector((state) => state.employee.employee);
+
+  const [backdropOpen, setBackdropOpen] = useState(true);
+
+  useEffect(() => {
+    if (userStatus === 'pending' || employeeStatus === 'pending') {
+      setBackdropOpen(true);
+    } else {
+      setBackdropOpen(false);
+    }
+  }, [userStatus, dispatch, employeeStatus]);
 
   useEffect(() => {
     if (userStatus === 'idle') {
@@ -37,8 +50,13 @@ function App() {
       dispatch(updateFormsWithEmployee(employee));
     }
   }, [userStatus, dispatch, employeeStatus, employee]);
+
   return (
     <>
+      <Backdrop open={backdropOpen}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
+
       <BrowserRouter>
         <Routes>
           <Route element={<NavBar />}>
@@ -63,6 +81,7 @@ function App() {
             <Route path="housing" element={<HousingPage />} />
           </Route>
           <Route path="register/:token" element={<RegisterPage />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </>

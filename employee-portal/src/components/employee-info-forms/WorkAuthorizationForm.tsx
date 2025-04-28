@@ -11,7 +11,8 @@ import {
   Typography,
 } from '@mui/material';
 
-import useErrorMap from '../../contexts/error-map/useErrorMap';
+import useErrorMap from '../../hooks/error-map/useErrorMap';
+import { useTextFieldProps } from '../../hooks/useTextFieldProps';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { updateWorkAuth } from '../../store/slices/employeeFormSlice';
 import {
@@ -20,15 +21,16 @@ import {
 } from '../../store/slices/employeeFormTypes';
 import { uploadEmployeeDocument } from '../../utils/utils';
 import FileUploadWithPreview from '../FileUploadWithPreview';
-import { useTextFieldProps } from '../useTextFieldProps';
 import { EmployeeFormProps } from './formProps';
 
 export type WorkAuthorizationFormProps = {
   onF1OptDocumentChange: (f: File) => void;
+  enableDocumentUpload: boolean;
 } & EmployeeFormProps;
 
 export default function WorkAuthorizationForm({
   onF1OptDocumentChange,
+  enableDocumentUpload,
   forceCheck,
   readOnly,
 }: WorkAuthorizationFormProps) {
@@ -165,11 +167,12 @@ export default function WorkAuthorizationForm({
             Additional Info
           </Typography>
           <Grid container spacing={2}>
-            {formData.authorizationType == 'F1' && (
+            {enableDocumentUpload && formData.authorizationType == 'F1' && (
               <Grid size={{ xs: 12 }}>
                 <FileUploadWithPreview
                   previewURL={formData.extraAuthInfo.optReceipt?.previewUrl}
                   fileName={formData.extraAuthInfo.optReceipt?.name}
+                  s3Key={formData.extraAuthInfo.optReceipt?.s3Key}
                   previewOnly={readOnly}
                   type="document"
                   buttonText="Upload OPT Receipt"

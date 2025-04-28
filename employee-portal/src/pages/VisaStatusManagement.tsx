@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import {
   CheckCircle as CheckCircleIcon,
   CloudUpload as CloudUploadIcon,
+  Download as DownloadIcon,
   ErrorOutline as ErrorOutlineIcon,
   HourglassEmpty as HourglassEmptyIcon,
   RadioButtonUnchecked as RadioButtonUncheckedIcon,
@@ -15,6 +16,7 @@ import {
   CardContent,
   Chip,
   Divider,
+  Paper,
   Step,
   StepContent,
   StepLabel,
@@ -23,33 +25,9 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 
-interface UserData {
-  _id: string;
-  [key: string]: unknown;
-}
-
-interface VisaStatus {
-  optReceipt: {
-    status: string;
-    feedback?: string;
-  };
-  optEAD: {
-    status: string;
-    feedback?: string;
-  };
-  i983: {
-    status: string;
-    feedback?: string;
-  };
-  i20: {
-    status: string;
-    feedback?: string;
-  };
-  employeeId: string;
-  workAuthorization: {
-    type: string;
-  };
-}
+import FileUploadWithPreview from '../components/FileUploadWithPreview';
+import { useAppDispatch, useAppSelector } from '../store';
+import { fetchEmployeeData } from '../store/slices/employeeSlice';
 
 interface UploadComponentProps {
   fileType: string;
@@ -67,52 +45,31 @@ interface DocumentStepProps {
 }
 
 const VisaStatusManagementPage = () => {
-  const [userData, setUserData] = useState<UserData | null>(null);
+  const userData = useAppSelector((state) => state.employee.employee);
+  const dispatch = useAppDispatch();
   const [file, setFile] = useState<File | null>(null);
-  const [userVisaStatus, setUserVisaStatus] = useState<VisaStatus | null>(null);
+  const userVisaStatus = userData?.visaInfo;
   const [activeStep, setActiveStep] = useState(0);
 
-  const fetchUserData = async () => {
-    try {
-      const res = await axios.get('http://localhost:3000/api/employee/personal-info', {
-        withCredentials: true,
-      });
-
-      setUserData(res.data.employee);
-    } catch (error) {
-      console.log(error);
-    }
+  const fetchUserData = () => {
+    dispatch(fetchEmployeeData());
   };
 
-  const fetchVisaStatus = async () => {
-    try {
-      const res = await axios.get(
-        `http://localhost:3000/api/employee/onboarding/visa-status?_id=${userData?._id}`,
-        {
-          withCredentials: true,
-        }
-      );
-
-      setUserVisaStatus(res.data.visaStatus);
-
-      // Set active step based on status
-      if (res.data.visaStatus) {
-        if (res.data.visaStatus.i20.status === 'Approved') {
-          setActiveStep(4); // All complete
-        } else if (res.data.visaStatus.i983.status === 'Approved') {
-          setActiveStep(3); // I-20 is next
-        } else if (res.data.visaStatus.optEAD.status === 'Approved') {
-          setActiveStep(2); // I-983 is next
-        } else if (res.data.visaStatus.optReceipt.status === 'Approved') {
-          setActiveStep(1); // OPT EAD is next
-        } else {
-          setActiveStep(0); // OPT Receipt is next
-        }
+  useEffect(() => {
+    if (userVisaStatus) {
+      if (userVisaStatus.i20.status === 'Approved') {
+        setActiveStep(4); // All complete
+      } else if (userVisaStatus.i983.status === 'Approved') {
+        setActiveStep(3); // I-20 is next
+      } else if (userVisaStatus.optEAD.status === 'Approved') {
+        setActiveStep(2); // I-983 is next
+      } else if (userVisaStatus.optReceipt.status === 'Approved') {
+        setActiveStep(1); // OPT EAD is next
+      } else {
+        setActiveStep(0); // OPT Receipt is next
       }
-    } catch (error) {
-      console.log(error);
     }
-  };
+  }, [userVisaStatus]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     if (e.target.files) {
@@ -143,6 +100,7 @@ const VisaStatusManagementPage = () => {
           _id: userData?._id,
           documentUpdate: {
             type: fileType.slice(0, fileType.length - 4),
+            status: 'Pending Approval',
           },
         };
 
@@ -161,6 +119,33 @@ const VisaStatusManagementPage = () => {
       }
     } catch (err) {
       console.error('Upload error:', err);
+    }
+  };
+
+  const downloadTemplate = async (templateType: 'empty' | 'sample') => {
+    try {
+      const fileName = templateType === 'empty' ? 'Empty_Template.pdf' : 'Sample_Template.pdf';
+
+      // Request a presigned URL with the asAttachment parameter
+      const response = await axios.get(
+        `http://localhost:3000/api/employee/docs/template-download`,
+        {
+          params: {
+            template: fileName,
+          },
+          withCredentials: true,
+        }
+      );
+
+      if (response.data && response.data.url) {
+        // Open the presigned URL to trigger download
+        window.open(response.data.url, '_blank');
+      } else {
+        throw new Error('Failed to get download URL');
+      }
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('Failed to download template. Please try again later.');
     }
   };
 
@@ -259,6 +244,7 @@ const VisaStatusManagementPage = () => {
     disabledMessage = '',
   }: DocumentStepProps) => {
     const statusInfo = getStatusInfo(status);
+    const isI983 = title === 'I-983';
 
     return (
       <Box sx={{ mb: 3 }}>
@@ -307,27 +293,75 @@ const VisaStatusManagementPage = () => {
           {status === 'Rejected' && <Alert severity="error">Rejected. {feedback}</Alert>}
         </div>
 
+        {/* I-983 Template Download Section */}
+        {isI983 && (status === 'Not Uploaded' || status === 'Rejected') && (
+          <Paper
+            elevation={2}
+            className="p-5 mb-5 bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500"
+          >
+            <Typography variant="h6" className="font-medium text-indigo-800 mb-3">
+              Download I-983 Templates
+            </Typography>
+            <Typography variant="body2" className="mb-4 text-gray-700">
+              Before submitting your I-983 form, please download both templates below. Use the
+              sample template as a reference to correctly fill out the empty template.
+            </Typography>
+            <div className="flex flex-wrap gap-3 mb-2 mt-3">
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<DownloadIcon />}
+                onClick={() => downloadTemplate('empty')}
+                size="medium"
+                className="bg-blue-600 hover:bg-blue-700 shadow-md"
+              >
+                Empty Template
+              </Button>
+              <Button
+                variant="outlined"
+                color="secondary"
+                startIcon={<DownloadIcon />}
+                onClick={() => downloadTemplate('sample')}
+                size="medium"
+                className="border-indigo-500 text-indigo-600 hover:bg-indigo-50"
+              >
+                Sample Template
+              </Button>
+            </div>
+          </Paper>
+        )}
+
         {(status === 'Not Uploaded' || status === 'Rejected') && (
-          <UploadComponent
-            fileType={fileType}
-            isDisabled={isDisabled}
-            disabledMessage={disabledMessage}
-          />
+          <>
+            <Box sx={{ display: 'none' }}>
+              <UploadComponent
+                fileType={fileType}
+                isDisabled={isDisabled}
+                disabledMessage={disabledMessage}
+              />
+            </Box>
+            <FileUploadWithPreview
+              type="document"
+              previewOnly={isDisabled}
+              fileName={file?.name}
+              previewURL={file ? URL.createObjectURL(file) : undefined}
+              onFileSelect={(f) => {
+                setFile(f);
+              }}
+            />
+            <Button
+              variant="contained"
+              onClick={() => handleUpload(fileType)}
+              color="primary"
+              disabled={isDisabled}
+            >
+              Submit
+            </Button>
+          </>
         )}
       </Box>
     );
   };
-
-  useEffect(() => {
-    fetchUserData();
-  }, []);
-
-  useEffect(() => {
-    if (userData?._id) {
-      fetchVisaStatus();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userData]);
 
   return (
     <div className="max-w-[1000px] mx-auto px-2 py-4">

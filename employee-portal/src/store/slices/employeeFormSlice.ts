@@ -131,6 +131,11 @@ const employeeFormSlice = createSlice({
         reference,
         emergencyContacts,
       } = action.payload;
+
+      const profilePictureName = profilePicture?.split('/').pop();
+      const driverLicenseName = driverLicense?.file?.split('/').pop();
+      const visaDocName = visaInfo.optReceipt?.file?.split('/').pop();
+
       state.personalInfo = {
         firstName,
         lastName,
@@ -145,8 +150,8 @@ const employeeFormSlice = createSlice({
         gender,
         profilePicture: profilePicture
           ? {
-              name: profilePicture,
-              previewUrl: '',
+              name: profilePictureName as string,
+              previewUrl: undefined,
               s3Key: profilePicture,
             }
           : undefined,
@@ -158,8 +163,8 @@ const employeeFormSlice = createSlice({
               number: driverLicense.number,
               expirationDate: formatDateString(driverLicense.expirationDate),
               license: {
-                name: driverLicense.file,
-                previewUrl: '',
+                name: driverLicenseName as string,
+                previewUrl: undefined,
                 s3Key: driverLicense.file,
               },
             }
@@ -176,8 +181,8 @@ const employeeFormSlice = createSlice({
           visaTitle: visaInfo.workAuthorization.otherTitle,
           optReceipt: visaInfo.optReceipt?.file
             ? {
-                name: visaInfo.optReceipt?.file,
-                previewUrl: '',
+                name: visaDocName as string,
+                previewUrl: undefined,
                 s3Key: visaInfo.optReceipt?.file,
               }
             : undefined,

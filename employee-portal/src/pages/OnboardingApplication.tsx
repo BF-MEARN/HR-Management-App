@@ -11,7 +11,7 @@ import PhoneContactForm from '../components/employee-info-forms/PhoneContactForm
 import WorkAuthorizationForm from '../components/employee-info-forms/WorkAuthorizationForm';
 import EmergencyContactForm from '../components/employee-info-forms/contact-forms/EmergencyContactForm';
 import ReferenceContactForm from '../components/employee-info-forms/contact-forms/ReferenceContactForm';
-import useErrorMap from '../contexts/error-map/useErrorMap';
+import useErrorMap from '../hooks/error-map/useErrorMap';
 import { useAppDispatch, useAppSelector } from '../store';
 import { postOnboardingSubmission } from '../store/slices/employeeFormSlice';
 
@@ -164,6 +164,7 @@ export default function OnBoardingApplicationPage() {
         return (
           <WorkAuthorizationForm
             onF1OptDocumentChange={(f: File) => (f1OptDocRef.current = f)}
+            enableDocumentUpload={true}
             readOnly={readOnly}
             forceCheck={forceCheckEnabled}
           />

@@ -1,11 +1,11 @@
 import { Box, Checkbox, FormControlLabel, Grid, TextField, Typography } from '@mui/material';
 
-import useErrorMap from '../../contexts/error-map/useErrorMap';
+import useErrorMap from '../../hooks/error-map/useErrorMap';
+import { useTextFieldProps } from '../../hooks/useTextFieldProps';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { updateDriverAndCar } from '../../store/slices/employeeFormSlice';
 import { uploadEmployeeDocument } from '../../utils/utils';
 import FileUploadWithPreview from '../FileUploadWithPreview';
-import { useTextFieldProps } from '../useTextFieldProps';
 import { EmployeeFormProps } from './formProps';
 
 export type DriverAndCarInfoFormProps = {
@@ -115,6 +115,7 @@ function DriverAndCarInfoForm({
               previewURL={formData.driverLicense.license.previewUrl}
               type="document"
               fileName={formData.driverLicense.license.name}
+              s3Key={formData.driverLicense.license.s3Key}
               buttonText="Upload Driver's License"
               previewOnly={readOnly}
               onFileSelect={async (f) => {

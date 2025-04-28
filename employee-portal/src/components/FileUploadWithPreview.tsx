@@ -1,5 +1,8 @@
-import { Download } from '@mui/icons-material';
-import { Box, Button, IconButton, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
+
+import { Box, Button, Link, Typography } from '@mui/material';
+
+import { getDocumentUrl } from '../utils/utils';
 
 const AcceptedTypes = {
   image: 'image/png,image/jpeg',
@@ -10,6 +13,7 @@ export interface FileUploadWithPreviewProps {
   previewURL?: string;
   fileName?: string;
   previewOnly?: boolean;
+  s3Key?: string;
   buttonText?: string;
   onFileSelect?: (file: File) => void;
   type: keyof typeof AcceptedTypes;
@@ -20,7 +24,8 @@ export interface FileUploadWithPreviewProps {
 export default function FileUploadWithPreview({
   previewURL,
   fileName,
-  buttonText = 'Upload File...',
+  buttonText = 'Select File...',
+  s3Key,
   onFileSelect = () => {},
   previewOnly = false,
   type = 'any',
@@ -28,8 +33,19 @@ export default function FileUploadWithPreview({
   height = '2.5rem',
 }: FileUploadWithPreviewProps) {
   const accept = AcceptedTypes[type];
+
+  const [fetchedURL, setFetchedURL] = useState<undefined | string>(undefined);
+  useEffect(() => {
+    async function getFileURL() {
+      if (fetchedURL || !s3Key || previewURL) return;
+      setFetchedURL(await getDocumentUrl(s3Key));
+    }
+    getFileURL();
+  }, [fetchedURL, previewURL, s3Key]);
+
+  const url = previewURL ?? fetchedURL;
   const renderContent = () => {
-    if (!previewURL || !fileName) {
+    if (!url || !fileName) {
       return (
         <Typography variant="body2" color="textSecondary">
           No file uploaded
@@ -40,7 +56,7 @@ export default function FileUploadWithPreview({
     if (type == 'image') {
       return (
         <img
-          src={previewURL}
+          src={url}
           alt="Preview"
           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
         />
@@ -49,20 +65,16 @@ export default function FileUploadWithPreview({
 
     return (
       <Box display="flex" alignItems="center" gap={1}>
-        <Typography>{fileName}</Typography>
-        {previewOnly && (
-          <IconButton
-            aria-label="download"
-            component="a"
-            href={previewURL}
-            target="_blank"
-            rel="noopener noreferrer"
-            download={fileName}
-            size="small"
-          >
-            <Download />
-          </IconButton>
-        )}
+        <Link
+          component="button"
+          variant="body2"
+          onClick={(e) => {
+            e.preventDefault();
+            window.open(url);
+          }}
+        >
+          {fileName}
+        </Link>
       </Box>
     );
   };
